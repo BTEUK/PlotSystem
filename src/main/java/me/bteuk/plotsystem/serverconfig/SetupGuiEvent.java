@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.serverconfig;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,13 +12,13 @@ import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
-public class InventoryClicked implements Listener {
+public class SetupGuiEvent implements Listener {
 
 	Main instance;
 	NavigationSQL navigationSQL;
 	PlotSQL plotSQL;
 
-	public InventoryClicked(Main plugin, NavigationSQL navigationSQL, PlotSQL plotSQL) {
+	public SetupGuiEvent(Main plugin, NavigationSQL navigationSQL, PlotSQL plotSQL) {
 
 		instance = plugin;
 		this.navigationSQL = navigationSQL;
@@ -33,7 +34,7 @@ public class InventoryClicked implements Listener {
 			return;
 		}
 
-		String title = e.getView().getTitle();
+		Component title = e.getView().title();
 
 		User u = Main.getInstance().getUser((Player) e.getWhoClicked());
 

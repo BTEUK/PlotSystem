@@ -19,7 +19,7 @@ public class JoinEvent implements Listener {
 		//If the player has the permission to configure the server then open the gui.
 		if (e.getPlayer().hasPermission("uknet.plots.configure")) {
 			
-			e.getPlayer().openInventory(SetupGui.Gui(e.getPlayer()));
+			e.getPlayer().openInventory(SetupGui.Gui());
 			
 		}		
 	}

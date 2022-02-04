@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.plotsystem.serverconfig.SetupGuiEvent;
+import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -88,21 +90,14 @@ public class Main extends JavaPlugin {
 	
 	//Plot Database
 	private String plot_database;
-	private PlotSQL plotSQL; 
+	private PlotSQL plotSQL;
 	private DataSource plot_dataSource;
 
-	public PlayerData playerData;
-	public PlotData plotData;
-	public TutorialData tutorialData;
-	public AreaData areaData;
-	public DenyData denyData;
-	public AcceptData acceptData;
-	public BookData bookData;
-	public MessageData messageData;
-	public PointsData pointsData;
-	public HologramData hologramData;
-	public HologramText hologramText;
-	
+	//Navigation Database
+	private String navigation_database;
+	private NavigationSQL navigationSQL;
+	private DataSource navigation_dataSource;
+
 	public Timers timers;
 
 
@@ -139,7 +134,7 @@ public class Main extends JavaPlugin {
 	Holograms holograms;
 	
 	//Server Name
-	public static String SERVER_TYPE;
+	public static String SERVER_NAME;
 
 	//Set the default world generation to be void.
 	@Override
@@ -158,44 +153,34 @@ public class Main extends JavaPlugin {
 		
 		if (!config.getBoolean("enabled")) {
 			
-			Bukkit.getConsoleSender().sendMessage(Utils.chat("&cThe config must be configured before the plugin can be enabled!"));
-			Bukkit.getConsoleSender().sendMessage(Utils.chat("&cPlease edit the database values in the config and then set 'enabled: true'"));
+			Bukkit.getLogger().warning(Utils.chat("&cThe config must be configured before the plugin can be enabled!"));
+			Bukkit.getLogger().warning(Utils.chat("&cPlease edit the database values in the config, give the server a unique name and then set 'enabled: true'"));
 			return;
 			
 		}
-		
-		SERVER_TYPE = "Plot";
 
 		//Setup MySQL		
 		try {
 			
 			plot_database = config.getString("database.plot");
-			plot_dataSource = mysqlSetup(plot_database);		
+			plot_dataSource = mysqlSetup(plot_database);
 			plotSQL = new PlotSQL(plot_dataSource);
 
-			/*
-			playerData = new PlayerData(dataSource);
-			plotData = new PlotData(dataSource);
-			tutorialData = new TutorialData(dataSource);
-			areaData = new AreaData(dataSource);
-			denyData = new DenyData(dataSource);
-			acceptData = new AcceptData(dataSource);
-			bookData = new BookData(dataSource);
-			messageData = new MessageData(dataSource);
-			pointsData = new PointsData(dataSource);
-			hologramData = new HologramData(dataSource);
-			hologramText = new HologramText(dataSource);
-			*/
+			navigation_database = config.getString("database.navigation");
+			navigation_dataSource = mysqlSetup(navigation_database);
+			navigationSQL = new NavigationSQL(navigation_dataSource);
 
 		} catch (SQLException /*| IOException*/ e) {
 			e.printStackTrace();
-			Bukkit.getConsoleSender().sendMessage(Utils.chat("&cFailed to connect to the database, please check that you have set the config values correctly."));
+			Bukkit.getLogger().severe(Utils.chat("&cFailed to connect to the database, please check that you have set the config values correctly."));
 			return;
 		}
+
+		SERVER_NAME = config.getString("server_name");
 		
-		if (!plotSQL.serverSetup(config.getString("server_name"))) {
-			
-			Bukkit.getConsoleSender().sendMessage(Utils.chat("&cThe server has not yet been configured, join the server and run the command /configure"));
+		if (!plotSQL.serverSetup(SERVER_NAME)) {
+
+			Bukkit.getLogger().warning(Utils.chat("&cThe server has not yet been configured, please join to configure the server!"));
 			configureServer();
 			
 		} else {
@@ -208,13 +193,14 @@ public class Main extends JavaPlugin {
 	public void configureServer() {
 		
 		new JoinEvent(this);
+		new SetupGuiEvent(this, navigationSQL, plotSQL);
 		SetupGui.initialize();
 		
 	}
 	
 	public void enableServer() {
 		
-		plotData.clearReview();
+		//plotData.clearReview();
 
 		//Bungeecord
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -241,14 +227,14 @@ public class Main extends JavaPlugin {
 		tutorialGui.setItemMeta(meta3);
 
 		//Holograms
-		holograms = new Holograms(hologramData, hologramText, playerData);
-		holograms.create();
+		//holograms = new Holograms(hologramData, hologramText, playerData);
+		//holograms.create();
 
 		//Listeners
 		new JoinServer(this);
-		new QuitServer(this, tutorialData, playerData, plotData);
+		//new QuitServer(this, tutorialData, playerData, plotData);
 		new InventoryClicked(this);
-		new ClaimEnter(this, plotData, playerData);
+		//new ClaimEnter(this, plotData, playerData);
 		new PlayerInteract(this, plotSQL);
 
 		new ItemSpawn(this);
@@ -265,7 +251,7 @@ public class Main extends JavaPlugin {
 		getCommand("tutorial").setExecutor(new TutorialCommand());
 		getCommand("tutorialStage").setExecutor(new TutorialStage());
 
-		getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
+		//getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
 
 		//Tab Completer
 		getCommand("tutorial").setTabCompleter(new TutorialTabCompleter());
@@ -301,16 +287,16 @@ public class Main extends JavaPlugin {
 		for (User u: users) {
 
 			//Set tutorialStage in PlayData.
-			tutorialData.updateValues(u);
+			//tutorialData.updateValues(u);
 
 			//Update the last online time of player.
-			playerData.updateTime(u.uuid);
+			//playerData.updateTime(u.uuid);
 
 			//If the player is in a review, cancel it.
 			if (u.review != null) {
 
 				WorldGuardFunctions.removeMember(u.review.plot, u.uuid);
-				plotData.setStatus(u.review.plot, "submitted");
+				//plotData.setStatus(u.review.plot, "submitted");
 				u.review.editBook.unregister();
 				u.player.getInventory().setItem(4, u.review.previousItem);
 				u.review = null;

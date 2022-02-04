@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
+import me.bteuk.plotsystem.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -406,4 +407,25 @@ public class NavigationSQL {
 		}
 	}
 
+	//Adds a new server to the database
+	public boolean addServer() {
+
+		//Create a statement to select the server name.
+		try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+				"INSERT INTO server_data(name, type) VALUES(?, ?);"
+		)) {
+
+			statement.setString(1, Main.SERVER_NAME);
+			statement.setString(2, "plot");
+			statement.executeUpdate();
+
+			return true;
+
+		} catch (SQLException sql) {
+
+			//If for some reason an error occures in the sql then return false.
+			sql.printStackTrace();
+			return false;
+		}
+	}
 }
