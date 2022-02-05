@@ -13,8 +13,7 @@ import me.bteuk.plotsystem.reviewing.FeedbackGui;
 import me.bteuk.plotsystem.reviewing.Review;
 import me.bteuk.plotsystem.reviewing.ReviewGui;
 import me.bteuk.plotsystem.tutorial.TutorialGui;
-import me.bteuk.plotsystem.utils.ClaimFunctions;
-import me.bteuk.plotsystem.utils.Plots;
+import me.bteuk.plotsystem.plots.PlotFunctions;
 import me.bteuk.plotsystem.utils.RankValues;
 import me.bteuk.plotsystem.utils.Ranks;
 import me.bteuk.plotsystem.utils.User;
@@ -136,7 +135,7 @@ public class MainGui {
 			u.previousGui = "main";
 			p.openInventory(TutorialGui.GUI(u));
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Selection Tool")) {
-			Plots.giveSelectionTool(u);
+			PlotFunctions.giveSelectionTool(u);
 			p.closeInventory();
 
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Menu")) {
@@ -172,7 +171,7 @@ public class MainGui {
 					u.tutorial.complete = true;
 					Ranks.applicant(u);
 					u.player.teleport(Main.spawn);
-					u.plots = new Plots();
+					//u.plots = new Plots();
 					return;
 				} else {
 					p.sendMessage(Utils.chat("&cYour selection does not include all of the property, please try again!"));
@@ -199,32 +198,16 @@ public class MainGui {
 
 			//Check whether the player has selected the corners correctly.
 			//Has selected at least 3 points to create a polygon.
-			if (u.plots.vector.size() >= 3) {
+			if (u.plotFunctions.size() < 3) {
 
-				//Does not exceed the size.
-				if (Plots.largestDistance(u.plots.vector) > RankValues.maxDis(p)) {
-					p.sendMessage(Utils.chat("&cYour selection is too large!"));
-					p.closeInventory();
-					return;
-
-				}
-
-				//Is not too small.
-				if (Plots.largestDistance(u.plots.vector) < 5) {
-					p.sendMessage(Utils.chat("&cYour selection is too small!"));
-					p.closeInventory();
-					return;
-
-				}
-
-			} else {
 				p.sendMessage(Utils.chat("&cYou must select a minimum of 3 points to create a plot!"));
 				p.closeInventory();
 				return;
+
 			}
 
 			//Create claim
-			p.sendMessage(ClaimFunctions.createClaim(u, u.plots.vector));
+			p.sendMessage(u.plotFunctions.createPlot());
 			p.closeInventory();
 			return;	
 

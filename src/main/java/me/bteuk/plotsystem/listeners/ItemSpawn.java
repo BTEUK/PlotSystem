@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
+import me.bteuk.plotsystem.tutorial.Tutorial;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +14,7 @@ public class ItemSpawn implements Listener {
 	public ItemSpawn(Main plugin) {
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+
 	}
 	
 	@EventHandler
@@ -20,13 +22,11 @@ public class ItemSpawn implements Listener {
 		
 		ItemStack item = e.getEntity().getItemStack();
 		
-		if (item.equals(Main.gui) || item.equals(Main.tutorialGui)) {
-			e.setCancelled(true);
-		}
-		
-	}
-	
-	
-	
+		if (item.equals(Main.gui) || item.equals(Tutorial.tutorialGui)) {
 
+			e.setCancelled(true);
+
+		}
+
+	}
 }

@@ -6,13 +6,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.tutorial.Tutorial;
+import me.bteuk.plotsystem.tutorial.TutorialInfo;
 import me.bteuk.plotsystem.utils.Inactive;
 import me.bteuk.plotsystem.utils.User;
 
 public class JoinServer implements Listener {
 
-	Tutorial t;
+	TutorialInfo t;
 	
 	public JoinServer(Main plugin) {
 

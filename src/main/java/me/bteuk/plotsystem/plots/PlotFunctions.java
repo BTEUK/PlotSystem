@@ -1,9 +1,13 @@
-package me.bteuk.plotsystem.utils;
+package me.bteuk.plotsystem.plots;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import me.bteuk.plotsystem.plots.Plots;
+import me.bteuk.plotsystem.utils.Point;
+import me.bteuk.plotsystem.utils.User;
+import me.bteuk.plotsystem.utils.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -30,7 +34,7 @@ import me.bteuk.plotsystem.mysql.PlotData;
  * This class deals with the selection of plots by relevant players.
  * All data about the selection is stored here.
  */
-public class Plots {
+public class PlotFunctions {
 	
 	//Stores a reference to the user for simplicity.
 	private User u;
@@ -42,7 +46,7 @@ public class Plots {
 	private World world;
 	
 	//Create a new instance of plots.
-	public Plots(User u) {
+	public PlotFunctions(User u) {
 		
 		this.u = u;
 		vector = new ArrayList<BlockVector2>();
@@ -90,16 +94,16 @@ public class Plots {
 		PlayerInventory i = u.player.getInventory();
 
 		//Check if the player already has the selection tool in their inventory.
-		if (i.contains(Main.selectionTool)) {
+		if (i.contains(Plots.selectionTool)) {
 			
 			//Get the selection tool from their inventory and swap it with the item in their hand.			
-			i.setItem(i.first(Main.selectionTool), i.getItemInMainHand());
-			i.setItemInMainHand(Main.selectionTool);
+			i.setItem(i.first(Plots.selectionTool), i.getItemInMainHand());
+			i.setItemInMainHand(Plots.selectionTool);
 		
 		} else {
 			
 			//If they don't have the selection tool already set it in their main hand.
-			i.setItemInMainHand(Main.selectionTool);
+			i.setItemInMainHand(Plots.selectionTool);
 			
 		}
 	}

@@ -38,7 +38,7 @@ public class Timers {
 
 	public Timers(Main instance, FileConfiguration config, DataSource dataSource) {
 		this.instance = instance;
-		this.users = instance.users;
+		this.users = instance.getUsers();
 		
 		//Are normal points enabled
 		//POINTS_ENABLED = config.getBoolean("points_enabled");

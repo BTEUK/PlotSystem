@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.tutorial;
+package me.bteuk.plotsystem.listeners.tutorial;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

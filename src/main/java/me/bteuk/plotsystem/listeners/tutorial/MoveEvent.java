@@ -1,5 +1,6 @@
-package me.bteuk.plotsystem.tutorial;
+package me.bteuk.plotsystem.listeners.tutorial;
 
+import me.bteuk.plotsystem.tutorial.TutorialConstants;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;

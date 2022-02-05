@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
+import me.bteuk.plotsystem.plots.Plots;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,7 +56,7 @@ public class PlayerInteract implements Listener {
 		}
 		
 		//Selection tool
-		if (u.player.getInventory().getItemInMainHand().equals(Main.selectionTool)) {
+		if (u.player.getInventory().getItemInMainHand().equals(Plots.selectionTool)) {
 			
 			//You must have this permission to use the plot selection tool.
 			//uknet = uknet plugins, plots = plotserver plugin, select = selection tool.

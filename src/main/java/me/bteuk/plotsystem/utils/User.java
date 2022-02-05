@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.utils;
 
+import me.bteuk.plotsystem.plots.PlotFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.TutorialData;
 import me.bteuk.plotsystem.reviewing.Review;
-import me.bteuk.plotsystem.tutorial.Tutorial;
+import me.bteuk.plotsystem.tutorial.TutorialInfo;
 
 public class User {
 
@@ -19,13 +20,14 @@ public class User {
 	
 	public int buildingTime;
 	
-	public Plots plots;
+	public PlotFunctions plotFunctions;
 	public int currentPlot = 0;
 	public String currentStatus = null;
 	public int attempt;
 	
 	public int inPlot = 0;
-	public String plotOwner = null;
+	public boolean plotOwner;
+	public boolean plotMember;
 	
 	public String role;
 	
@@ -34,7 +36,7 @@ public class User {
 	public ItemStack slot5;
 	public ItemStack slot9;
 	
-	public Tutorial tutorial;
+	public TutorialInfo tutorial;
 	
 	public String previousGui;
 	
@@ -64,15 +66,16 @@ public class User {
 			
 		//Continue the tutorial from where they last were.
 		if (!(tutorialData.tutorialComplete(uuid))) {
-			tutorial = new Tutorial(this);
+			tutorial = new TutorialInfo(this);
 			Bukkit.getScheduler().runTaskLater (Main.getInstance(), () -> tutorial.continueTutorial(), 20);
 		} else {
-			tutorial = new Tutorial(this, true);
+			tutorial = new TutorialInfo(this, true);
 			Ranks.applicant(this);
 		}
 		
-		//Create plots map.
-		plots = new Plots();
+		//Create plot functions class.
+		//This handles the selection and creation of new plots.
+		plotFunctions = new PlotFunctions(this);
 		
 		//Set current world
 		world = player.getWorld();
