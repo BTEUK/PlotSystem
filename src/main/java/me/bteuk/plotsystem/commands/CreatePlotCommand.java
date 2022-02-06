@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.plotsystem.gui.plots.CreatePlotGui;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -34,7 +35,7 @@ public class CreatePlotCommand implements CommandExecutor {
 		}
 		
 		//Check if the plot is valid
-		if (u.plots.size() < 3) {
+		if (u.plotFunctions.size() < 3) {
 			
 			u.player.sendMessage(Utils.chat("&cYou must select at least 3 points for a valid plot!"));
 			return true;
@@ -42,7 +43,8 @@ public class CreatePlotCommand implements CommandExecutor {
 		}
 		
 		//Open the plot creation menu
-		u.player.openInventory(CreatePlotGui.Gui(u));		
+		u.plotFunctions.area();
+		u.player.openInventory(CreatePlotGui.Gui(u));
 		return true;
 		
 	}	

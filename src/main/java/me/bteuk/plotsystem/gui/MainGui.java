@@ -135,7 +135,7 @@ public class MainGui {
 			u.previousGui = "main";
 			p.openInventory(TutorialGui.GUI(u));
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Selection Tool")) {
-			PlotFunctions.giveSelectionTool(u);
+			u.plotFunctions.giveSelectionTool();
 			p.closeInventory();
 
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Menu")) {
@@ -205,11 +205,6 @@ public class MainGui {
 				return;
 
 			}
-
-			//Create claim
-			p.sendMessage(u.plotFunctions.createPlot());
-			p.closeInventory();
-			return;	
 
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Head Database")) {
 

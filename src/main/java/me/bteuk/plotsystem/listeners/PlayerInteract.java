@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.plots.Plots;
+import me.bteuk.plotsystem.tutorial.Tutorial;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,14 +42,14 @@ public class PlayerInteract implements Listener {
 		User u = Main.getInstance().getUser(e.getPlayer());
 
 		if (e.getPlayer().getOpenInventory().getType() != InventoryType.CRAFTING && e.getPlayer().getOpenInventory().getType() != InventoryType.CREATIVE) {
-		    return;
+			return;
 		}
 		
 		if (e.getPlayer().getInventory().getItemInMainHand().equals(Main.gui)) {
 			e.setCancelled(true);
 			e.getPlayer().closeInventory();
 			e.getPlayer().openInventory(MainGui.GUI(u));
-		} else if (e.getPlayer().getInventory().getItemInMainHand().equals(Main.tutorialGui)) {
+		} else if (e.getPlayer().getInventory().getItemInMainHand().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 			u.player.closeInventory();
 			u.previousGui = "none";
@@ -89,7 +90,7 @@ public class PlayerInteract implements Listener {
 				}
 				
 				//Passed the checks, start a new selection at the clicked block.
-				u.plots.startSelection(e.getClickedBlock());
+				u.plotFunctions.startSelection(e.getClickedBlock());
 				u.player.sendMessage(Utils.chat("&aStarted a new selection at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
 				//If the player right clicks then add a point to the existing selection.
@@ -98,7 +99,7 @@ public class PlayerInteract implements Listener {
 				e.setCancelled(true);
 				
 				//Check if they are making their plot in the same world as their first point.
-				if (!u.player.getWorld().equals(u.plots.world())) {
+				if (!u.player.getWorld().equals(u.plotFunctions.world())) {
 					
 					u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection."));
 					
@@ -112,7 +113,7 @@ public class PlayerInteract implements Listener {
 				}
 
 				//If the player hasn't selected their first point cancel.
-				if (u.plots.size() == 0) {
+				if (u.plotFunctions.size() == 0) {
 					
 					u.player.sendMessage(Utils.chat("&cYou must first begin your selection with left click!"));
 					return;
@@ -127,7 +128,12 @@ public class PlayerInteract implements Listener {
 					
 				}
 
-				u.plots.addPoint(e.getClickedBlock());
+				if (!u.plotFunctions.addPoint(e.getClickedBlock())) {
+
+					u.player.sendMessage(Utils.chat("&cThis point is more than 500 blocks away from the first point."));
+					return;
+
+				}
 				u.player.sendMessage(Utils.chat("&aAdded point at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
 			}
@@ -140,7 +146,7 @@ public class PlayerInteract implements Listener {
 	@EventHandler
 	public void swapHands(PlayerSwapHandItemsEvent e) {
 		
-		if (e.getOffHandItem().equals(Main.gui) || e.getOffHandItem().equals(Main.tutorialGui)) {
+		if (e.getOffHandItem().equals(Main.gui) || e.getOffHandItem().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 		}
 		
@@ -149,7 +155,7 @@ public class PlayerInteract implements Listener {
 	@EventHandler
 	public void dropItem(PlayerDropItemEvent e) {
 		
-		if (e.getItemDrop().getItemStack().equals(Main.gui) || e.getItemDrop().getItemStack().equals(Main.tutorialGui)) {
+		if (e.getItemDrop().getItemStack().equals(Main.gui) || e.getItemDrop().getItemStack().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 		}
 		
@@ -157,7 +163,7 @@ public class PlayerInteract implements Listener {
 	
 	@EventHandler
 	public void moveItem(InventoryMoveItemEvent e) {
-		if (e.getItem().equals(Main.gui) || e.getItem().equals(Main.tutorialGui)) {
+		if (e.getItem().equals(Main.gui) || e.getItem().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 		}
 		
@@ -165,10 +171,10 @@ public class PlayerInteract implements Listener {
 	
 	@EventHandler
 	public void moveItem(InventoryDragEvent e) {
-		if (e.getOldCursor().equals(Main.gui) || e.getOldCursor().equals(Main.tutorialGui)) {
+		if (e.getOldCursor().equals(Main.gui) || e.getOldCursor().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 		}
-		if (e.getCursor().equals(Main.gui) || e.getCursor().equals(Main.tutorialGui)) {
+		if (e.getCursor().equals(Main.gui) || e.getCursor().equals(Tutorial.tutorialGui)) {
 			e.setCancelled(true);
 		}
 		

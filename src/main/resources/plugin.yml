@@ -8,29 +8,29 @@ api-version: 1.17
 commands:
   createplot:
     usage: /<command>
-    description: Allows the creation of new plots for the plotsystem.
-    plotsystem:
-      aliases: [ ps ]
-      usage: /<command>
-      description: Includes all the commands related to the plot system management.
-    gui:
-      usage: /<command>
-      description: Open the Main Gui of the plugin.
-    createarea:
-      usage: /<command>
-      description: Creates a polygonal area in which plots can be claimed, requires a polygon selection.
-    buildingpoints:
-      usage: /<command>
-      description: Lists building points of 9 players.
-    spawn:
-      usage: /<command>
-      description: Teleports the player to spawn.
-    tutorial:
-      usage: /<command>
-      description: Sets the tutorial stage to that specific in the command.
-    tutorialstage:
-      usage: /<command>
-      description: Shows what stage of the tutorial a specific player is on.
-    customholo:
-      usage: /<command>
-      description: Allows admins to create custom holograms that are manipulated by the publicbuilds plugin.
+    description: Open create plot gui.
+  plotsystem:
+    aliases: [ ps ]
+    usage: /<command>
+    description: Includes all the commands related to the plot system management.
+  gui:
+    usage: /<command>
+    description: Open the Main Gui of the plugin.
+  createarea:
+    usage: /<command>
+    description: Creates a polygonal area in which plots can be claimed, requires a polygon selection.
+  buildingpoints:
+    usage: /<command>
+    description: Lists building points of 9 players.
+  spawn:
+    usage: /<command>
+    description: Teleports the player to spawn.
+  tutorial:
+    usage: /<command>
+    description: Sets the tutorial stage to that specific in the command.
+  tutorialstage:
+    usage: /<command>
+    description: Shows what stage of the tutorial a specific player is on.
+  customholo:
+    usage: /<command>
+    description: Allows admins to create custom holograms that are manipulated by the publicbuilds plugin.

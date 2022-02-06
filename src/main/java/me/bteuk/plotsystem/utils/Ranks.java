@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Ranks {
 
+	/*
 	public static void checkRankup(User u) {
 
 		PlayerData playerData = Main.getInstance().playerData;
@@ -65,5 +66,5 @@ public class Ranks {
 		checkRankup(u);
 
 	}
-
+	 */
 }

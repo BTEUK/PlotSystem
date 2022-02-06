@@ -3,7 +3,6 @@ package me.bteuk.plotsystem.plots;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.listeners.InventoryClicked;
 import me.bteuk.plotsystem.listeners.ItemSpawn;
-import me.bteuk.plotsystem.listeners.JoinServer;
 import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.plots.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
@@ -15,11 +14,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class Plots {
 
-    private Main instance;
+    private final Main instance;
     public static ItemStack selectionTool;
 
-    private PlotSQL plotSQL;
-    private GlobalSQL globalSQL;
+    private final PlotSQL plotSQL;
+    private final GlobalSQL globalSQL;
 
     public Plots(Main instance, PlotSQL plotSQL, GlobalSQL globalSQL) {
 
@@ -43,6 +42,7 @@ public class Plots {
         new PlayerInteract(instance, plotSQL);
         new ItemSpawn(instance);
 
+        //Deals with tracking where players are in relation to plots.
         new ClaimEnter(instance, plotSQL, globalSQL);
 
     }

@@ -1,23 +1,28 @@
 package me.bteuk.plotsystem.sql;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.plots.Location;
 import me.bteuk.plotsystem.utils.Time;
+import org.bukkit.block.Block;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 public class PlotSQL {
 
     DataSource dataSource;
+    NavigationSQL navigationSQL;
 
     //Set the dataSource for the plot_data database.
-    public PlotSQL(DataSource dataSource) {
+    public PlotSQL(DataSource dataSource, NavigationSQL navigationSQL) {
 
         this.dataSource = dataSource;
+        this.navigationSQL = navigationSQL;
 
     }
 
@@ -65,12 +70,12 @@ public class PlotSQL {
         }
     }
 
-    //Returns whether you are able to build in the specified world.
+    //Returns the name of the save world.
     public String getSaveWorld() {
 
         //Create a statement to select the type where type = save.
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM world_data WHERE type='save';"
+                "SELECT name FROM world_data WHERE server='" + Main.SERVER_NAME + "', type='save';"
         )) {
 
             ResultSet results = statement.executeQuery();
@@ -403,5 +408,74 @@ public class PlotSQL {
             sql.printStackTrace();
             return null;
         }
+    }
+
+    //Get location bounds for specific world/server.
+    public ArrayList<Location> getLocations(String world) {
+
+        ArrayList<Location> locations = new ArrayList<>();
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "SELECT name, coordMin, coordMax FROM location_data WHERE world=?, server=?;"
+        )) {
+
+            statement.setString(1, world);
+            statement.setString(2, Main.SERVER_NAME);
+            ResultSet results = statement.executeQuery();
+
+            while (results.next()) {
+
+                locations.add(new Location(
+                        results.getString("name"),
+                        (int) navigationSQL.getX(results.getInt("coordMin")),
+                        (int) navigationSQL.getX(results.getInt("coordMax")),
+                        (int) navigationSQL.getZ(results.getInt("coordMin")),
+                        (int) navigationSQL.getZ(results.getInt("coordMax"))
+                ));
+            }
+
+
+        } catch (SQLException sql) {
+
+            //If for some reason an error occurred in the sql then return false.
+            sql.printStackTrace();
+            return null;
+        }
+
+        return locations;
+    }
+
+    public int createPlot(int size, int difficulty, String location) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO plot_data(status, size, difficulty, location) VALUES(?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+
+            statement.setString(1, "unclaimed");
+            statement.setInt(2, size);
+            statement.setInt(3, difficulty);
+            statement.setString(4, location);
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            ResultSet results = statement.getGeneratedKeys();
+            if (results.next()) {
+
+                return results.getInt("id");
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
+        }
+
     }
 }

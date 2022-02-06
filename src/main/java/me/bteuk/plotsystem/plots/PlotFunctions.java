@@ -2,246 +2,249 @@ package me.bteuk.plotsystem.plots;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import me.bteuk.plotsystem.plots.Plots;
-import me.bteuk.plotsystem.utils.Point;
+import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.WorldGuardFunctions;
+import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-
-import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.mysql.PlotData;
 
 /*
  * This class deals with the selection of plots by relevant players.
  * All data about the selection is stored here.
  */
 public class PlotFunctions {
-	
-	//Stores a reference to the user for simplicity.
-	private User u;
 
-	//This vector of BlockVector2 (2d points) represent the selected points.
-	private List<BlockVector2> vector;
-	
-	//The world where the selection is being made.
-	private World world;
-	
-	//Create a new instance of plots.
-	public PlotFunctions(User u) {
-		
-		this.u = u;
-		vector = new ArrayList<BlockVector2>();
-		
-	}
-	
-	//Clear the selection.
-	public void clear() {
-		
-		vector.clear();
-		
-	}
+    //Stores a reference to the user for simplicity.
+    private final User u;
 
-	public void startSelection(Block block) {
+    //This vector of BlockVector2 (2d points) represent the selected points.
+    private final List<BlockVector2> vector;
 
-		//Since this is the start of a selection make sure the vector is empty.
-		clear();
-		
-		//Set the world.
-		world = block.getWorld();
-		
-		//Get the x,z of the block clicked and store it in the vector.
-		BlockVector2 bv2 = BlockVector2.at(block.getX(), block.getZ());
-		vector.add(bv2);
+    //The world where the selection is being made.
+    private World world;
 
-	}
-	
-	public World world() {
-		
-		return world;
-		
-	}
+    //The location where the plot is.
+    private String location;
 
-	public void addPoint(Block block) {
+    //Size and difficulty of the plot when creating the plot.
+    public int size;
+    public int difficulty;
 
-		//Add a point to the vector.
-		BlockVector2 bv2 = BlockVector2.at(block.getX(), block.getZ());
-		vector.add(bv2);
+    //Create a new instance of plots.
+    public PlotFunctions(User u) {
 
-	}
+        this.u = u;
+        vector = new ArrayList<>();
 
-	public void giveSelectionTool() {
+    }
 
-		//Get the player inventory and check whether they already have the selection tool.
-		PlayerInventory i = u.player.getInventory();
+    //Clear the selection.
+    public void clear() {
 
-		//Check if the player already has the selection tool in their inventory.
-		if (i.contains(Plots.selectionTool)) {
-			
-			//Get the selection tool from their inventory and swap it with the item in their hand.			
-			i.setItem(i.first(Plots.selectionTool), i.getItemInMainHand());
-			i.setItemInMainHand(Plots.selectionTool);
-		
-		} else {
-			
-			//If they don't have the selection tool already set it in their main hand.
-			i.setItemInMainHand(Plots.selectionTool);
-			
-		}
-	}
-	
-	//Return number of elements in vector.
-	public int size() {
-		
-		return vector.size();
-		
-	}
-	
-	//Create a plot with the current selection.
-	public String createPlot() {
+        world = null;
+        location = null;
+        vector.clear();
 
-		//Get plugin instance and config.
-		Main instance = Main.getInstance();
-		FileConfiguration config = instance.getConfig();
+    }
 
-		//Get worlds.
-		World saveWorld = BukkitAdapter.adapt(Bukkit.getWorld(config.getString("worlds.save")));
-		World buildWorld = BukkitAdapter.adapt(Bukkit.getWorld(config.getString("worlds.build")));
+    public void startSelection(Block block) {
 
-		//Get instance of WorldGuard.
-		WorldGuard wg = WorldGuard.getInstance();
+        //Since this is the start of a selection make sure the vector is empty.
+        clear();
 
-		//Get regions.
-		RegionContainer container = wg.getPlatform().getRegionContainer();
-		RegionManager saveRegions = container.get(saveWorld);
-		RegionManager buildRegions = container.get(buildWorld);
+        //Set the world.
+        world = block.getWorld();
 
-		PlotData plotData = Main.getInstance().plotData;
+        //Get the x,z of the block clicked and store it in the vector.
+        BlockVector2 bv2 = BlockVector2.at(block.getX(), block.getZ());
+        vector.add(bv2);
 
-		//Create new id
-		int plotID = plotData.getNewID();
+    }
 
-		//Create region
-		ProtectedPolygonalRegion region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, 1, 256);
+    public World world() {
 
-		//Check whether the region overlaps an existing plot, if true stop the process.
-		ApplicableRegionSet set = saveRegions.getApplicableRegions(region);
-		if (set.size() > 0) {
-			return (ChatColor.RED + "This region overlaps with an existing plot, please create a different plot.");
-		}
+        return world;
 
-		//Check if the player is allowed to create a plot in this location.
-		//They need to be in a valid area and also have the minimum rank required to create a plot here.
-		for (BlockVector2 bv : vector) {
+    }
 
-			set = buildRegions.getApplicableRegions(BlockVector3.at(bv.getX(), 64, bv.getZ()));
+    public boolean addPoint(Block block) {
 
-			if ((!(set.testState(null, Main.CREATE_PLOT_GUEST))) &&
-					(!(set.testState(null, Main.CREATE_PLOT_APPRENTICE))) &&
-					(!(set.testState(null, Main.CREATE_PLOT_JRBUILDER)))) {
-				return (ChatColor.RED + "You can not create a plot here!");
-			}
+        //Add a point to the vector.
+        BlockVector2 bv2 = BlockVector2.at(block.getX(), block.getZ());
 
-			if (set.testState(null, Main.CREATE_PLOT_GUEST)) {
-				continue;
+        //If the distance in a plot exceeds 500 blocks it's too large.
+        if (bv2.distance(vector.get(0)) > 500) {
 
-			} else if (set.testState(null, Main.CREATE_PLOT_APPRENTICE) && !(u.player.hasPermission("group.apprentice"))) {
-				return (ChatColor.RED + "You must be Apprentice or higher to create a plot here!");
+            return false;
 
-			} else if (set.testState(null, Main.CREATE_PLOT_JRBUILDER) && !(u.player.hasPermission("group.jrbuilder"))) {
-				return (ChatColor.RED + "You must be Jr.Builder or higher to create a plot here!");
+        } else {
 
-			} 
-		}	
+            vector.add(bv2);
+            return true;
 
-		//Check if any plots are within 2 metre of the plot you're trying to create. 
-		Point pt = new Point();
-		ArrayList<Integer> nearby = WorldGuardFunctions.getNearbyPlots(region);
-		ProtectedRegion rg;
-		ArrayList<BlockVector2> pts = new ArrayList<BlockVector2>();
-		BlockVector2 pt1;
-		BlockVector2 pt2;
-		BlockVector2 pt3;
-		BlockVector2 pt4;
-		int size;
-		int size2 = vector.size();
-		vector.add(vector.get(0));
+        }
 
-		//Iterate through all nearby plots
-		for (int i : nearby) {
-			rg = saveRegions.getRegion(String.valueOf(i));
-			pts.clear();
-			pts.addAll(rg.getPoints());
-			size = pts.size();
-			pts.add(pts.get(0));
+    }
 
-			//For each line between 2 points of that plot
-			for (int j = 0; j<size; j++) {
-				//Get the 2 points
-				pt1 = pts.get(j);
-				pt2 = pts.get(j+1);
+    public void giveSelectionTool() {
 
-				//Compare to all lines of the plot the player is trying to create
-				for (int k = 0; k<size2; k++) {
-					//Get the 2 points
-					pt3 = vector.get(k);
-					pt4 = vector.get(k+1);
+        //Get the player inventory and check whether they already have the selection tool.
+        PlayerInventory i = u.player.getInventory();
 
+        //Check if the player already has the selection tool in their inventory.
+        if (i.contains(Plots.selectionTool)) {
 
-					//If the shortest distance between the 2 lines is less than 2 metres then the plot is being
-					//created too close to an existing plot and the plot creation process will be aborted.
-					if (pt.getShortestDistance(pt1, pt2, pt3, pt4) <= 2) {
-						return (ChatColor.RED + "Your plot is too close to an existing plot, please create a plot somewhere else.");
-					}
-				}
-			}
-		}
+            //Get the selection tool from their inventory and swap it with the item in their hand.
+            i.setItem(i.first(Plots.selectionTool), i.getItemInMainHand());
+            i.setItemInMainHand(Plots.selectionTool);
 
-		//Create an entry in the database for the plot.
-		if (!(plotData.createPlot(plotID, u.uuid))) {
-			return (ChatColor.RED + "An error occured, please try again!");
-		}
+        } else {
 
-		//Set owner of the region
-		DefaultDomain owners = new DefaultDomain();
-		owners.addPlayer(UUID.fromString(u.uuid));
-		region.setOwners(owners);
+            //If they don't have the selection tool already set it in their main hand.
+            i.setItemInMainHand(Plots.selectionTool);
 
-		//Set the region priority to 1
-		region.setPriority(1);
+        }
+    }
 
-		//Add the regions to the worlds
-		saveRegions.addRegion(region);
-		buildRegions.addRegion(region);
+    //Return number of elements in vector.
+    public int size() {
 
-		//Save the new regions
-		try {
-			saveRegions.save();
-			buildRegions.save();
-		} catch (StorageException e1) {
-			e1.printStackTrace();
-		}
+        return vector.size();
 
-		u.plots.vector.clear();;
-		return (ChatColor.GREEN + "Plot created with ID " + ChatColor.DARK_AQUA + plotID);
+    }
 
-	}
+    //Sets size as the area of the selection
+    public void area() {
+
+        //If the vector has less than 3 points you can't get an area.
+        if (size() < 3) {
+            size = 0;
+        }
+
+        int sumX = 0;
+        int sumZ = 0;
+
+        for (int i = 0; i < size() - 1; i++) {
+
+            sumX += vector.get(i).getX() * vector.get(i + 1).getZ();
+            sumZ += vector.get(i + 1).getX() * vector.get(i).getZ();
+
+        }
+
+        size = Math.abs((sumX - sumZ) / 2);
+
+    }
+
+    //Create a plot with the current selection.
+    public String createPlot(PlotSQL plotSQL) {
+
+        //Get instance of WorldGuard.
+        WorldGuard wg = WorldGuard.getInstance();
+
+        //Get regions.
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+        RegionManager saveRegions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(plotSQL.getSaveWorld())));
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(world.getName())));
+
+        //Create region
+        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, 1, 256);
+
+        //Check whether the region overlaps an existing plot, if true stop the process.
+        ApplicableRegionSet set = saveRegions.getApplicableRegions(region);
+        if (set.size() > 0) {
+
+            return (ChatColor.RED + "This region overlaps with an existing plot, please create a different plot.");
+
+        }
+
+        ArrayList<Location> locations = plotSQL.getLocations(world.getName());
+
+        //Check if this location is a valid area for a plot, store the area name.
+        for (Location location : locations) {
+
+            if (location.inLocation(vector.get(0))) {
+                this.location = location.getName();
+            }
+
+        }
+
+        if (location == null) {
+            return (Utils.chat("&cThis selection is not in a valid location."));
+        }
+
+        //Create an entry in the database for the plot.
+        int plotID = plotSQL.createPlot(size, difficulty, location);
+
+        //Set the region name.
+        region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, 1, 256);
+
+        //Set the region priority to 1
+        region.setPriority(1);
+
+        //Add the regions to the worlds
+        saveRegions.addRegion(region);
+        buildRegions.addRegion(region);
+
+        //Save the new regions
+        try {
+            saveRegions.save();
+            buildRegions.save();
+        } catch (
+                StorageException e1) {
+            e1.printStackTrace();
+        }
+
+        clear();
+
+        return (Utils.chat("&aPlot created with ID &3" + plotID +
+                " &awith difficulty &3" + difficultyName()) +
+                " &aand size &3" + sizeName());
+
+    }
+
+    public PlotDifficulty difficultyName() {
+
+        switch(difficulty) {
+
+            case 1:
+                return PlotDifficulty.EASY;
+            case 2:
+                return PlotDifficulty.NORMAL;
+            case 3:
+                return PlotDifficulty.HARD;
+            default:
+                return null;
+
+        }
+    }
+
+    public PlotSize sizeName() {
+
+        if (size < 600) {
+
+            return PlotSize.SMALL;
+
+        } else if (size < 1500) {
+
+            return PlotSize.MEDIUM;
+
+        } else {
+
+            return PlotSize.LARGE;
+
+        }
+    }
 }
