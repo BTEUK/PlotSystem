@@ -1,17 +1,29 @@
 package me.bteuk.plotsystem.tutorial;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.listeners.tutorial.CommandListener;
 import me.bteuk.plotsystem.listeners.tutorial.MoveEvent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Tutorial {
 
     private Main instance;
     public static ItemStack tutorialGui;
+
+    //TutorialInfo tutorial;
+    HashMap<Integer, String> pl;
+    List<BlockVector2> pt;
+    Location lo;
+    ArrayList<Integer> pls;
 
     public Tutorial(Main instance) {
 

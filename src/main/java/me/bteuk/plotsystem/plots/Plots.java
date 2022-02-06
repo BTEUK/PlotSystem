@@ -1,6 +1,10 @@
 package me.bteuk.plotsystem.plots;
 
 import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.listeners.InventoryClicked;
+import me.bteuk.plotsystem.listeners.ItemSpawn;
+import me.bteuk.plotsystem.listeners.JoinServer;
+import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.plots.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -34,8 +38,12 @@ public class Plots {
         selectionTool.setItemMeta(meta);
 
         //Listeners
+        //new QuitServer(this, tutorialData, playerData, plotData);
+        new InventoryClicked(instance);
+        new PlayerInteract(instance, plotSQL);
+        new ItemSpawn(instance);
+
         new ClaimEnter(instance, plotSQL, globalSQL);
 
     }
-
 }

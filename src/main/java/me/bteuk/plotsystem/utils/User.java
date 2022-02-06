@@ -14,10 +14,17 @@ import me.bteuk.plotsystem.tutorial.TutorialInfo;
 
 public class User {
 
+	//Basic information about the player.
 	public Player player;
 	public String uuid;
 	public String name;
-	
+
+	//Important tutorial information.
+	public boolean tutorial_complete;
+
+
+
+
 	public int buildingTime;
 	
 	public PlotFunctions plotFunctions;

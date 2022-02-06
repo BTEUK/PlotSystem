@@ -354,4 +354,54 @@ public class PlotSQL {
             return false;
         }
     }
+
+    //Check if there is a server with a tutorial.
+    public boolean tutorialExists() {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "SELECT name FROM server_data WHERE plots_only=?;"
+        )) {
+
+            statement.setBoolean(1, false);
+            ResultSet results = statement.executeQuery();
+
+            return results.next();
+
+        } catch (SQLException sql) {
+
+            //If for some reason an error occurred in the sql then return false.
+            sql.printStackTrace();
+            return false;
+        }
+    }
+
+    //Get a tutorial server.
+    public String getTutorialServer() {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "SELECT name FROM server_data WHERE plots_only=? ORDER BY tutorial_only DESC;"
+        )) {
+
+            statement.setBoolean(1, false);
+            ResultSet results = statement.executeQuery();
+
+            //Return the first item in the list,
+            // if there is a tutorial only server that will be first.
+            if (results.next()) {
+
+                return results.getString(1);
+
+            } else {
+
+                return null;
+
+            }
+
+        } catch (SQLException sql) {
+
+            //If for some reason an error occurred in the sql then return false.
+            sql.printStackTrace();
+            return null;
+        }
+    }
 }

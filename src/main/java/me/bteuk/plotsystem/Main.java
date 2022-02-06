@@ -3,13 +3,12 @@ package me.bteuk.plotsystem;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.plotsystem.listeners.JoinServer;
 import me.bteuk.plotsystem.plots.Plots;
 import me.bteuk.plotsystem.serverconfig.SetupGuiEvent;
 import me.bteuk.plotsystem.sql.GlobalSQL;
@@ -28,9 +27,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-
 import me.bteuk.plotsystem.commands.BuildingPoints;
 import me.bteuk.plotsystem.commands.CreateArea;
 import me.bteuk.plotsystem.commands.OpenGui;
@@ -41,10 +37,6 @@ import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.gui.PlotGui;
 import me.bteuk.plotsystem.gui.PlotInfo;
 import me.bteuk.plotsystem.gui.SwitchServerGUI;
-import me.bteuk.plotsystem.listeners.InventoryClicked;
-import me.bteuk.plotsystem.listeners.ItemSpawn;
-import me.bteuk.plotsystem.listeners.JoinServer;
-import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.reviewing.AcceptGui;
 import me.bteuk.plotsystem.reviewing.DenyGui;
 import me.bteuk.plotsystem.reviewing.FeedbackGui;
@@ -82,9 +74,11 @@ public class Main extends JavaPlugin {
 
     //Plots
     public Plots plots;
+    public static boolean PLOTS_ONLY;
 
     //Tutorial
     public Tutorial tutorial;
+    public static boolean TUTORIAL_ONLY;
 
 
     //Other
@@ -94,16 +88,6 @@ public class Main extends JavaPlugin {
     static FileConfiguration config;
 
     private ArrayList<User> users;
-
-    //TutorialInfo tutorial;
-    HashMap<Integer, String> pl;
-    List<BlockVector2> pt;
-    Location lo;
-    ArrayList<Integer> pls;
-
-    public static StateFlag CREATE_PLOT_GUEST;
-    public static StateFlag CREATE_PLOT_APPRENTICE;
-    public static StateFlag CREATE_PLOT_JRBUILDER;
 
     public static ItemStack gui;
 
@@ -198,20 +182,23 @@ public class Main extends JavaPlugin {
         meta2.setLocalizedName(ChatColor.AQUA + "" + ChatColor.BOLD + "Building Menu");
         gui.setItemMeta(meta2);
 
-        //Listeners
-        new JoinServer(this);
-        //new QuitServer(this, tutorialData, playerData, plotData);
-        new InventoryClicked(this);
-        new PlayerInteract(this, plotSQL);
-        new ItemSpawn(this);
+        //Set the global static variable indicating whether the server is limited to a single task.
+        PLOTS_ONLY = plotSQL.plotsOnly();
+        TUTORIAL_ONLY = plotSQL.tutorialOnly();
 
         //plotData.clearReview();
+
+        //Global Join listener
+        new JoinServer(instance, plotSQL);
 
         //Setup Timers
         timers = new Timers(this, config, plot_dataSource);
         timers.startTimers();
 
-        if (!plotSQL.tutorialOnly()) {
+        //Create bungeecord channel
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
+        if (!TUTORIAL_ONLY) {
 
             //Setup plots
             plots = new Plots(this, plotSQL, globalSQL);
@@ -219,16 +206,13 @@ public class Main extends JavaPlugin {
 
         }
 
-        if (!plotSQL.plotsOnly()) {
+        if (!PLOTS_ONLY) {
 
             //Setup tutorial
             tutorial = new Tutorial(this);
             tutorial.setup();
 
         }
-
-        //Bungeecord
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         //Holograms
         //holograms = new Holograms(hologramData, hologramText, playerData);
@@ -287,6 +271,9 @@ public class Main extends JavaPlugin {
 
             }
         }
+
+        //Disable bungeecord channel.
+        this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
         Bukkit.getLogger().info("Disabled PublicBuilds");
     }
