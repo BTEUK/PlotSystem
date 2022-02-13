@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.listeners.plots;
+package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;

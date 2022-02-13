@@ -1,7 +1,9 @@
 package me.bteuk.plotsystem.utils;
 
-import me.bteuk.plotsystem.plots.PlotFunctions;
+import me.bteuk.plotsystem.plots.SelectionTool;
+import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import me.bteuk.plotsystem.utils.enums.Role;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -11,7 +13,6 @@ import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.TutorialData;
 import me.bteuk.plotsystem.reviewing.Review;
-import me.bteuk.plotsystem.tutorial.TutorialInfo;
 
 public class User {
 
@@ -29,8 +30,7 @@ public class User {
 
     public int buildingTime;
 
-    public PlotFunctions plotFunctions;
-    public PlotCreateInfo plotCreateInfo;
+    public SelectionTool selectionTool;
 
     public int currentPlot = 0;
     public String currentStatus = null;
@@ -44,8 +44,6 @@ public class User {
 
     public ItemStack slot5;
     public ItemStack slot9;
-
-    public TutorialInfo tutorial;
 
     public String previousGui;
 
@@ -78,9 +76,8 @@ public class User {
             Ranks.applicant(this);
         }
 
-        //Create plot functions class.
-        //This handles the selection and creation of new plots.
-        plotFunctions = new PlotFunctions(this);
+        //If the player is architect or above create plot creation functions.
+        SelectionTool selectionTool = new SelectionTool(this);
 
         //Set current world
         world = player.getWorld();

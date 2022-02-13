@@ -11,7 +11,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.tutorial.TutorialGui;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 

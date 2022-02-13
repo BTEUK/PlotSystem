@@ -1,20 +1,18 @@
 package me.bteuk.plotsystem.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
-import org.bukkit.entity.Player;
-
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.HologramData;
 import me.bteuk.plotsystem.mysql.HologramText;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 public class Holograms {
 

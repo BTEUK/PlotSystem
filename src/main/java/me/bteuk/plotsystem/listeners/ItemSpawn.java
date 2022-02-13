@@ -1,6 +1,5 @@
 package me.bteuk.plotsystem.listeners;
 
-import me.bteuk.plotsystem.tutorial.Tutorial;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

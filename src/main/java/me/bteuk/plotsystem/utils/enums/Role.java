@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.utils;
+package me.bteuk.plotsystem.utils.enums;
 
 public enum Role {
     GUEST,

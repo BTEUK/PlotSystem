@@ -1,6 +1,6 @@
 package me.bteuk.plotsystem.commands;
 
-import me.bteuk.plotsystem.gui.plots.CreatePlotGui;
+import me.bteuk.plotsystem.gui.CreatePlotGui;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

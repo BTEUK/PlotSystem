@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.utils;
+package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 

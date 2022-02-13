@@ -12,7 +12,7 @@ import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.WorldGuardFunctions;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.md_5.bungee.api.ChatColor;
 
 public class ReviewGui {

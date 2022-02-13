@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.utils;
+package me.bteuk.plotsystem.utils.math;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;

@@ -1,19 +1,13 @@
 package me.bteuk.plotsystem.sql;
 
-import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.utils.Leaderboard;
-import me.bteuk.plotsystem.utils.Role;
+import me.bteuk.plotsystem.utils.enums.Role;
 import me.bteuk.plotsystem.utils.Time;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class GlobalSQL {
 

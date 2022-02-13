@@ -14,7 +14,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import me.bteuk.plotsystem.mysql.MessageData;
-import me.bteuk.plotsystem.tutorial.TutorialConstants;
 import me.bteuk.plotsystem.utils.User;
 
 public class Timers {

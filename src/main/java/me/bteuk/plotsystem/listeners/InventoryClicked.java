@@ -17,9 +17,6 @@ import me.bteuk.plotsystem.reviewing.AcceptGui;
 import me.bteuk.plotsystem.reviewing.DenyGui;
 import me.bteuk.plotsystem.reviewing.FeedbackGui;
 import me.bteuk.plotsystem.reviewing.ReviewGui;
-import me.bteuk.plotsystem.tutorial.TutorialGui;
-import me.bteuk.plotsystem.tutorial.TutorialSelectionGui;
-import me.bteuk.plotsystem.tutorial.TutorialVideoGui;
 import me.bteuk.plotsystem.utils.User;
 
 public class InventoryClicked implements Listener {

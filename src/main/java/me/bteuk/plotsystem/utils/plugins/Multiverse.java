@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.serverconfig;
+package me.bteuk.plotsystem.utils.plugins;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;

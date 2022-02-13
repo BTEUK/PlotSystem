@@ -21,11 +21,10 @@ import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.mysql.PointsData;
 import me.bteuk.plotsystem.utils.Accept;
-import me.bteuk.plotsystem.utils.ClaimFunctions;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.WorldEditor;
-import me.bteuk.plotsystem.utils.WorldGuardFunctions;
+import me.bteuk.plotsystem.utils.plugins.WorldEditor;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 public class AcceptGui {
 

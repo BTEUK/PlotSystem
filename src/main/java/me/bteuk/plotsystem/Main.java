@@ -8,29 +8,28 @@ import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.plotsystem.listeners.InventoryClicked;
+import me.bteuk.plotsystem.listeners.ItemSpawn;
 import me.bteuk.plotsystem.listeners.JoinServer;
-import me.bteuk.plotsystem.plots.Plots;
-import me.bteuk.plotsystem.serverconfig.SetupGuiEvent;
+import me.bteuk.plotsystem.listeners.PlayerInteract;
+import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.tutorial.*;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.bteuk.plotsystem.commands.BuildingPoints;
 import me.bteuk.plotsystem.commands.CreateArea;
 import me.bteuk.plotsystem.commands.OpenGui;
-import me.bteuk.plotsystem.commands.Spawn;
 import me.bteuk.plotsystem.gui.ConfirmCancel;
 import me.bteuk.plotsystem.gui.LocationGUI;
 import me.bteuk.plotsystem.gui.MainGui;
@@ -41,13 +40,11 @@ import me.bteuk.plotsystem.reviewing.AcceptGui;
 import me.bteuk.plotsystem.reviewing.DenyGui;
 import me.bteuk.plotsystem.reviewing.FeedbackGui;
 import me.bteuk.plotsystem.reviewing.ReviewGui;
-import me.bteuk.plotsystem.serverconfig.JoinEvent;
-import me.bteuk.plotsystem.serverconfig.SetupGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Holograms;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.WorldGuardFunctions;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 public class Main extends JavaPlugin {
 
@@ -72,17 +69,8 @@ public class Main extends JavaPlugin {
 
     public Timers timers;
 
-    //Plots
-    public Plots plots;
-    public static boolean PLOTS_ONLY;
-
-    //Tutorial
-    public Tutorial tutorial;
-    public static boolean TUTORIAL_ONLY;
-
-
-    //Other
-    public static Permission perms = null;
+    //Items
+    public static ItemStack selectionTool;
 
     static Main instance;
     static FileConfiguration config;
@@ -92,11 +80,6 @@ public class Main extends JavaPlugin {
     public static ItemStack gui;
 
     int interval;
-
-    //Locations
-    public static Location spawn;
-    public static Location cranham;
-    public static Location monkspath;
 
     //Holograms
     Holograms holograms;
@@ -134,13 +117,13 @@ public class Main extends JavaPlugin {
             global_dataSource = mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
 
-            plot_database = config.getString("database.plot");
-            plot_dataSource = mysqlSetup(plot_database);
-            plotSQL = new PlotSQL(plot_dataSource);
-
             navigation_database = config.getString("database.navigation");
             navigation_dataSource = mysqlSetup(navigation_database);
             navigationSQL = new NavigationSQL(navigation_dataSource);
+
+            plot_database = config.getString("database.plot");
+            plot_dataSource = mysqlSetup(plot_database);
+            plotSQL = new PlotSQL(plot_dataSource, navigationSQL);
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
@@ -148,28 +131,27 @@ public class Main extends JavaPlugin {
             return;
         }
 
+        //Set the server name from config.
         SERVER_NAME = config.getString("server_name");
 
         if (!plotSQL.serverSetup(SERVER_NAME)) {
 
-            Bukkit.getLogger().warning(Utils.chat("&cThe server has not yet been configured, please join to configure the server!"));
-            configureServer();
+            //Add server to database and enable server.
+            if (navigationSQL.insert(
+                    "INSERT INTO server_data(name,type) VALUES(" + SERVER_NAME + ",'plot');"
+            )) {
 
-        } else {
+                Bukkit.getLogger().info(Utils.chat("&aServer added to database, enabling server!"));
+                enableServer();
 
-            enableServer();
-
+                //If it fails close the plugin.
+            } else {
+                Bukkit.getLogger().severe(Utils.chat("&cFailed to add server to database, shutting down PlotSystem!"));
+            }
         }
     }
 
-    public void configureServer() {
-
-        new JoinEvent(this);
-        new SetupGuiEvent(this, navigationSQL, plotSQL);
-        SetupGui.initialize();
-
-    }
-
+    //Server enabling procedure when the config has been set up.
     public void enableServer() {
 
         //General Setup
@@ -181,10 +163,6 @@ public class Main extends JavaPlugin {
         ItemMeta meta2 = gui.getItemMeta();
         meta2.setLocalizedName(ChatColor.AQUA + "" + ChatColor.BOLD + "Building Menu");
         gui.setItemMeta(meta2);
-
-        //Set the global static variable indicating whether the server is limited to a single task.
-        PLOTS_ONLY = plotSQL.plotsOnly();
-        TUTORIAL_ONLY = plotSQL.tutorialOnly();
 
         //plotData.clearReview();
 
@@ -198,21 +176,20 @@ public class Main extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        if (!TUTORIAL_ONLY) {
+        //Create selection tool item
+        selectionTool = new ItemStack(Material.BLAZE_ROD);
+        ItemMeta meta = selectionTool.getItemMeta();
+        meta.setLocalizedName(Utils.chat("&aSelection Tool"));
+        selectionTool.setItemMeta(meta);
 
-            //Setup plots
-            plots = new Plots(this, plotSQL, globalSQL);
-            plots.setup();
+        //Listeners
+        //new QuitServer(this, tutorialData, playerData, plotData);
+        new InventoryClicked(instance);
+        new PlayerInteract(instance, plotSQL);
+        new ItemSpawn(instance);
 
-        }
-
-        if (!PLOTS_ONLY) {
-
-            //Setup tutorial
-            tutorial = new Tutorial(this);
-            tutorial.setup();
-
-        }
+        //Deals with tracking where players are in relation to plots.
+        new ClaimEnter(instance, plotSQL, globalSQL);
 
         //Holograms
         //holograms = new Holograms(hologramData, hologramText, playerData);

@@ -31,7 +31,7 @@ public class Zone implements CommandExecutor {
 		if (args[0].equalsIgnoreCase("create")) {
 			
 			//Paused to focus on tutorials.
-			u.plots.size();
+			u.plotFunctions.size();
 			
 		} else if (args[0].equalsIgnoreCase("open")) {
 			

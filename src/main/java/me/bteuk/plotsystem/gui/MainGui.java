@@ -12,13 +12,10 @@ import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.reviewing.FeedbackGui;
 import me.bteuk.plotsystem.reviewing.Review;
 import me.bteuk.plotsystem.reviewing.ReviewGui;
-import me.bteuk.plotsystem.tutorial.TutorialGui;
-import me.bteuk.plotsystem.plots.PlotFunctions;
-import me.bteuk.plotsystem.utils.RankValues;
 import me.bteuk.plotsystem.utils.Ranks;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.WorldGuardFunctions;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.md_5.bungee.api.ChatColor;
 
 public class MainGui {

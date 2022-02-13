@@ -14,6 +14,7 @@ import me.bteuk.plotsystem.utils.CustomHologram;
 public class NavigationSQL {
 
     DataSource dataSource;
+    int success;
 
     public NavigationSQL(DataSource dataSource) {
 
@@ -467,4 +468,27 @@ public class NavigationSQL {
         }
 
     }
+
+    //Add a new server
+    public boolean insert(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            success = statement.executeUpdate();
+
+            //If the insert was successful return true;
+            if (success > 0) {return true;}
+            else {
+
+                Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
+                return false;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

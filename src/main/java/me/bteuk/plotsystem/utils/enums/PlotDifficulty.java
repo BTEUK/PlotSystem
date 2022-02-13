@@ -1,4 +1,4 @@
-package me.bteuk.plotsystem.plots;
+package me.bteuk.plotsystem.utils.enums;
 
 public enum PlotDifficulty {
     EASY,
