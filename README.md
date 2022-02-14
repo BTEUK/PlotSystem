@@ -1,2 +1,3 @@
 # UKnet-PlotSystem
-Plot System for UKnet
+Plot System for UKnet, under development!  
+Developed by ELgamer
