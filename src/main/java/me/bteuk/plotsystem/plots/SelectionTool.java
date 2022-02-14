@@ -2,10 +2,13 @@ package me.bteuk.plotsystem.plots;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
+import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.enums.PlotDifficulty;
 import me.bteuk.plotsystem.utils.enums.PlotSize;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.PlayerInventory;
@@ -26,10 +29,22 @@ public class SelectionTool extends WGCreatePlot {
     //The location where the plot is.
     private String location;
 
-    public SelectionTool(User u) {
+    //Size and difficulty of the plot when creating the plot.
+    public int size;
+    public int difficulty;
+
+    //PlotSQL
+    PlotSQL plotSQL;
+
+    public SelectionTool(User u, PlotSQL plotSQL) {
 
         this.u = u;
         vector = new ArrayList<>();
+        this.plotSQL = plotSQL;
+
+        //Set default size and difficulty
+        size = 1;
+        difficulty = 1;
 
     }
 
@@ -130,6 +145,7 @@ public class SelectionTool extends WGCreatePlot {
 
     }
 
+    //Returns the plot difficulty name.
     public PlotDifficulty difficultyName() {
 
         switch(difficulty) {
@@ -146,6 +162,7 @@ public class SelectionTool extends WGCreatePlot {
         }
     }
 
+    //Returns the plot size name.
     public PlotSize sizeName() {
 
         if (size < 600) {
@@ -159,6 +176,60 @@ public class SelectionTool extends WGCreatePlot {
         } else {
 
             return PlotSize.LARGE;
+
+        }
+    }
+
+    //Returns the plot size material.
+    public Material sizeMaterial() {
+
+        if (size < 600) {
+
+            return Material.LIME_CONCRETE;
+
+        } else if (size < 1500) {
+
+            return Material.YELLOW_CONCRETE;
+
+        } else {
+
+            return Material.RED_CONCRETE;
+
+        }
+    }
+
+    //Returns the plot difficulty material.
+    public Material difficultyMaterial() {
+
+        switch(difficulty) {
+
+            case 1:
+                return Material.LIME_CONCRETE;
+            case 2:
+                return Material.YELLOW_CONCRETE;
+            case 3:
+                return Material.RED_CONCRETE;
+            default:
+                return null;
+
+        }
+    }
+
+    //Before this method can be run the player must have gone through the plot creation gui.
+    //This will make sure the difficulty and size are set.
+    public boolean createPlot() {
+
+        if (createPlot(u.player, world, location, vector, plotSQL, size, difficulty)) {
+
+            u.player.sendMessage(Utils.chat("&aPlot created with ID &3" + plotID +
+                    " &awith difficulty &3" + difficultyName()) +
+                    " &aand size &3" + sizeName());
+
+            return true;
+
+        } else {
+
+            return false;
 
         }
     }

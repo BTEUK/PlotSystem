@@ -22,16 +22,14 @@ This class adds the implementation of plot creation using worldguard.
  */
 public class WGCreatePlot {
 
-    //Size and difficulty of the plot when creating the plot.
-    public int size;
-    public int difficulty;
+    public int plotID;
 
     //Create a new instance of plots.
     public WGCreatePlot() {
     }
 
     //Create a plot with the current selection.
-    public boolean createPlot(Player p, World world, String location, List<BlockVector2> vector, PlotSQL plotSQL) {
+    public boolean createPlot(Player p, World world, String location, List<BlockVector2> vector, PlotSQL plotSQL, int size, int difficulty) {
 
         //Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
@@ -54,7 +52,7 @@ public class WGCreatePlot {
         }
 
         //Create an entry in the database for the plot.
-        int plotID = plotSQL.createPlot(size, difficulty, location);
+        plotID = plotSQL.createPlot(size, difficulty, location);
 
         //Set the region name.
         region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, 1, 256);
@@ -76,14 +74,5 @@ public class WGCreatePlot {
         }
 
         return true;
-        /*
-        the below will be added to plot creation gui
-
-        clear();
-
-        return (Utils.chat("&aPlot created with ID &3" + plotID +
-                " &awith difficulty &3" + difficultyName()) +
-                " &aand size &3" + sizeName());
-        */
     }
 }

@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils;
 
 import me.bteuk.plotsystem.plots.SelectionTool;
+import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.enums.Role;
@@ -54,7 +55,7 @@ public class User {
 
     private final GlobalSQL globalSQL;
 
-    public User(Player player, GlobalSQL globalSQL) {
+    public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         //Set sql
         this.globalSQL = globalSQL;
@@ -68,16 +69,12 @@ public class User {
         updatePlayerData();
 
         //Continue the tutorial from where they last were.
-        if (!(tutorialData.tutorialComplete(uuid))) {
-            tutorial = new TutorialInfo(this);
-            Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> tutorial.continueTutorial(), 20);
-        } else {
-            tutorial = new TutorialInfo(this, true);
-            Ranks.applicant(this);
-        }
+        //if tutorial is incomplete
 
         //If the player is architect or above create plot creation functions.
-        SelectionTool selectionTool = new SelectionTool(this);
+        if (role == Role.ARCHITECT || role == Role.REVIEWER) {
+            selectionTool = new SelectionTool(this, plotSQL);
+        }
 
         //Set current world
         world = player.getWorld();

@@ -34,9 +34,11 @@ public class CreatePlotGui {
 
         inv.clear();
 
+        Utils.createItem(inv, u.selectionTool.sizeMaterial(), 1, 12, Utils.chat("&b&l" + u.selectionTool.sizeName()),
+                Utils.chat("&fClick to cycle through different sizes."));
 
-        Utils.createItem(inv, Material.LIME_CONCRETE, 1, 12, ChatColor.AQUA + "" + ChatColor.BOLD + "Plots Only",
-                Utils.chat("&fThis will setup the server to only allow plot worlds."));
+        Utils.createItem(inv, u.selectionTool.difficultyMaterial(), 1, 12, Utils.chat("&b&l" + u.selectionTool.difficultyName()),
+                Utils.chat("&fClick to cycle through different difficulties."));
 
         toReturn.setContents(inv.getContents());
         return toReturn;
