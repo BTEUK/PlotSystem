@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.plotsystem.commands.PlotSystem;
 import me.bteuk.plotsystem.listeners.InventoryClicked;
 import me.bteuk.plotsystem.listeners.ItemSpawn;
 import me.bteuk.plotsystem.listeners.JoinServer;
@@ -15,7 +16,6 @@ import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
-import me.bteuk.plotsystem.tutorial.*;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,7 +28,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.bteuk.plotsystem.commands.BuildingPoints;
-import me.bteuk.plotsystem.commands.CreateArea;
 import me.bteuk.plotsystem.commands.OpenGui;
 import me.bteuk.plotsystem.gui.ConfirmCancel;
 import me.bteuk.plotsystem.gui.LocationGUI;
@@ -196,17 +195,14 @@ public class Main extends JavaPlugin {
         //holograms.create();
 
         //Commands
+        getCommand("plotsystem").setExecutor(new PlotSystem(plotSQL, navigationSQL));
+
+
         getCommand("gui").setExecutor(new OpenGui());
         getCommand("createarea").setExecutor(new CreateArea());
         getCommand("buildingpoints").setExecutor(new BuildingPoints());
-        getCommand("spawn").setExecutor(new Spawn());
-        getCommand("tutorial").setExecutor(new TutorialCommand());
-        getCommand("tutorialStage").setExecutor(new TutorialStage());
 
         //getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
-
-        //Tab Completer
-        getCommand("tutorial").setTabCompleter(new TutorialTabCompleter());
 
         //GUIs
         MainGui.initialize();
@@ -218,9 +214,6 @@ public class Main extends JavaPlugin {
         LocationGUI.initialize();
         ConfirmCancel.initialize();
         SwitchServerGUI.initialize();
-        TutorialGui.initialize();
-        TutorialVideoGui.initialize();
-        TutorialSelectionGui.initialize();
         FeedbackGui.initialize();
 
     }

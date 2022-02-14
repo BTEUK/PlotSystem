@@ -53,6 +53,10 @@ public class SelectionTool extends WGCreatePlot {
 
         world = null;
         location = null;
+
+        size = 1;
+        difficulty = 1;
+
         vector.clear();
 
     }

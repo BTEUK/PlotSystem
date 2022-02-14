@@ -13,8 +13,8 @@ import me.bteuk.plotsystem.utils.CustomHologram;
 
 public class NavigationSQL {
 
-    DataSource dataSource;
-    int success;
+    private DataSource dataSource;
+    private int success;
 
     public NavigationSQL(DataSource dataSource) {
 
@@ -469,7 +469,7 @@ public class NavigationSQL {
 
     }
 
-    //Add a new server
+    //Generic insert statement, return true is successful.
     public boolean insert(String sql) {
 
         try (Connection conn = conn();
@@ -488,7 +488,7 @@ public class NavigationSQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
-
 }

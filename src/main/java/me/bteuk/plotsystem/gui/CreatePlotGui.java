@@ -7,10 +7,7 @@ import me.bteuk.plotsystem.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,11 +44,47 @@ public class CreatePlotGui {
 
     public static void clicked(User u, int slot, ItemStack clicked, Inventory inv, NavigationSQL navigationSQL, PlotSQL plotSQL) {
 
-        Player p = u.player;
+        if (clicked.getItemMeta().getLore().equals(Utils.chat("&fClick to cycle through different sizes."))) {
 
-        if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Plots Only")) {
+            //Change the size by 1.
+            if (u.selectionTool.size == 3) {
+
+                u.selectionTool.size = 1;
+
+            } else {
+
+                u.selectionTool.size ++;
+
+            }
+
+            //Update the inventory.
+            u.player.getInventory().setContents(CreatePlotGui.Gui(u).getContents());
+            u.player.updateInventory();
+
+        } else if (clicked.getItemMeta().getLore().equals(Utils.chat("&fClick to cycle through different sizes."))) {
+
+            //Change the difficulty by 1.
+            if (u.selectionTool.difficulty == 3) {
+
+                u.selectionTool.difficulty = 1;
+
+            } else {
+
+                u.selectionTool.difficulty ++;
+
+            }
+
+            //Update the inventory.
+            u.player.getInventory().setContents(CreatePlotGui.Gui(u).getContents());
+            u.player.updateInventory();
+        } else if (clicked.getItemMeta().getLocalizedName().equals(Utils.chat("&b&lCreate Plot"))) {
+
+            //Create the plot.
+            u.selectionTool.createPlot();
+            u.player.closeInventory();
 
         }
+
         return;
 
 

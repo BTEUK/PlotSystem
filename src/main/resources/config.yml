@@ -7,34 +7,15 @@ password: password
 
 #Database names (doesn't require adjusting)
 database:
+    global: uknet_global
     plot: uknet_plots
+    navigation: uknet_navigation
     
 #Server configuration
 enabled: false
-server_name: plotserver  
-
-#Utils plugin
-UKUtils: true
-
-#Promotion Point Values
-rankup:
-    apprentice: 10
-    jrbuilder: 30
-    builder: 100
-
-#Plot Limits
-#Limit on maximum distance between 2 points of a plot
-plot_distance:
-    guest: 50
-    apprentice: 75
-    jrbuilder: 100
-    builder: 200
-    
-#Minimum distance between 2 points of a claim
-min_dis: 5
+server_name: plotserver
 
 #Limit on active claimed plots
-
 #If user is at the limit they will no longer be able to create a new plot
 plot_limit:
     guest: 1
@@ -45,101 +26,6 @@ plot_limit:
 #Maximum number of total plots, this includes submitted plots
 plot_maximum: 15
 
-#Server must be using multiverse to allow for multiple worlds
-worlds:
-    save: saveWorld
-    build: buildWorld
-    tutorial: tutorialWorld
-
-tutorial_1:
-    start:
-        x: 0.5
-        y: 64.0
-        z: -6.5
-        yaw: 0.0
-        pitch: 0.0
-    good:
-        x: 3.5
-        y: 64.0
-        z: 6.5
-    bad:
-        x: -2.5
-        y: 64.0
-        z: 6.5
-tutorial_2:
-    start:
-        x: 2870614.5
-        y: 143.0
-        z: -5430305.5
-        yaw: -90.0
-        pitch: 0.0
-    corner_1:
-        x: 2870584.23
-        y: 143.0
-        z: -5430323.02
-    corner_2:
-        x: 2870600.15
-        y: 143.0
-        z: -5430302.43
-    corner_3:
-        x: 2870619.02
-        y: 143.0
-        z: -5430317.09
-    corner_4:
-        x: 2870603.15
-        y: 143.0
-        z: -5430337.79
-tutorial_3:
-    start:
-        x: 100.5
-        y: 65.0
-        z: 100.5
-        yaw: 0.0
-        pitch: 0.0
-    continue:
-        x: 90.5
-        y: 65.0
-        z: 109.5
-    worldedit:
-        x: 102.5
-        y: 65.0
-        z: 112.5
-    gep:
-        x: 98.5
-        y: 65.0
-        z: 112.5
-    roofs:
-        x: 94.5
-        y: 65.0
-        z: 111.5
-    details:
-        x: 106.5
-        y: 65.0
-        z: 111.5
-    texture:
-        x: 110.5
-        y: 65.0
-        z: 109.5 
-tutorial_9:
-    start:
-        x: 2807465.5
-        y: 72.0
-        z: -5415408.5
-        yaw: -90.0
-        pitch: 0.0
-    corner_1:
-        x: 2807456
-        z: -5415388
-    corner_2:
-        x: 2807440
-        z: -5415421
-    corner_3:
-        x: 2807469
-        z: -5415433
-    corner_4:
-        x: 2807485
-        z: -5415405
-
 #Building points
 #Points multiplier for each level
 #Example if size is 3 and size_multiplier is 5 then the player will receive 3*5=15 points for size.
@@ -149,35 +35,8 @@ accuracy_multiplier: 1
 quality_multiplier: 1
 points_base: 5
 
-#Points multiplier
-#Calculated by building points multiplied by points_multiplier
-#Example the user received 15 building points and the points_multiplier is 3 then they will get 15*3=45 points.
-points_enabled: true
-points_multiplier: 5
-
 #Number of days a player can be inactive before their plots get cancelled
 plot_inactive_cancel: 14
 
 #Cooldown between plot submissions in minutes
 submit_cooldown: 5
-
-#Locations
-location:
-    spawn:
-        x:
-        y:
-        z:
-    hologram:
-        x:
-        y:
-        z:
-    cranham:
-        map:
-            x:
-            y:
-            z:
-    monkspath:
-        map:
-            x:
-            y:
-            z:
