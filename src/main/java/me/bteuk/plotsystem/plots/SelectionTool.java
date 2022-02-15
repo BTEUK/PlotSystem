@@ -29,6 +29,9 @@ public class SelectionTool extends WGCreatePlot {
     //The location where the plot is.
     private String location;
 
+    //Area of the plot.
+    public int area;
+
     //Size and difficulty of the plot when creating the plot.
     public int size;
     public int difficulty;
@@ -132,7 +135,7 @@ public class SelectionTool extends WGCreatePlot {
 
         //If the vector has less than 3 points you can't get an area.
         if (size() < 3) {
-            size = 0;
+            area = 0;
         }
 
         int sumX = 0;
@@ -145,14 +148,32 @@ public class SelectionTool extends WGCreatePlot {
 
         }
 
-        size = Math.abs((sumX - sumZ) / 2);
+        area = Math.abs((sumX - sumZ) / 2);
 
+    }
+
+    //Sets the default plot size.
+    public void setDefaultSize() {
+
+        if (area < 600) {
+
+            size = 1;
+
+        } else if (area < 1500) {
+
+            size = 2;
+
+        } else {
+
+            size = 3;
+
+        }
     }
 
     //Returns the plot difficulty name.
     public PlotDifficulty difficultyName() {
 
-        switch(difficulty) {
+        switch (difficulty) {
 
             case 1:
                 return PlotDifficulty.EASY;
@@ -169,17 +190,16 @@ public class SelectionTool extends WGCreatePlot {
     //Returns the plot size name.
     public PlotSize sizeName() {
 
-        if (size < 600) {
+        switch (size) {
 
-            return PlotSize.SMALL;
-
-        } else if (size < 1500) {
-
-            return PlotSize.MEDIUM;
-
-        } else {
-
-            return PlotSize.LARGE;
+            case 1:
+                return PlotSize.SMALL;
+            case 2:
+                return PlotSize.MEDIUM;
+            case 3:
+                return PlotSize.LARGE;
+            default:
+                return null;
 
         }
     }
@@ -187,17 +207,16 @@ public class SelectionTool extends WGCreatePlot {
     //Returns the plot size material.
     public Material sizeMaterial() {
 
-        if (size < 600) {
+        switch (size) {
 
-            return Material.LIME_CONCRETE;
-
-        } else if (size < 1500) {
-
-            return Material.YELLOW_CONCRETE;
-
-        } else {
-
-            return Material.RED_CONCRETE;
+            case 1:
+                return Material.LIME_CONCRETE;
+            case 2:
+                return Material.YELLOW_CONCRETE;
+            case 3:
+                return Material.RED_CONCRETE;
+            default:
+                return null;
 
         }
     }
@@ -205,7 +224,7 @@ public class SelectionTool extends WGCreatePlot {
     //Returns the plot difficulty material.
     public Material difficultyMaterial() {
 
-        switch(difficulty) {
+        switch (difficulty) {
 
             case 1:
                 return Material.LIME_CONCRETE;

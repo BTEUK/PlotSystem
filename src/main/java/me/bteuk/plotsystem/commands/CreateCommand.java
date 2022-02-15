@@ -92,6 +92,7 @@ public class CreateCommand {
 
         //Open the plot creation menu
         u.selectionTool.area();
+        u.selectionTool.setDefaultSize();
         u.player.openInventory(CreatePlotGui.Gui(u));
 
     }

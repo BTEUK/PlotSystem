@@ -8,7 +8,9 @@ import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystem;
+import me.bteuk.plotsystem.gui.*;
 import me.bteuk.plotsystem.listeners.InventoryClicked;
 import me.bteuk.plotsystem.listeners.ItemSpawn;
 import me.bteuk.plotsystem.listeners.JoinServer;
@@ -17,6 +19,7 @@ import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
+import net.royawesome.jlibnoise.module.modifier.Clamp;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,12 +32,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.bteuk.plotsystem.commands.BuildingPoints;
 import me.bteuk.plotsystem.commands.OpenGui;
-import me.bteuk.plotsystem.gui.ConfirmCancel;
-import me.bteuk.plotsystem.gui.LocationGUI;
-import me.bteuk.plotsystem.gui.MainGui;
-import me.bteuk.plotsystem.gui.PlotGui;
-import me.bteuk.plotsystem.gui.PlotInfo;
-import me.bteuk.plotsystem.gui.SwitchServerGUI;
 import me.bteuk.plotsystem.reviewing.AcceptGui;
 import me.bteuk.plotsystem.reviewing.DenyGui;
 import me.bteuk.plotsystem.reviewing.FeedbackGui;
@@ -194,8 +191,13 @@ public class Main extends JavaPlugin {
         //holograms = new Holograms(hologramData, hologramText, playerData);
         //holograms.create();
 
+        //Create instance of claim command,
+        //as it is used to check whether a person is able to claim the plot they're standing in.
+        ClaimCommand claimCommand = new ClaimCommand(plotSQL);
+
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystem(plotSQL, navigationSQL));
+        getCommand("claim").setExecutor(claimCommand);
 
 
         getCommand("gui").setExecutor(new OpenGui());
@@ -215,6 +217,8 @@ public class Main extends JavaPlugin {
         ConfirmCancel.initialize();
         SwitchServerGUI.initialize();
         FeedbackGui.initialize();
+
+        ClaimGui.initialize();
 
     }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.math.Point;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -259,21 +260,14 @@ public class WorldGuardFunctions {
 
 	}
 
-	public static boolean addMember(int plot, String uuid) {
-
-		//Get plugin instance and config.
-		Main instance = Main.getInstance();
-		FileConfiguration config = instance.getConfig();
-
-		//Get world.
-		World buildWorld = Bukkit.getServer().getWorld(config.getString("worlds.build"));
+	public static boolean addMember(int plot, String uuid, World world) {
 
 		//Get instance of WorldGuard.
 		WorldGuard wg = WorldGuard.getInstance();
 
 		//Get regions.
 		RegionContainer container = wg.getPlatform().getRegionContainer();
-		RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
+		RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
 		//Add the member to the region.
 		buildRegions.getRegion(String.valueOf(plot)).getMembers().addPlayer(UUID.fromString(uuid));
@@ -288,21 +282,14 @@ public class WorldGuardFunctions {
 		}
 	}
 	
-	public static boolean removeMember(int plot, String uuid) {
-
-		//Get plugin instance and config.
-		Main instance = Main.getInstance();
-		FileConfiguration config = instance.getConfig();
-
-		//Get world.
-		World buildWorld = Bukkit.getServer().getWorld(config.getString("worlds.build"));
+	public static boolean removeMember(int plot, String uuid, World world) {
 
 		//Get instance of WorldGuard.
 		WorldGuard wg = WorldGuard.getInstance();
 
 		//Get regions.
 		RegionContainer container = wg.getPlatform().getRegionContainer();
-		RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
+		RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
 		//Check if the member is in the region.
 		if (buildRegions.getRegion(String.valueOf(plot)).getMembers().contains(UUID.fromString(uuid))) {

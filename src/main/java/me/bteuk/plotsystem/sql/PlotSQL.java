@@ -43,25 +43,27 @@ public class PlotSQL {
         )) {
 
             statement.setString(1, world);
-            ResultSet results = statement.executeQuery();
 
-            //If there is a result for this world, and it is of type build then return true, else return false.
-            if (results.next()) {
+            try (ResultSet results = statement.executeQuery()) {
 
-                if (results.getString("type").equals("build")) {
+                //If there is a result for this world, and it is of type build then return true, else return false.
+                if (results.next()) {
 
-                    return true;
+                    if (results.getString("type").equals("build")) {
+
+                        return true;
+
+                    } else {
+
+                        return false;
+
+                    }
 
                 } else {
 
                     return false;
 
                 }
-
-            } else {
-
-                return false;
-
             }
 
         } catch (SQLException sql) {
@@ -80,17 +82,18 @@ public class PlotSQL {
                 "SELECT name FROM world_data WHERE server='" + Main.SERVER_NAME + "', type='save';"
         )) {
 
-            ResultSet results = statement.executeQuery();
+            try (ResultSet results = statement.executeQuery()) {
 
-            //If there is a value for save the return the name, else return null.
-            if (results.next()) {
+                //If there is a value for save the return the name, else return null.
+                if (results.next()) {
 
-                return results.getString("name");
+                    return results.getString("name");
 
-            } else {
+                } else {
 
-                return null;
+                    return null;
 
+                }
             }
 
         } catch (SQLException sql) {
@@ -98,28 +101,6 @@ public class PlotSQL {
             //If for some reason an error occurred in the sql then return null.
             sql.printStackTrace();
             return null;
-        }
-    }
-
-    //Checks whether the server has been added to the config.
-    //If not then the server must be setup first before the plugin is fully enabled.
-    public boolean serverSetup(String name) {
-
-        //Create a statement to select the server name.
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM server_data WHERE name=?;"
-        )) {
-
-            ResultSet results = statement.executeQuery();
-
-            //If the server exists return true
-            return (results.next());
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
         }
     }
 
@@ -145,84 +126,6 @@ public class PlotSQL {
         }
     }
 
-    //Adds a new server to the database
-    public boolean addServer(boolean tutorial_only, boolean plots_only) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO server_data(name, tutorial_only, plots_only) VALUES(?, ?, ?);"
-        )) {
-
-            statement.setString(1, Main.SERVER_NAME);
-            statement.setBoolean(2, tutorial_only);
-            statement.setBoolean(3, plots_only);
-            statement.executeUpdate();
-
-            return true;
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Checks whether this server is plots only.
-    public boolean plotsOnly() {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT plots_only FROM server_data WHERE name=?;"
-        )) {
-
-            statement.setString(1, Main.SERVER_NAME);
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-
-                return results.getBoolean(1);
-
-            } else {
-
-                return false;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Checks whether this server is tutorial only.
-    public boolean tutorialOnly() {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT tutorial_only FROM server_data WHERE name=?;"
-        )) {
-
-            statement.setString(1, Main.SERVER_NAME);
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-
-                return results.getBoolean(1);
-
-            } else {
-
-                return false;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
     //Checks whether the plot is claimed.
     public boolean isClaimed(int plotID) {
 
@@ -231,16 +134,18 @@ public class PlotSQL {
         )) {
 
             statement.setInt(1, plotID);
-            ResultSet results = statement.executeQuery();
 
-            if (results.next()) {
+            try (ResultSet results = statement.executeQuery()) {
 
-                return true;
+                if (results.next()) {
 
-            } else {
+                    return true;
 
-                return false;
+                } else {
 
+                    return false;
+
+                }
             }
 
         } catch (SQLException sql) {
@@ -362,56 +267,6 @@ public class PlotSQL {
         }
     }
 
-    //Check if there is a server with a tutorial.
-    public boolean tutorialExists() {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM server_data WHERE plots_only=?;"
-        )) {
-
-            statement.setBoolean(1, false);
-            ResultSet results = statement.executeQuery();
-
-            return results.next();
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Get a tutorial server.
-    public String getTutorialServer() {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM server_data WHERE plots_only=? ORDER BY tutorial_only DESC;"
-        )) {
-
-            statement.setBoolean(1, false);
-            ResultSet results = statement.executeQuery();
-
-            //Return the first item in the list,
-            // if there is a tutorial only server that will be first.
-            if (results.next()) {
-
-                return results.getString(1);
-
-            } else {
-
-                return null;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return null;
-        }
-    }
-
     //Get location bounds for specific world + server.
     public ArrayList<Location> getLocations(String world) {
 
@@ -423,19 +278,20 @@ public class PlotSQL {
 
             statement.setString(1, world);
             statement.setString(2, Main.SERVER_NAME);
-            ResultSet results = statement.executeQuery();
 
-            while (results.next()) {
+            try (ResultSet results = statement.executeQuery()) {
 
-                locations.add(new Location(
-                        results.getString("name"),
-                        (int) navigationSQL.getX(results.getInt("coordMin")),
-                        (int) navigationSQL.getX(results.getInt("coordMax")),
-                        (int) navigationSQL.getZ(results.getInt("coordMin")),
-                        (int) navigationSQL.getZ(results.getInt("coordMax"))
-                ));
+                while (results.next()) {
+
+                    locations.add(new Location(
+                            results.getString("name"),
+                            (int) navigationSQL.getX(results.getInt("coordMin")),
+                            (int) navigationSQL.getX(results.getInt("coordMax")),
+                            (int) navigationSQL.getZ(results.getInt("coordMin")),
+                            (int) navigationSQL.getZ(results.getInt("coordMax"))
+                    ));
+                }
             }
-
 
         } catch (SQLException sql) {
 
@@ -462,15 +318,16 @@ public class PlotSQL {
             statement.executeUpdate();
 
             //If the id does not exist return 0.
-            ResultSet results = statement.getGeneratedKeys();
-            if (results.next()) {
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
 
-                return results.getInt("id");
+                    return results.getInt("id");
 
-            } else {
+                } else {
 
-                return 0;
+                    return 0;
 
+                }
             }
 
         } catch (SQLException sql) {
@@ -505,19 +362,65 @@ public class PlotSQL {
         }
     }
 
-    //Check whether the database has the specific row, return boolean.
-    public boolean hasRow(String sql) {
+    //Update a row in the database, return true if it was successful.
+    public boolean update(String sql) {
 
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            ResultSet results = statement.executeQuery();
+            success = statement.executeUpdate();
+
+            //If the insert was successful return true;
+            if (success > 0) {return true;}
+            else {
+
+                Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
+                return false;
+
+            }
+
+        } catch (SQLException e) {
+            //If for some reason an error occurred in the sql then return false.
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //Check whether the database has the specific row, return boolean.
+    public boolean hasRow(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
 
             return results.next();
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    //Return the first int for a specific statement, if no value is found return 0.
+    public int getInt(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getInt(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 }
