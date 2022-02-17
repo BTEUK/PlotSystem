@@ -478,13 +478,29 @@ public class NavigationSQL {
             success = statement.executeUpdate();
 
             //If the insert was successful return true;
-            if (success > 0) {return true;}
-            else {
+            if (success > 0) {
+                return true;
+            } else {
 
                 Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
                 return false;
 
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //Generic statement checking whether a specific row exists.
+    public boolean hasRow(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            return results.next();
 
         } catch (SQLException e) {
             e.printStackTrace();

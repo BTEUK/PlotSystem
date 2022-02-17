@@ -130,7 +130,7 @@ public class Main extends JavaPlugin {
         //Set the server name from config.
         SERVER_NAME = config.getString("server_name");
 
-        if (!plotSQL.serverSetup(SERVER_NAME)) {
+        if (!navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
 
             //Add server to database and enable server.
             if (navigationSQL.insert(
@@ -201,7 +201,6 @@ public class Main extends JavaPlugin {
 
 
         getCommand("gui").setExecutor(new OpenGui());
-        getCommand("createarea").setExecutor(new CreateArea());
         getCommand("buildingpoints").setExecutor(new BuildingPoints());
 
         //getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
@@ -237,7 +236,8 @@ public class Main extends JavaPlugin {
             //If the player is in a review, cancel it.
             if (u.review != null) {
 
-                WorldGuardFunctions.removeMember(u.review.plot, u.uuid);
+                WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE name=" +
+                        plotSQL.getString(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")) + ";")));
                 //plotData.setStatus(u.review.plot, "submitted");
                 u.review.editBook.unregister();
                 u.player.getInventory().setItem(4, u.review.previousItem);

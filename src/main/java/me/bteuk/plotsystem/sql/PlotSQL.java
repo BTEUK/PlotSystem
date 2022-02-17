@@ -423,4 +423,27 @@ public class PlotSQL {
             return 0;
         }
     }
+
+    //Return the first string for a specific statement, if no value is found return null.
+    public String getString(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getString(1);
+
+            } else {
+
+                return null;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
