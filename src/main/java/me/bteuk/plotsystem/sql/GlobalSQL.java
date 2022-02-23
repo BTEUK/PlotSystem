@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public class GlobalSQL {
 
@@ -23,12 +24,64 @@ public class GlobalSQL {
         return dataSource.getConnection();
     }
 
+    //Generic statement checking whether a specific row exists.
+    public boolean hasRow(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            return results.next();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //Get a hashmap of all events for this server.
+    public HashMap<String, String> getEvents(String server) {
+
+        //Create map.
+        HashMap<String, String> map = new HashMap<>();
+
+        //Try and get all events for this server.
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server=" + server + ";");
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                map.put(results.getString(1), results.getString(2));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return map;
+        }
+
+        //Try and delete all events for this server.
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server=" + server + ";")) {
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return map;
+        }
+
+        //Return the map.
+        return map;
+
+    }
+
 
     public boolean playerExists(String uuid) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT uuid FROM player_data WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, uuid);
             ResultSet results = statement.executeQuery();
@@ -45,7 +98,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "UPDATE player_data SET name = ? WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, name);
             statement.setString(2, uuid);
@@ -62,7 +115,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO player_data(uuid, name, role, last_online, last_submit) VALUES(?, ?, ?, ?, ?);"
-        )){
+        )) {
 
             statement.setString(1, uuid);
             statement.setString(2, name);
@@ -80,7 +133,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "UPDATE player_data SET last_online = ? WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setLong(1, Time.currentTime());
             statement.setString(2, uuid);
@@ -95,7 +148,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT role FROM player_data WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, uuid);
             ResultSet results = statement.executeQuery();
@@ -116,7 +169,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "UPDATE player_data SET last_submit = ? WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setLong(1, Time.currentTime());
             statement.setString(2, uuid);
@@ -131,7 +184,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT last_submit FROM player_data WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, uuid);
 
@@ -154,7 +207,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT name FROM player_data WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, uuid);
 
@@ -172,7 +225,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "UPDATE player_data SET role = ? WHERE uuid = ?;"
-        )){
+        )) {
 
             statement.setString(1, role.name());
             statement.setString(2, uuid);
@@ -187,7 +240,7 @@ public class GlobalSQL {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT uuid FROM player_data WHERE name = ?;"
-        )){
+        )) {
 
             statement.setString(1, name);
             ResultSet results = statement.executeQuery();

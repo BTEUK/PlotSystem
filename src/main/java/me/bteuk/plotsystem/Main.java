@@ -55,7 +55,7 @@ public class Main extends JavaPlugin {
 
     //Plot Database
     private String plot_database;
-    private PlotSQL plotSQL;
+    public PlotSQL plotSQL;
     private DataSource plot_dataSource;
 
     //Navigation Database
@@ -166,7 +166,7 @@ public class Main extends JavaPlugin {
         new JoinServer(instance, plotSQL);
 
         //Setup Timers
-        timers = new Timers(this, config, plot_dataSource);
+        timers = new Timers(this, globalSQL);
         timers.startTimers();
 
         //Create bungeecord channel
@@ -257,7 +257,6 @@ public class Main extends JavaPlugin {
 
         host = config.getString("host");
         port = config.getInt("port");
-        database = config.getString("database");
         username = config.getString("username");
         password = config.getString("password");
 

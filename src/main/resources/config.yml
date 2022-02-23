@@ -1,4 +1,4 @@
-#MySQL is manditory for this plugin
+#MySQL is mandatory for this plugin
 #Login information
 host: localhost
 port: 3306
@@ -7,10 +7,10 @@ password: password
 
 #Database names (doesn't require adjusting)
 database:
-    global: uknet_global
-    plot: uknet_plots
-    navigation: uknet_navigation
-    
+  global: uknet_global
+  plot: uknet_plots
+  navigation: uknet_navigation
+
 #Server configuration
 enabled: false
 server_name: plotserver
@@ -18,10 +18,10 @@ server_name: plotserver
 #Limit on active claimed plots
 #If user is at the limit they will no longer be able to create a new plot
 plot_limit:
-    guest: 1
-    apprentice: 2
-    jrbuilder: 3
-    builder: 5
+  guest: 1
+  apprentice: 2
+  jrbuilder: 3
+  builder: 5
 
 #Maximum number of total plots, this includes submitted plots
 plot_maximum: 15
