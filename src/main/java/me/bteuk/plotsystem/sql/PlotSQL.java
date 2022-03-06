@@ -4,6 +4,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.plots.Location;
 import me.bteuk.plotsystem.utils.Time;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 
@@ -16,12 +17,12 @@ import javax.sql.DataSource;
 
 public class PlotSQL {
 
-    private DataSource dataSource;
+    private BasicDataSource dataSource;
     private NavigationSQL navigationSQL;
     private int success;
 
     //Set the dataSource for the plot_data database.
-    public PlotSQL(DataSource dataSource, NavigationSQL navigationSQL) {
+    public PlotSQL(BasicDataSource dataSource, NavigationSQL navigationSQL) {
 
         this.dataSource = dataSource;
         this.navigationSQL = navigationSQL;
@@ -339,29 +340,6 @@ public class PlotSQL {
 
     }
 
-    //Generic insert statement, return true is successful.
-    public boolean insert(String sql) {
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            success = statement.executeUpdate();
-
-            //If the insert was successful return true;
-            if (success > 0) {return true;}
-            else {
-
-                Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
-                return false;
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     //Update a row in the database, return true if it was successful.
     public boolean update(String sql) {
 
@@ -374,7 +352,7 @@ public class PlotSQL {
             if (success > 0) {return true;}
             else {
 
-                Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
+                Bukkit.getLogger().warning("SQL update " + sql + " failed!");
                 return false;
 
             }

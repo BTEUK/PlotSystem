@@ -93,7 +93,11 @@ public class CreateCommand {
         //Open the plot creation menu
         u.selectionTool.area();
         u.selectionTool.setDefaultSize();
-        u.player.openInventory(CreatePlotGui.Gui(u));
+
+        //Get the user from the network plugin.
+        me.bteuk.network.utils.User user = me.bteuk.network.Main.getInstance().getUser(u.player);
+        user.uniqueGui = CreatePlotGui.createPlotGui(u);
+        user.uniqueGui.open(user);
 
     }
 
@@ -168,7 +172,7 @@ public class CreateCommand {
                 xmax, 256, zmax, 0, 0));
 
         //Add the location to the database.
-        if (plotSQL.insert("INSERT INTO location_data(name, world, server, coordMin, coordMax) VALUES(" + args[2] + ", " + args[3] + ", " +  coordMin + ", " + coordMax + ");")) {
+        if (plotSQL.update("INSERT INTO location_data(name, world, server, coordMin, coordMax) VALUES(" + args[2] + ", " + args[3] + ", " +  coordMin + ", " + coordMax + ");")) {
 
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2]) + " to world " + args[3]);
 

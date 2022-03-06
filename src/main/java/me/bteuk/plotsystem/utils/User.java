@@ -2,17 +2,13 @@ package me.bteuk.plotsystem.utils;
 
 import me.bteuk.plotsystem.plots.SelectionTool;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.enums.Role;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
-import me.bteuk.plotsystem.mysql.TutorialData;
 import me.bteuk.plotsystem.reviewing.Review;
 
 public class User {
@@ -101,17 +97,17 @@ public class User {
             role = Role.GUEST;
         }
 
-        if (globalSQL.playerExists(uuid)) {
+        if (globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid = " + uuid + ";")) {
 
             //If true then update their last online time and username.
-            globalSQL.updateTime(uuid);
-            globalSQL.updatePlayerName(uuid, player.getName());
-            globalSQL.updateRole(uuid, role);
+            globalSQL.update("UPDATE player_data SET last_online = " + Time.currentTime() + " WHERE uuid = " + uuid + ";");
+            globalSQL.update("UPDATE player_data SET name = " + player.getName() + " WHERE uuid = " + uuid + ";");
+            globalSQL.update("UPDATE player_data SET role = " + role + " WHERE uuid = " + uuid + ";");
 
         } else {
 
-            globalSQL.createPlayerInstance(player.getUniqueId().toString(),
-                    player.getName(), role);
+            globalSQL.update("INSERT INTO player_data(uuid, name, role, last_online, last_submit) " +
+                    "VALUES(" + player.getUniqueId().toString() + ", " + player.getName() + ", " + role +", " + Time.currentTime() + ", " + 0 + ");");
 
         }
     }

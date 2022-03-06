@@ -3,9 +3,8 @@ package me.bteuk.plotsystem.sql;
 import java.sql.*;
 import java.util.ArrayList;
 
-import javax.sql.DataSource;
-
 import me.bteuk.plotsystem.Main;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -13,10 +12,10 @@ import me.bteuk.plotsystem.utils.CustomHologram;
 
 public class NavigationSQL {
 
-    private DataSource dataSource;
+    private BasicDataSource dataSource;
     private int success;
 
-    public NavigationSQL(DataSource dataSource) {
+    public NavigationSQL(BasicDataSource dataSource) {
 
         this.dataSource = dataSource;
 

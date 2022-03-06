@@ -21,7 +21,7 @@ public class ItemSpawn implements Listener {
 		
 		ItemStack item = e.getEntity().getItemStack();
 		
-		if (item.equals(Main.gui) || item.equals(Tutorial.tutorialGui)) {
+		if (item.equals(Main.gui)) {
 
 			e.setCancelled(true);
 

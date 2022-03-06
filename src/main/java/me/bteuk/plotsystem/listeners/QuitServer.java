@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.PlotData;
-import me.bteuk.plotsystem.mysql.TutorialData;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.md_5.bungee.api.ChatColor;

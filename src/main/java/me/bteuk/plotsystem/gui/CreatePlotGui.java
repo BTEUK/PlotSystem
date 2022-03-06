@@ -1,5 +1,8 @@
 package me.bteuk.plotsystem.gui;
 
+import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -8,85 +11,95 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class CreatePlotGui {
 
-    public static Inventory inv;
-    public static Component inventory_name;
-    public static int inv_rows = 3 * 9;
+    public static UniqueGui createPlotGui(User user) {
 
-    public static void initialize() {
+        UniqueGui gui = new UniqueGui(27, Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        inventory_name = Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD);
+        //Choose plot size.
+        gui.setItem(12, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+                        Utils.chat("&b&l" + user.selectionTool.sizeName()),
+                        Utils.chat("&fClick to cycle through different sizes.")),
+                u ->
 
-        inv = Bukkit.createInventory(null, inv_rows);
+                {
 
-    }
+                    User eUser = Main.getInstance().getUser(u.player);
 
-    public static Inventory Gui(User u) {
+                    //Change the size by 1.
+                    if (eUser.selectionTool.size == 3) {
 
-        Inventory toReturn = Bukkit.createInventory(null, inv_rows, inventory_name);
+                        eUser.selectionTool.size = 1;
 
-        inv.clear();
+                    } else {
 
-        Utils.createItem(inv, u.selectionTool.sizeMaterial(), 1, 12, Utils.chat("&b&l" + u.selectionTool.sizeName()),
-                Utils.chat("&fClick to cycle through different sizes."));
+                        eUser.selectionTool.size++;
 
-        Utils.createItem(inv, u.selectionTool.difficultyMaterial(), 1, 12, Utils.chat("&b&l" + u.selectionTool.difficultyName()),
-                Utils.chat("&fClick to cycle through different difficulties."));
+                    }
 
-        toReturn.setContents(inv.getContents());
-        return toReturn;
+                    //Update the inventory.
+                    u.uniqueGui.delete();
+                    u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
+                    u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                    Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 
-    }
+                });
 
-    public static void clicked(User u, int slot, ItemStack clicked, Inventory inv, NavigationSQL navigationSQL, PlotSQL plotSQL) {
+        //Choose plot difficulty.
+        gui.setItem(14, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+                        Utils.chat("&b&l" + user.selectionTool.difficultyName()),
+                        Utils.chat("&fClick to cycle through different difficulties.")),
+                u ->
 
-        if (clicked.getItemMeta().getLore().equals(Utils.chat("&fClick to cycle through different sizes."))) {
+                {
 
-            //Change the size by 1.
-            if (u.selectionTool.size == 3) {
+                    User eUser = Main.getInstance().getUser(u.player);
 
-                u.selectionTool.size = 1;
+                    //Change the difficulty by 1.
+                    if (eUser.selectionTool.difficulty == 3) {
 
-            } else {
+                        eUser.selectionTool.difficulty = 1;
 
-                u.selectionTool.size ++;
+                    } else {
 
-            }
+                        eUser.selectionTool.difficulty++;
 
-            //Update the inventory.
-            u.player.getInventory().setContents(CreatePlotGui.Gui(u).getContents());
-            u.player.updateInventory();
+                    }
 
-        } else if (clicked.getItemMeta().getLore().equals(Utils.chat("&fClick to cycle through different sizes."))) {
+                    //Update the inventory.
+                    u.uniqueGui.delete();
+                    u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
+                    u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                    Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 
-            //Change the difficulty by 1.
-            if (u.selectionTool.difficulty == 3) {
+                });
 
-                u.selectionTool.difficulty = 1;
+        //Create plot.
+        gui.setItem(12, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+                        Utils.chat("&b&l Create Plot"),
+                        Utils.chat("&fClick create a new plot with the settings selected.")),
+                u ->
 
-            } else {
+                {
 
-                u.selectionTool.difficulty ++;
+                    User eUser = Main.getInstance().getUser(u.player);
 
-            }
+                    //Update the inventory.
+                    u.player.closeInventory();
+                    u.uniqueGui.delete();
+                    u.uniqueGui = null;
 
-            //Update the inventory.
-            u.player.getInventory().setContents(CreatePlotGui.Gui(u).getContents());
-            u.player.updateInventory();
-        } else if (clicked.getItemMeta().getLocalizedName().equals(Utils.chat("&b&lCreate Plot"))) {
+                    //Create plot.
+                    eUser.selectionTool.createPlot();
 
-            //Create the plot.
-            u.selectionTool.createPlot();
-            u.player.closeInventory();
+                });
 
-        }
-
-        return;
-
+        return gui;
 
     }
 }

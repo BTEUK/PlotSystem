@@ -4,10 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.sql.DataSource;
-
-import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
-import com.mysql.cj.jdbc.MysqlDataSource;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystem;
 import me.bteuk.plotsystem.gui.*;
@@ -19,7 +15,7 @@ import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
-import net.royawesome.jlibnoise.module.modifier.Clamp;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -51,17 +47,17 @@ public class Main extends JavaPlugin {
     //Global Database
     private String global_database;
     private GlobalSQL globalSQL;
-    private DataSource global_dataSource;
+    private BasicDataSource global_dataSource;
 
     //Plot Database
     private String plot_database;
     public PlotSQL plotSQL;
-    private DataSource plot_dataSource;
+    private BasicDataSource plot_dataSource;
 
     //Navigation Database
     private String navigation_database;
     private NavigationSQL navigationSQL;
-    private DataSource navigation_dataSource;
+    private BasicDataSource navigation_dataSource;
 
     public Timers timers;
 
@@ -163,7 +159,7 @@ public class Main extends JavaPlugin {
         //plotData.clearReview();
 
         //Global Join listener
-        new JoinServer(instance, plotSQL);
+        new JoinServer(instance, globalSQL, plotSQL);
 
         //Setup Timers
         timers = new Timers(this, globalSQL);
@@ -253,19 +249,20 @@ public class Main extends JavaPlugin {
     }
 
     //Creates the mysql connection.
-    private DataSource mysqlSetup(String database) throws SQLException {
+    private BasicDataSource mysqlSetup(String database) throws SQLException {
 
         host = config.getString("host");
         port = config.getInt("port");
         username = config.getString("username");
         password = config.getString("password");
 
-        MysqlDataSource dataSource = new MysqlConnectionPoolDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setServerName(host);
-        dataSource.setPortNumber(port);
-        dataSource.setDatabaseName(database + "?&useSSL=false&");
-        dataSource.setUser(username);
+        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&useSSL=false&");
+        //dataSource.setServerName(host);
+        //dataSource.setPortNumber(port);
+        //dataSource.setDatabaseName(database + "?&useSSL=false&");
+        dataSource.setUsername(username);
         dataSource.setPassword(password);
 
         testDataSource(dataSource);
@@ -273,7 +270,7 @@ public class Main extends JavaPlugin {
 
     }
 
-    public void testDataSource(DataSource dataSource) throws SQLException {
+    public void testDataSource(BasicDataSource dataSource) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             if (!connection.isValid(1000)) {
                 throw new SQLException("Could not establish database connection.");

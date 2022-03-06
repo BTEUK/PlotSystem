@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.navigation.SwitchServer;
+import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,11 +23,13 @@ an alternative server which does have a tutorial.
  */
 public class JoinServer implements Listener {
 
+	private final GlobalSQL globalSQL;
 	private final PlotSQL plotSQL;
 
-	public JoinServer(Main plugin, PlotSQL plotSQL) {
+	public JoinServer(Main plugin, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+		this.globalSQL = globalSQL;
 		this.plotSQL = plotSQL;
 
 	}
@@ -35,21 +38,23 @@ public class JoinServer implements Listener {
 	public void joinEvent(PlayerJoinEvent e) {
 		
 		//Create instance of User and add it to list.
-		User u = new User(e.getPlayer());
+		User u = new User(e.getPlayer(), globalSQL, plotSQL);
 		Main.getInstance().getUsers().add(u);
 
-		//If the player has not completed the tutorial, and the server is for plots only
-		//Send the player to a server with a tutorial, if one exists.
-		if (!u.tutorial_complete && Main.PLOTS_ONLY) {
+		//If the player has a join event, execute it.
+		if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid=?;")) {
 
-			if (plotSQL.tutorialExists()) {
+			//Get the event from the database.
+			String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid=?");
 
-				String server = plotSQL.getTutorialServer();
+			//Clear the events.
+			globalSQL.update("DELETE FROM join_events WHERE uuid=?;");
 
-				u.player.sendMessage(Component.text("Teleporting to tutorial.", NamedTextColor.GREEN));
-				SwitchServer.toServer(u, server);
 
-			}
+
+
 		}
+
+
 	}
 }
