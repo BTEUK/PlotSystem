@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.listeners;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.plots.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -14,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -25,7 +25,7 @@ public class PlayerInteract implements Listener {
 
     PlotSQL plotSQL;
 
-    public PlayerInteract(Main plugin, PlotSQL plotSQL) {
+    public PlayerInteract(PlotSystem plugin, PlotSQL plotSQL) {
 
         //Register the listener.
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -38,20 +38,20 @@ public class PlayerInteract implements Listener {
     @EventHandler
     public void interactEvent(PlayerInteractEvent e) {
 
-        User u = Main.getInstance().getUser(e.getPlayer());
+        User u = PlotSystem.getInstance().getUser(e.getPlayer());
 
         if (e.getPlayer().getOpenInventory().getType() != InventoryType.CRAFTING && e.getPlayer().getOpenInventory().getType() != InventoryType.CREATIVE) {
             return;
         }
 
-        if (e.getPlayer().getInventory().getItemInMainHand().equals(Main.gui)) {
+        if (e.getPlayer().getInventory().getItemInMainHand().equals(PlotSystem.gui)) {
             e.setCancelled(true);
             e.getPlayer().closeInventory();
             e.getPlayer().openInventory(MainGui.GUI(u));
         }
 
         //Selection tool
-        if (u.player.getInventory().getItemInMainHand().equals(Main.selectionTool)) {
+        if (u.player.getInventory().getItemInMainHand().equals(PlotSystem.selectionTool)) {
 
             //You must have this permission to use the plot selection tool.
             //uknet = uknet plugins, plots = plotserver plugin, select = selection tool.
@@ -164,7 +164,7 @@ public class PlayerInteract implements Listener {
     @EventHandler
     public void swapHands(PlayerSwapHandItemsEvent e) {
 
-        if (e.getOffHandItem().equals(Main.gui)) {
+        if (e.getOffHandItem().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
 
@@ -173,7 +173,7 @@ public class PlayerInteract implements Listener {
     @EventHandler
     public void dropItem(PlayerDropItemEvent e) {
 
-        if (e.getItemDrop().getItemStack().equals(Main.gui)) {
+        if (e.getItemDrop().getItemStack().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
 
@@ -181,7 +181,7 @@ public class PlayerInteract implements Listener {
 
     @EventHandler
     public void moveItem(InventoryMoveItemEvent e) {
-        if (e.getItem().equals(Main.gui)) {
+        if (e.getItem().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
 
@@ -189,10 +189,10 @@ public class PlayerInteract implements Listener {
 
     @EventHandler
     public void moveItem(InventoryDragEvent e) {
-        if (e.getOldCursor().equals(Main.gui)) {
+        if (e.getOldCursor().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
-        if (e.getCursor().equals(Main.gui)) {
+        if (e.getCursor().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
 

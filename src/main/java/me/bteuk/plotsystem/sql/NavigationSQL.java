@@ -3,7 +3,7 @@ package me.bteuk.plotsystem.sql;
 import java.sql.*;
 import java.util.ArrayList;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -416,7 +416,7 @@ public class NavigationSQL {
                 "INSERT INTO server_data(name, type) VALUES(?, ?);"
         )) {
 
-            statement.setString(1, Main.SERVER_NAME);
+            statement.setString(1, PlotSystem.SERVER_NAME);
             statement.setString(2, "plot");
             statement.executeUpdate();
 

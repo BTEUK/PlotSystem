@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Leaderboard;
 import me.bteuk.plotsystem.utils.Time;
 
@@ -157,7 +157,7 @@ public class PlayerData {
 	public List<String> getInactivePlayers() {
 
 		//Get config.
-		FileConfiguration config = Main.getInstance().getConfig();
+		FileConfiguration config = PlotSystem.getInstance().getConfig();
 
 		//Calculate the time in milliseconds inactiveMax days ago, inactiveMax is the number of days player can be inactive before their plots are cancelled.
 		int inactiveMax = config.getInt("plot_inactive_cancel");

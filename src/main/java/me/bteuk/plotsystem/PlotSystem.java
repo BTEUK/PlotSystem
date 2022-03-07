@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import me.bteuk.plotsystem.commands.ClaimCommand;
-import me.bteuk.plotsystem.commands.PlotSystem;
+import me.bteuk.plotsystem.commands.PlotSystemCommand;
 import me.bteuk.plotsystem.gui.*;
 import me.bteuk.plotsystem.listeners.InventoryClicked;
 import me.bteuk.plotsystem.listeners.ItemSpawn;
@@ -38,7 +38,7 @@ import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
-public class Main extends JavaPlugin {
+public class PlotSystem extends JavaPlugin {
 
     //MySQL
     private String host, username, password;
@@ -64,7 +64,7 @@ public class Main extends JavaPlugin {
     //Items
     public static ItemStack selectionTool;
 
-    static Main instance;
+    static PlotSystem instance;
     static FileConfiguration config;
 
     private ArrayList<User> users;
@@ -89,8 +89,8 @@ public class Main extends JavaPlugin {
     public void onEnable() {
 
         //Config Setup
-        Main.instance = this;
-        Main.config = this.getConfig();
+        PlotSystem.instance = this;
+        PlotSystem.config = this.getConfig();
 
         saveDefaultConfig();
 
@@ -162,7 +162,7 @@ public class Main extends JavaPlugin {
         new JoinServer(instance, globalSQL, plotSQL);
 
         //Setup Timers
-        timers = new Timers(this, globalSQL);
+        timers = new Timers(this, globalSQL, plotSQL);
         timers.startTimers();
 
         //Create bungeecord channel
@@ -192,7 +192,7 @@ public class Main extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotSQL);
 
         //Commands
-        getCommand("plotsystem").setExecutor(new PlotSystem(plotSQL, navigationSQL));
+        getCommand("plotsystem").setExecutor(new PlotSystemCommand(plotSQL, navigationSQL));
         getCommand("claim").setExecutor(claimCommand);
 
 
@@ -277,7 +277,7 @@ public class Main extends JavaPlugin {
     }
 
     //Returns an instance of the plugin.
-    public static Main getInstance() {
+    public static PlotSystem getInstance() {
         return instance;
     }
 

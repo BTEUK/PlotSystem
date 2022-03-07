@@ -6,11 +6,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;	
+import me.bteuk.plotsystem.PlotSystem;
 
 public class ItemSpawn implements Listener {
 	
-	public ItemSpawn(Main plugin) {
+	public ItemSpawn(PlotSystem plugin) {
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 
@@ -21,7 +21,7 @@ public class ItemSpawn implements Listener {
 		
 		ItemStack item = e.getEntity().getItemStack();
 		
-		if (item.equals(Main.gui)) {
+		if (item.equals(PlotSystem.gui)) {
 
 			e.setCancelled(true);
 

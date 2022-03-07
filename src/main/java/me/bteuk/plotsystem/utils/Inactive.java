@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.utils;
 
 import java.util.List;
 
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -10,7 +11,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.mysql.PointsData;
 
@@ -19,9 +19,9 @@ public class Inactive {
 	public static void cancelInactivePlots() {
 
 		//Get config.
-		FileConfiguration config = Main.getInstance().getConfig();	
+		FileConfiguration config = PlotSystem.getInstance().getConfig();
 		
-		PointsData pointsData = Main.getInstance().pointsData;
+		PointsData pointsData = PlotSystem.getInstance().pointsData;
 
 		//Get all plots claimed by inactive players.
 
@@ -29,7 +29,7 @@ public class Inactive {
 		long timeCap = config.getLong("plot_inactive_cancel")*24*60*60*1000;
 		long timeDif = time - timeCap; 
 		
-		PlotData plotData = Main.getInstance().plotData;
+		PlotData plotData = PlotSystem.getInstance().plotData;
 		
 		List<Integer> inactivePlots = plotData.getInactivePlots(timeDif);
 

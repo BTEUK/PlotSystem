@@ -1,7 +1,7 @@
 package me.bteuk.plotsystem.plots;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -103,16 +103,16 @@ public class SelectionTool extends WGCreatePlot {
         PlayerInventory i = u.player.getInventory();
 
         //Check if the player already has the selection tool in their inventory.
-        if (i.contains(Main.selectionTool)) {
+        if (i.contains(PlotSystem.selectionTool)) {
 
             //Get the selection tool from their inventory and swap it with the item in their hand.
-            i.setItem(i.first(Main.selectionTool), i.getItemInMainHand());
-            i.setItemInMainHand(Main.selectionTool);
+            i.setItem(i.first(PlotSystem.selectionTool), i.getItemInMainHand());
+            i.setItemInMainHand(PlotSystem.selectionTool);
 
         } else {
 
             //If they don't have the selection tool already set it in their main hand.
-            i.setItemInMainHand(Main.selectionTool);
+            i.setItemInMainHand(PlotSystem.selectionTool);
 
         }
     }

@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.gui;
 
 import java.util.List;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -54,9 +54,9 @@ public class ConfirmCancel {
 	public static void clicked(User u, int slot, ItemStack clicked, Inventory inv) {
 
 		//Get config.
-		FileConfiguration config = Main.getInstance().getConfig();
+		FileConfiguration config = PlotSystem.getInstance().getConfig();
 
-		PlotData plotData = Main.getInstance().plotData;
+		PlotData plotData = PlotSystem.getInstance().plotData;
 		
 		//Get player
 		Player p = u.player;

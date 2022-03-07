@@ -12,7 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Time;
 
 public class AcceptData {
@@ -240,7 +240,7 @@ public class AcceptData {
 	
 	public ItemStack getBook(int plot) {
 		
-		BookData bookData = Main.getInstance().bookData;
+		BookData bookData = PlotSystem.getInstance().bookData;
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta bookMeta = (BookMeta) book.getItemMeta();
 		

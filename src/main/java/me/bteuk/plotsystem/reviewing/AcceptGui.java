@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.List;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -13,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.AcceptData;
 import me.bteuk.plotsystem.mysql.BookData;
 import me.bteuk.plotsystem.mysql.MessageData;
@@ -292,14 +292,14 @@ public class AcceptGui {
 			p.updateInventory();
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Submit")) {
 
-			PlayerData playerData = Main.getInstance().playerData;
-			PlotData plotData = Main.getInstance().plotData;
-			BookData bookData = Main.getInstance().bookData;
-			AcceptData acceptData = Main.getInstance().acceptData;
-			MessageData messageData = Main.getInstance().messageData;
-			PointsData pointsData = Main.getInstance().pointsData;
+			PlayerData playerData = PlotSystem.getInstance().playerData;
+			PlotData plotData = PlotSystem.getInstance().plotData;
+			BookData bookData = PlotSystem.getInstance().bookData;
+			AcceptData acceptData = PlotSystem.getInstance().acceptData;
+			MessageData messageData = PlotSystem.getInstance().messageData;
+			PointsData pointsData = PlotSystem.getInstance().pointsData;
 
-			FileConfiguration config = Main.getInstance().getConfig();
+			FileConfiguration config = PlotSystem.getInstance().getConfig();
 
 			p.closeInventory();
 

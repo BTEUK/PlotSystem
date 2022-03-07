@@ -1,12 +1,12 @@
 package me.bteuk.plotsystem.listeners;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.User;
@@ -19,7 +19,7 @@ public class QuitServer implements Listener {
 	PlayerData playerData;
 	PlotData plotData;
 	
-	public QuitServer(Main plugin, TutorialData tutorialData, PlayerData playerData, PlotData plotData) {
+	public QuitServer(PlotSystem plugin, TutorialData tutorialData, PlayerData playerData, PlotData plotData) {
 
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 		this.tutorialData = tutorialData;
@@ -32,7 +32,7 @@ public class QuitServer implements Listener {
 	public void quitEvent(PlayerQuitEvent e) {
 
 		//Get instance of plugin.
-		Main instance = Main.getInstance();
+		PlotSystem instance = PlotSystem.getInstance();
 
 		//Get user from the list.
 		User u = instance.getUser(e.getPlayer());

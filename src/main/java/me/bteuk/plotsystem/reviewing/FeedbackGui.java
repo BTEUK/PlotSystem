@@ -2,13 +2,13 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.ArrayList;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.mysql.AcceptData;
 import me.bteuk.plotsystem.mysql.DenyData;
@@ -33,9 +33,9 @@ public class FeedbackGui {
 
 	public static Inventory GUI (User u) {
 
-		AcceptData acceptData = Main.getInstance().acceptData;
-		DenyData denyData = Main.getInstance().denyData;
-		PlayerData playerData = Main.getInstance().playerData;
+		AcceptData acceptData = PlotSystem.getInstance().acceptData;
+		DenyData denyData = PlotSystem.getInstance().denyData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 
 		Inventory toReturn = Bukkit.createInventory(null, inv_rows, inventory_name);
 
@@ -147,8 +147,8 @@ public class FeedbackGui {
 			return;
 		}
 		
-		AcceptData acceptData = Main.getInstance().acceptData;
-		DenyData denyData = Main.getInstance().denyData;
+		AcceptData acceptData = PlotSystem.getInstance().acceptData;
+		DenyData denyData = PlotSystem.getInstance().denyData;
 		
 		int plot;
 		int attempt;

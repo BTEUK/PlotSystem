@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.List;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.BookData;
 import me.bteuk.plotsystem.mysql.DenyData;
 import me.bteuk.plotsystem.mysql.MessageData;
@@ -61,12 +61,12 @@ public class DenyGui {
 
 		Player p = u.player;
 
-		FileConfiguration config = Main.getInstance().getConfig();
+		FileConfiguration config = PlotSystem.getInstance().getConfig();
 
-		PlotData plotData = Main.getInstance().plotData;
-		DenyData denyData = Main.getInstance().denyData;
-		BookData bookData = Main.getInstance().bookData;
-		MessageData messageData = Main.getInstance().messageData;
+		PlotData plotData = PlotSystem.getInstance().plotData;
+		DenyData denyData = PlotSystem.getInstance().denyData;
+		BookData bookData = PlotSystem.getInstance().bookData;
+		MessageData messageData = PlotSystem.getInstance().messageData;
 
 		if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Return")) {
 			//Open the review gui.
@@ -202,7 +202,7 @@ public class DenyGui {
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Remove Plot")) {
 
 			p.closeInventory();
-			PointsData pointsData = Main.getInstance().pointsData;
+			PointsData pointsData = PlotSystem.getInstance().pointsData;
 
 			//Get the feedback written in the book.
 			List<String> book = u.review.bookMeta.getPages();

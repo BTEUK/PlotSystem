@@ -2,7 +2,7 @@ package me.bteuk.plotsystem.utils;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.mysql.HologramData;
 import me.bteuk.plotsystem.mysql.HologramText;
 import me.bteuk.plotsystem.mysql.PlayerData;
@@ -35,7 +35,7 @@ public class Holograms {
 		ArrayList<CustomHologram> holograms = hologramData.getHolos();
 		ArrayList<String> lines;
 		Hologram hologram;
-		Main instance = Main.getInstance();
+		PlotSystem instance = PlotSystem.getInstance();
 
 		if (holograms == null) {return;} else if (holograms.isEmpty()) {return;}
 

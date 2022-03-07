@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.Time;
@@ -64,8 +64,8 @@ public class PlotInfo {
 
 		//Get player
 		Player p = u.player;
-		PlotData plotData = Main.getInstance().plotData;
-		PlayerData playerData = Main.getInstance().playerData;
+		PlotData plotData = PlotSystem.getInstance().plotData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 
 		if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Teleport")) {
 
@@ -85,7 +85,7 @@ public class PlotInfo {
 
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Submit Plot")) {
 
-			long lon_min = Main.getInstance().getConfig().getInt("submit_cooldown")*60*1000;
+			long lon_min = PlotSystem.getInstance().getConfig().getInt("submit_cooldown")*60*1000;
 
 			if (Time.currentTime() - playerData.getSubmit(u.uuid) <= lon_min) {
 

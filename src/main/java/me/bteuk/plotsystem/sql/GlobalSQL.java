@@ -1,7 +1,7 @@
 package me.bteuk.plotsystem.sql;
 
-import me.bteuk.plotsystem.utils.enums.Role;
-import me.bteuk.plotsystem.utils.Time;
+import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.commands.PlotSystemCommand;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 
@@ -42,14 +42,11 @@ public class GlobalSQL {
     }
 
     //Get a hashmap of all events for this server.
-    public HashMap<String, String> getEvents(String server) {
-
-        //Create map.
-        HashMap<String, String> map = new HashMap<>();
+    public HashMap<String, String> getEvents(String serverName, HashMap<String, String> map) {
 
         //Try and get all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server=" + server + ";");
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server=" + serverName + ";");
              ResultSet results = statement.executeQuery()) {
 
             while (results.next()) {
@@ -64,7 +61,7 @@ public class GlobalSQL {
 
         //Try and delete all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server=" + server + ";")) {
+             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server=" + serverName + ";")) {
 
             statement.executeUpdate();
 

@@ -1,17 +1,13 @@
 package me.bteuk.plotsystem.commands;
 
-import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-public class PlotSystem implements CommandExecutor {
+public class PlotSystemCommand implements CommandExecutor {
 
     //SQL
     PlotSQL plotSQL;
@@ -21,7 +17,7 @@ public class PlotSystem implements CommandExecutor {
     CreateCommand createCommand;
 
 
-    public PlotSystem(PlotSQL plotSQL, NavigationSQL navigationSQL) {
+    public PlotSystemCommand(PlotSQL plotSQL, NavigationSQL navigationSQL) {
 
         this.plotSQL = plotSQL;
 

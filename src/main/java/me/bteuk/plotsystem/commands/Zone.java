@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 
 public class Zone implements CommandExecutor {
@@ -22,7 +22,7 @@ public class Zone implements CommandExecutor {
 		}
 		
 		Player p = (Player) sender;
-		User u = Main.getInstance().getUser(p);
+		User u = PlotSystem.getInstance().getUser(p);
 		
 		if (args.length == 0) {
 			help(p);

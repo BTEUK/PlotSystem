@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import me.bteuk.plotsystem.utils.PlotValues;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.math.Point;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -26,33 +26,25 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.sql.PlotSQL;
 
 public class WorldGuardFunctions {
 
-    public static Location getCurrentLocation(int plot) {
-
-        //Get instance of plugin and config
-        Main instance = Main.getInstance();
-        FileConfiguration config = instance.getConfig();
-
-        //Get worlds from config
-        World buildWorld = Bukkit.getServer().getWorld(config.getString("worlds.build"));
+    public static Location getCurrentLocation(int plot, World world) {
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
 
         //Get worldguard region data
         RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
         //Get the worldguard region and teleport to player to one of the corners.
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
-        Location l = new Location(buildWorld, bv.getX(), Utils.getHighestYAt(buildWorld, bv.getX(), bv.getZ()), bv.getZ());
+        Location l = new Location(world, bv.getX(), Utils.getHighestYAt(world, bv.getX(), bv.getZ()), bv.getZ());
 
         return (l);
 
@@ -61,7 +53,7 @@ public class WorldGuardFunctions {
     public static Location getBeforeLocation(int plot) {
 
         //Get instance of plugin and config
-        Main instance = Main.getInstance();
+        PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
 
         //Get worlds from config
@@ -87,7 +79,7 @@ public class WorldGuardFunctions {
     public static List<BlockVector2> getPoints(int plot) {
 
         //Get instance of plugin and config
-        Main instance = Main.getInstance();
+        PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
 
         //Get worlds from config
@@ -150,7 +142,7 @@ public class WorldGuardFunctions {
     public static ApplicableRegionSet getPlots(BlockVector3 min, BlockVector3 max, int radius) {
 
         //Get plugin instance and config.
-        Main instance = Main.getInstance();
+        PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
 
         //Get worlds.
@@ -229,7 +221,7 @@ public class WorldGuardFunctions {
         points = region.getPoints();
 
         //Get instance of plugin and config
-        Main instance = Main.getInstance();
+        PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
 
         //Get worlds from config
@@ -311,7 +303,7 @@ public class WorldGuardFunctions {
     public static Location plotLocation(int plot) {
 
         //Get the world the plot is in.
-        String world = Main.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE location=" + Main.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + ";");
+        String world = PlotSystem.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE location=" + PlotSystem.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + ";");
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();

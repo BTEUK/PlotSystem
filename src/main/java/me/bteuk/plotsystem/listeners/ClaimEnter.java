@@ -6,7 +6,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -24,7 +24,7 @@ public class ClaimEnter implements Listener {
     PlotSQL plotSQL;
     GlobalSQL globalSQL;
 
-    public ClaimEnter(Main plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
+    public ClaimEnter(PlotSystem plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
         this.plotSQL = plotSQL;
@@ -34,7 +34,7 @@ public class ClaimEnter implements Listener {
     @EventHandler
     public void joinEvent(PlayerJoinEvent e) {
 
-        User u = Main.getInstance().getUser(e.getPlayer());
+        User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
 
     }
@@ -42,7 +42,7 @@ public class ClaimEnter implements Listener {
     //If the player is in a buildable world check whether they enter or exit a plot.
     @EventHandler
     public void moveEvent(PlayerMoveEvent e) {
-        User u = Main.getInstance().getUser(e.getPlayer());
+        User u = PlotSystem.getInstance().getUser(e.getPlayer());
         if (plotSQL.buildable(u.player.getWorld().getName())) {
             checkRegion(u);
         }

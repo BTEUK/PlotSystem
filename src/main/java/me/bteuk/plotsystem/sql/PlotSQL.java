@@ -1,19 +1,13 @@
 package me.bteuk.plotsystem.sql;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.plots.Location;
 import me.bteuk.plotsystem.utils.Time;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
 
 public class PlotSQL {
 
@@ -80,7 +74,7 @@ public class PlotSQL {
 
         //Create a statement to select the type where type = save.
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM world_data WHERE server='" + Main.SERVER_NAME + "', type='save';"
+                "SELECT name FROM world_data WHERE server='" + PlotSystem.SERVER_NAME + "', type='save';"
         )) {
 
             try (ResultSet results = statement.executeQuery()) {
@@ -114,7 +108,7 @@ public class PlotSQL {
 
             statement.setString(1, name);
             statement.setString(2, type);
-            statement.setString(3, Main.SERVER_NAME);
+            statement.setString(3, PlotSystem.SERVER_NAME);
             statement.executeUpdate();
 
             return true;
@@ -278,7 +272,7 @@ public class PlotSQL {
         )) {
 
             statement.setString(1, world);
-            statement.setString(2, Main.SERVER_NAME);
+            statement.setString(2, PlotSystem.SERVER_NAME);
 
             try (ResultSet results = statement.executeQuery()) {
 

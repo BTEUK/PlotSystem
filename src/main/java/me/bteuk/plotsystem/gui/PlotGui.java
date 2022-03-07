@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -30,7 +30,7 @@ public class PlotGui {
 
 	public static Inventory GUI (User u) {
 
-		PlotData plotData = Main.getInstance().plotData;
+		PlotData plotData = PlotSystem.getInstance().plotData;
 		
 		Inventory toReturn = Bukkit.createInventory(null, inv_rows, inventory_name);
 

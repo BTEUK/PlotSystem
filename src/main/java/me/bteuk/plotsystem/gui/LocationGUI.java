@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.gui;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -7,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 
@@ -53,11 +53,11 @@ public class LocationGUI {
 		if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "London, Cranham")) {
 			
 			//Will teleport the player to the map for this location.
-			p.teleport(Main.cranham);
+			p.teleport(PlotSystem.cranham);
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Solihull, Monkspath")) {
 			
 			//Will teleport the player to the map for this location.
-			p.teleport(Main.monkspath);
+			p.teleport(PlotSystem.monkspath);
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Return")) {
 			p.closeInventory();
 			p.openInventory(MainGui.GUI(u));

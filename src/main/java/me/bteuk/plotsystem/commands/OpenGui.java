@@ -5,7 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.utils.User;
 
@@ -19,7 +19,7 @@ public class OpenGui implements CommandExecutor {
 		}
 
 		Player p = (Player) sender;
-		User u = Main.getInstance().getUser(p);
+		User u = PlotSystem.getInstance().getUser(p);
 		
 		p.openInventory(MainGui.GUI(u));
 		

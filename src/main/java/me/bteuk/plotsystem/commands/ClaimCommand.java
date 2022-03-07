@@ -2,7 +2,7 @@ package me.bteuk.plotsystem.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -35,7 +35,7 @@ public class ClaimCommand implements CommandExecutor {
 
         //Get the player and user.
         Player p = (Player) sender;
-        User u = Main.getInstance().getUser(p);
+        User u = PlotSystem.getInstance().getUser(p);
 
         //If the plot is valid open the claim plot gui.
         if (validPlot(u)) {
@@ -74,7 +74,7 @@ public class ClaimCommand implements CommandExecutor {
 
         }
 
-        //If the plot of already claimed, tell the player they can not claim it, but they can request to join it.
+        //If the plot is already claimed, tell the player they can not claim it, but they can request to join it.
         if (plotSQL.isClaimed(u.inPlot)) {
 
             u.player.sendMessage(Utils.chat("&cThis plot is already claimed, if you wish to build in this plot ask the plot owner to invite you."));

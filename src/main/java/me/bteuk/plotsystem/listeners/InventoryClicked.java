@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ConfirmCancel;
 import me.bteuk.plotsystem.gui.LocationGUI;
 import me.bteuk.plotsystem.gui.MainGui;
@@ -21,8 +21,8 @@ import me.bteuk.plotsystem.utils.User;
 
 public class InventoryClicked implements Listener {
 	
-	Main instance;
-	public InventoryClicked(Main plugin) {
+	PlotSystem instance;
+	public InventoryClicked(PlotSystem plugin) {
 	
 		instance = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -37,7 +37,7 @@ public class InventoryClicked implements Listener {
 		 
 		String title = e.getView().getTitle();
 		
-		User u = Main.getInstance().getUser((Player) e.getWhoClicked());
+		User u = PlotSystem.getInstance().getUser((Player) e.getWhoClicked());
 		if (title.equals(MainGui.inventory_name)) {
 			e.setCancelled(true);
 			if (e.getCurrentItem() == null){
@@ -155,12 +155,12 @@ public class InventoryClicked implements Listener {
 				TutorialSelectionGui.clicked(u, e.getSlot(), e.getCurrentItem(), e.getInventory());
 			}
 		}
-		else if (e.getCurrentItem().equals(Main.gui)) {
+		else if (e.getCurrentItem().equals(PlotSystem.gui)) {
 			e.setCancelled(true);
 			u.player.closeInventory();
 			Bukkit.getScheduler().runTaskLater (instance, () -> u.player.openInventory(MainGui.GUI(u)), 1);
 		}
-		else if (e.getCurrentItem().equals(Main.tutorialGui)) {
+		else if (e.getCurrentItem().equals(PlotSystem.tutorialGui)) {
 			e.setCancelled(true);
 			u.player.closeInventory();
 			u.previousGui = "none";

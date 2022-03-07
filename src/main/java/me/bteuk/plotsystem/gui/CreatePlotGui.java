@@ -2,7 +2,7 @@ package me.bteuk.plotsystem.gui;
 
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.UniqueGui;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -24,7 +24,7 @@ public class CreatePlotGui {
 
                 {
 
-                    User eUser = Main.getInstance().getUser(u.player);
+                    User eUser = PlotSystem.getInstance().getUser(u.player);
 
                     //Change the size by 1.
                     if (eUser.selectionTool.size == 3) {
@@ -53,7 +53,7 @@ public class CreatePlotGui {
 
                 {
 
-                    User eUser = Main.getInstance().getUser(u.player);
+                    User eUser = PlotSystem.getInstance().getUser(u.player);
 
                     //Change the difficulty by 1.
                     if (eUser.selectionTool.difficulty == 3) {
@@ -82,7 +82,7 @@ public class CreatePlotGui {
 
                 {
 
-                    User eUser = Main.getInstance().getUser(u.player);
+                    User eUser = PlotSystem.getInstance().getUser(u.player);
 
                     //Update the inventory.
                     u.player.closeInventory();

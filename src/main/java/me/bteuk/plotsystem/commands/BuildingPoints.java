@@ -1,12 +1,12 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.utils.Leaderboard;
 import me.bteuk.plotsystem.utils.User;
@@ -21,7 +21,7 @@ public class BuildingPoints implements CommandExecutor {
 			return true;
 		}
 		
-		User u = Main.getInstance().getUser((Player) sender);
+		User u = PlotSystem.getInstance().getUser((Player) sender);
 
 		if (args.length == 0) {
 
@@ -40,7 +40,7 @@ public class BuildingPoints implements CommandExecutor {
 			return true;
 		}
 		
-		PlayerData playerData = Main.getInstance().playerData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 		
 		String uuid = playerData.getUUID(args[0]);
 		

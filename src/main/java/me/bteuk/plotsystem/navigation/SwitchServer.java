@@ -2,7 +2,7 @@ package me.bteuk.plotsystem.navigation;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 
 public class SwitchServer {
@@ -14,7 +14,7 @@ public class SwitchServer {
         out.writeUTF("Connect");
         out.writeUTF(server);
 
-        u.player.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
+        u.player.sendPluginMessage(PlotSystem.getInstance(), "BungeeCord", out.toByteArray());
 
     }
 }

@@ -1,9 +1,8 @@
 package me.bteuk.plotsystem.commands;
 
-import com.fastasyncworldedit.core.configuration.Config;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -50,13 +49,13 @@ public class CreateCommand {
 
                 break;
 
-            case "server":
+            case "world":
 
                 break;
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone, server]"));
+                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone, world]"));
 
         }
 
@@ -74,7 +73,7 @@ public class CreateCommand {
         }
 
         //Get the user
-        User u = Main.getInstance().getUser((Player) sender);
+        User u = PlotSystem.getInstance().getUser((Player) sender);
 
         //Check if the user has permission to use this command
         if (!u.player.hasPermission("uknet.plots.createplot")) {
@@ -158,7 +157,7 @@ public class CreateCommand {
         }
 
         //Check if the world exists.
-        if (!plotSQL.hasRow("SELECT name FROM world_data WHERE name=" +args[3] + ", server= " + Main.SERVER_NAME + ";")) {
+        if (!plotSQL.hasRow("SELECT name FROM world_data WHERE name=" +args[3] + ", server= " + PlotSystem.SERVER_NAME + ";")) {
 
             sender.sendMessage(Utils.chat("&cThe world " + args[3] + " does not exist on this server."));
             return;

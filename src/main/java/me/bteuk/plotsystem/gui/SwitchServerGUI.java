@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.gui;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
-import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 
@@ -65,7 +65,7 @@ public class SwitchServerGUI {
 			out.writeUTF("Connect");
 			out.writeUTF("lobby");
 
-			p.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
+			p.sendPluginMessage(PlotSystem.getInstance(), "BungeeCord", out.toByteArray());
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Return")) {
 			p.closeInventory();
 			if (u.previousGui.equals("main")) {
@@ -80,13 +80,13 @@ public class SwitchServerGUI {
 			out.writeUTF("Connect");
 			out.writeUTF("earth");
 
-			p.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
+			p.sendPluginMessage(PlotSystem.getInstance(), "BungeeCord", out.toByteArray());
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Minigames Server")) {
 			ByteArrayDataOutput out = ByteStreams.newDataOutput();
 			out.writeUTF("Connect");
 			out.writeUTF("minigames");
 
-			p.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
+			p.sendPluginMessage(PlotSystem.getInstance(), "BungeeCord", out.toByteArray());
 		}
 	}
 

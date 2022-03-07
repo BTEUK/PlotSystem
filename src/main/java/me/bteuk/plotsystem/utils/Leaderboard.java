@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.mysql.PlayerData;	
 
 public class Leaderboard {
@@ -20,7 +20,7 @@ public class Leaderboard {
 	
 	public static void printLeaderboard(User u) {
 
-		PlayerData playerData = Main.getInstance().playerData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 		
 		Leaderboard lead = playerData.pointsAboveBelow(u.uuid, u.name);
 
@@ -49,7 +49,7 @@ public class Leaderboard {
 	
 	public static void printLeaderboardElse(User u, String uuid, String name) {
 
-		PlayerData playerData = Main.getInstance().playerData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 		Leaderboard lead = playerData.pointsAboveBelow(uuid, name);
 
 		if (lead == null) {
@@ -77,7 +77,7 @@ public class Leaderboard {
 	
 	public static void printLeaderboardTop(User u) {
 
-		PlayerData playerData = Main.getInstance().playerData;
+		PlayerData playerData = PlotSystem.getInstance().playerData;
 		LinkedHashMap<String, Integer> lead = playerData.pointsTop();
 
 		if (lead == null) {

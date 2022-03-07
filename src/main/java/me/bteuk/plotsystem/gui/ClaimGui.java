@@ -1,9 +1,7 @@
 package me.bteuk.plotsystem.gui;
 
-import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.UniqueGui;
-import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.User;
@@ -12,14 +10,10 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 public class ClaimGui {
 
@@ -58,7 +52,7 @@ public class ClaimGui {
 
                 {
 
-                    User eUser = Main.getInstance().getUser(u.player);
+                    User eUser = PlotSystem.getInstance().getUser(u.player);
 
                     u.player.closeInventory();
 

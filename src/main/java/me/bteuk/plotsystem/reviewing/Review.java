@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import me.bteuk.plotsystem.Main;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Accept;
 
 public class Review {
@@ -32,7 +32,7 @@ public class Review {
 		bookMeta = (BookMeta) book.getItemMeta();
 		bookMeta.setDisplayName(ChatColor.GREEN + "Feedback");
 
-		editBook = new EditBook(Main.getInstance(), this);	
+		editBook = new EditBook(PlotSystem.getInstance(), this);
 		
 	}
 
