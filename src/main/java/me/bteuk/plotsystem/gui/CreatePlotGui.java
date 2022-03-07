@@ -3,17 +3,12 @@ package me.bteuk.plotsystem.gui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.plotsystem.Main;
-import me.bteuk.plotsystem.sql.NavigationSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 public class CreatePlotGui {
 
@@ -22,7 +17,7 @@ public class CreatePlotGui {
         UniqueGui gui = new UniqueGui(27, Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Choose plot size.
-        gui.setItem(12, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.chat("&b&l" + user.selectionTool.sizeName()),
                         Utils.chat("&fClick to cycle through different sizes.")),
                 u ->
@@ -51,7 +46,7 @@ public class CreatePlotGui {
                 });
 
         //Choose plot difficulty.
-        gui.setItem(14, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(14, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.chat("&b&l" + user.selectionTool.difficultyName()),
                         Utils.chat("&fClick to cycle through different difficulties.")),
                 u ->
@@ -80,7 +75,7 @@ public class CreatePlotGui {
                 });
 
         //Create plot.
-        gui.setItem(12, me.bteuk.network.utils.Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.chat("&b&l Create Plot"),
                         Utils.chat("&fClick create a new plot with the settings selected.")),
                 u ->

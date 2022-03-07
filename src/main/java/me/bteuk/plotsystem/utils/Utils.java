@@ -23,7 +23,7 @@ public class Utils {
 		return ChatColor.translateAlternateColorCodes('&', s);
 	}
 
-	public static ItemStack createItem(Inventory inv, Material material, int amount, int invSlot, String displayName, String... loreString) {
+	public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {
 
 		ItemStack item;
 
@@ -32,14 +32,12 @@ public class Utils {
 		item = new ItemStack(material);
 
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(Utils.chat(displayName));
+		meta.setDisplayName(me.bteuk.network.utils.Utils.chat(displayName));
 		for (String s : loreString) {
-			lore.add(Utils.chat(s));
+			lore.add(me.bteuk.network.utils.Utils.chat(s));
 		}
 		meta.setLore(lore);
 		item.setItemMeta(meta);
-
-		inv.setItem(invSlot - 1,  item);
 
 		return item;
 

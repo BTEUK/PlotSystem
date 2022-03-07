@@ -1,5 +1,8 @@
 package me.bteuk.plotsystem.gui;
 
+import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.Time;
@@ -20,102 +23,91 @@ import org.bukkit.inventory.ItemStack;
 
 public class ClaimGui {
 
-    public static Inventory inv;
-    public static Component inventory_name;
-    public static int inv_rows = 3 * 9;
+    public static UniqueGui createClaimGui(User user) {
 
-    public static void initialize() {
+        UniqueGui gui = new UniqueGui(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        inventory_name = Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD);
+        gui.setItem(12, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+                Utils.chat("&b&lPlot Size"),
+                Utils.chat("&f" + PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-        inv = Bukkit.createInventory(null, inv_rows);
+        gui.setItem(12, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+                Utils.chat("&b&lPlot Difficulty"),
+                Utils.chat("&f" + PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-    }
+        gui.setItem(12, Utils.createItem(Material.ENDER_EYE, 1,
+                        Utils.chat("&b&lView Plot in Google Maps"),
+                        Utils.chat("&fClick to open a link to this plot in google maps.")),
+                u ->
 
-    public static Inventory Gui(User u, PlotSQL plotSQL) {
+                {
 
-        Inventory toReturn = Bukkit.createInventory(null, inv_rows, inventory_name);
+                    u.player.closeInventory();
 
-        inv.clear();
+                    TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "insert link here"));
 
-        Utils.createItem(inv, PlotValues.sizeMaterial(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + u.inPlot + ";")),
-                1, 13, ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Size",
-                Utils.chat("&f" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + u.inPlot + ";"))));
+                    u.player.sendMessage(message);
 
-        Utils.createItem(inv, PlotValues.difficultyMaterial(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";")),
-                1, 13, ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Difficulty",
-                Utils.chat("&f" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";"))));
+                });
 
-        Utils.createItem(inv, Material.ENDER_EYE, 1, 13, ChatColor.AQUA + "" + ChatColor.BOLD + "View Plot in Google Maps",
-                Utils.chat("&fClick to open a link to this plot in google maps."));
+        gui.setItem(12, Utils.createItem(Material.EMERALD, 1,
+                        Utils.chat("&b&lClaim Plot"),
+                        Utils.chat("&fClick to claim the plot and start building.")),
+                u ->
 
-        Utils.createItem(inv, Material.SPRUCE_BOAT, 1, 15, ChatColor.AQUA + "" + ChatColor.BOLD + "Claim Plot",
-                Utils.chat("&fClick to claim the plot and start building."));
+                {
 
-        toReturn.setContents(inv.getContents());
-        return toReturn;
-    }
+                    User eUser = Main.getInstance().getUser(u.player);
 
-    public static void clicked(User u, ItemStack clicked, PlotSQL plotSQL) {
+                    u.player.closeInventory();
 
-        Player p = u.player;
+                    //If the plot status can be updated, add the player as plot owner.
+                    if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
 
-        if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "View Plot in Google Maps")) {
+                        //If the player can't be given owner, set the plot status back to unclaimed.
+                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ", " + eUser.uuid + ", " + 1 + ", " + Time.currentTime() + ";")) {
 
-            p.closeInventory();
+                            //Add player to worldguard region.
+                            if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.world)) {
 
-            TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "insert link here"));
+                                eUser.player.sendMessage(Utils.chat("&aSuccessfully claimed plot &b" + eUser.inPlot + "&c, good luck building."));
+                                Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
-            p.sendMessage(message);
-            return;
+                            } else {
 
-        } else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Claim Plot")) {
+                                eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
+                                Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
 
-            p.closeInventory();
+                            }
 
-            //If the plot status can be updated, add the player as plot owner.
-            if (plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";")) {
+                        } else {
 
-                //If the player can't be given owner, set the plot status back to unclaimed.
-                if (plotSQL.insert("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + ", " + u.uuid + ", " + 1 + ", " + Time.currentTime() + ";")) {
+                            eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
+                            Bukkit.getLogger().warning("Plot owner insert failed for plot " + eUser.inPlot);
 
-                    //Add player to worldguard region.
-                    if (WorldGuardFunctions.addMember(u.inPlot, u.uuid, u.world)) {
+                            //Attempt to set plot back to unclaimed
+                            if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
 
-                        p.sendMessage(Utils.chat("&aSuccessfully claimed plot &b" + u.inPlot + "&c, good luck building."));
-                        Bukkit.getLogger().info("Plot " + u.inPlot + " successfully claimed by " + u.name);
+                                Bukkit.getLogger().warning("Plot " + eUser.inPlot + " has been set back to unclaimed.");
 
-                    } else {
+                            } else {
 
-                        p.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
-                        Bukkit.getLogger().warning("Plot " + u.inPlot + " was claimed but they were not added to the worldguard region.");
+                                Bukkit.getLogger().severe("Plot " + eUser.inPlot + " is set to claimed but has no owner!");
 
-                    }
-
-                } else {
-
-                    p.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
-                    Bukkit.getLogger().warning("Plot owner insert failed for plot " + u.inPlot);
-
-                    //Attempt to set plot back to unclaimed
-                    if (plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";")) {
-
-                        Bukkit.getLogger().warning("Plot " + u.inPlot + " has been set back to unclaimed.");
+                            }
+                        }
 
                     } else {
 
-                        Bukkit.getLogger().severe("Plot " + u.inPlot + " is set to claimed but has no owner!");
+                        eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
+                        Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + eUser.inPlot);
 
                     }
-                }
 
-            } else {
+                });
 
-                p.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
-                Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + u.inPlot);
+        return gui;
 
-            }
-        }
     }
 }

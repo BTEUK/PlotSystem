@@ -31,7 +31,6 @@ public class User {
 
     public int currentPlot = 0;
     public String currentStatus = null;
-    public int attempt;
 
     public int inPlot = 0;
     public boolean plotOwner;
@@ -39,22 +38,18 @@ public class User {
 
     public World world;
 
-    public ItemStack slot5;
-    public ItemStack slot9;
-
     public String previousGui;
-
-    TutorialData tutorialData;
-    PlayerData playerData;
 
     public Review review = null;
 
     private final GlobalSQL globalSQL;
+    public final PlotSQL plotSQL;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         //Set sql
         this.globalSQL = globalSQL;
+        this.plotSQL = plotSQL;
 
         //Set player, uuid and name variable.
         this.player = player;

@@ -213,8 +213,6 @@ public class Main extends JavaPlugin {
         SwitchServerGUI.initialize();
         FeedbackGui.initialize();
 
-        ClaimGui.initialize();
-
     }
 
 

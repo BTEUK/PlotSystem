@@ -1,5 +1,7 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -37,7 +39,12 @@ public class ClaimCommand implements CommandExecutor {
 
         //If the plot is valid open the claim plot gui.
         if (validPlot(u)) {
-            p.openInventory(ClaimGui.Gui(u, plotSQL));
+
+            NetworkUser user = Network.getInstance().getUser(u.player);
+
+            user.uniqueGui = ClaimGui.createClaimGui(u);
+            user.uniqueGui.open(user);
+
         }
 
         return true;

@@ -1,6 +1,8 @@
 package me.bteuk.plotsystem.commands;
 
 import com.fastasyncworldedit.core.configuration.Config;
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.Main;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.NavigationSQL;
@@ -95,7 +97,7 @@ public class CreateCommand {
         u.selectionTool.setDefaultSize();
 
         //Get the user from the network plugin.
-        me.bteuk.network.utils.User user = me.bteuk.network.Main.getInstance().getUser(u.player);
+        NetworkUser user = Network.getInstance().getUser(u.player);
         user.uniqueGui = CreatePlotGui.createPlotGui(u);
         user.uniqueGui.open(user);
 
