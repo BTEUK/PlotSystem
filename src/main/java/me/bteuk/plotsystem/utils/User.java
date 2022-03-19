@@ -42,7 +42,7 @@ public class User {
 
     public Review review = null;
 
-    private final GlobalSQL globalSQL;
+    public final GlobalSQL globalSQL;
     public final PlotSQL plotSQL;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {

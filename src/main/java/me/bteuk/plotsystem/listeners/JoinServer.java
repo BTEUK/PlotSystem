@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.events.EventManager;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -52,49 +53,8 @@ public class JoinServer implements Listener {
             //Split the event by word.
             String[] aEvent = event.split(" ");
 
-            //Start the execution process by looking at the event message structure.
-            if (aEvent[0].equals("teleport")) {
-
-                //Events for teleporting
-                if (aEvent[1].equals("plot")) {
-
-                    //Convert the string id to int id.
-                    int id = Integer.parseInt(aEvent[2]);
-
-                    //Teleport to specific plot id.
-                    //Get the server of the plot.
-                    String server = plotSQL.getString("SELECT server FROM location_data WHERE name="
-                            + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                            + ";");
-
-                    //If the plot is on the current server teleport them directly.
-                    //Else teleport them to the correct server and them teleport them to the plot.
-                    if (server.equals(Network.SERVER_NAME)) {
-
-                        //Get world of plot.
-                        World world = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE name="
-                                + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                                + ";"));
-
-                        //Get location of plot and teleport the player there.
-                        u.player.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
-
-                    } else {
-
-                        //Set the server join event.
-                        globalSQL.update("INSERT INTO join_events(uuid,event) VALUES("
-                                + u.player.getUniqueId()
-                                + "," + "teleport plot " + id + ");");
-
-                        //Teleport them to another server.
-                        u.player.closeInventory();
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(server);
-
-                    }
-                }
-            }
+            //Send the event to the event handler.
+            EventManager.event(u.uuid, aEvent);
 
             //Clear the events.
             globalSQL.update("DELETE FROM join_events WHERE uuid=?;");
