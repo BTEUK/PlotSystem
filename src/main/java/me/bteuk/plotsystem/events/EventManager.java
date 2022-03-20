@@ -1,7 +1,5 @@
 package me.bteuk.plotsystem.events;
 
-import me.bteuk.plotsystem.utils.User;
-
 public class EventManager {
 
     public static void event(String uuid, String[] event) {
@@ -14,12 +12,12 @@ public class EventManager {
         }
         else if (event[0].equals("submit")) {
 
-
+            SubmitEvent.event(uuid, event);
 
         }
         else if (event[0].equals("retract")) {
 
-
+            RetractEvent.event(uuid, event);
 
         }
         else if (event[0].equals("delete")) {

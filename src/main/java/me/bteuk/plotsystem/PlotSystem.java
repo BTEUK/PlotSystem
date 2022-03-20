@@ -46,7 +46,7 @@ public class PlotSystem extends JavaPlugin {
 
     //Global Database
     private String global_database;
-    private GlobalSQL globalSQL;
+    public GlobalSQL globalSQL;
     private BasicDataSource global_dataSource;
 
     //Plot Database
