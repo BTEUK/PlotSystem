@@ -11,7 +11,7 @@ public class RetractEvent {
 
     public static void event(String uuid, String[] event) {
 
-        //Events for submitting
+        //Events for retracting
         if (event[1].equals("plot")) {
 
             //Get the user.

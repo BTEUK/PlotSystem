@@ -22,7 +22,7 @@ public class EventManager {
         }
         else if (event[0].equals("delete")) {
 
-
+            DeleteEvent.event(uuid, event);
 
         }
         else if (event[0].equals("leave")) {

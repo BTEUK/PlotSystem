@@ -299,6 +299,28 @@ public class WorldGuardFunctions {
         }
     }
 
+    public static boolean deletePlot(int plot, World world) {
+
+        //Get instance of WorldGuard.
+        WorldGuard wg = WorldGuard.getInstance();
+
+        //Get regions.
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
+
+        //Attempt to remove the plot.
+        buildRegions.removeRegion(String.valueOf(plot));
+
+        //Save the changes
+        try {
+            buildRegions.saveChanges();
+            return true;
+        } catch (StorageException e1) {
+            e1.printStackTrace();
+            return false;
+        }
+    }
+
     //Get the location of a plot.
     public static Location plotLocation(int plot) {
 
