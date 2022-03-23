@@ -37,14 +37,15 @@ public class DeleteEvent {
                 //Send error to console.
                 Bukkit.getLogger().severe(Utils.chat("&cPlot delete event failed!"));
                 Bukkit.getLogger().severe(Utils.chat("&cEvent details:" + Arrays.toString(event)));
+                return;
 
             }
 
             //Revert plot to original state.
             WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
 
-            //Remove plot from worldguard.
-            WorldGuardFunctions.deletePlot(id, pasteWorld);
+            //Remove all members from the worldguard plot.
+            WorldGuardFunctions.clearMembers(id, pasteWorld);
 
             //Remove all members of plot in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");

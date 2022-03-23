@@ -70,12 +70,17 @@ public class ClaimEnter implements Listener {
                         //If the plot is claimed, send the relevant message.
                         if (!plotSQL.isClaimed(plot)) {
 
+                            //Set the claimed value to false to indicate the plot is not claimed.
+                            u.isClaimed = false;
                             u.plotOwner = false;
                             u.plotMember = false;
                             u.player.sendActionBar(Component.text("You have entered plot " + plot + ", it is currently unclaimed.", NamedTextColor.GREEN));
                             u.player.sendActionBar(Component.text("Open the building menu and click on the emerald to claim the plot.", NamedTextColor.GREEN));
 
                         } else {
+
+                            //Set the claimed value to true to indicate the plot is already claimed.
+                            u.isClaimed = true;
 
                             //If you are the owner of the plot send the relevant message.
                             if (plotSQL.isOwner(plot, u.uuid)) {
@@ -159,6 +164,7 @@ public class ClaimEnter implements Listener {
             }
 
             u.inPlot = 0;
+            u.isClaimed = true;
 
         }
     }

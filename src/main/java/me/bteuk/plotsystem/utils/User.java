@@ -35,6 +35,7 @@ public class User {
     public int inPlot = 0;
     public boolean plotOwner;
     public boolean plotMember;
+    public boolean isClaimed;
 
     public World world;
 

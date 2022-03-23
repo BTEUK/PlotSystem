@@ -27,7 +27,11 @@ public class EventManager {
         }
         else if (event[0].equals("leave")) {
 
+            LeaveEvent.event(uuid, event);
 
+        } else if (event[0].equals("claim")) {
+
+            ClaimEvent.event(uuid, event);
 
         }
 
