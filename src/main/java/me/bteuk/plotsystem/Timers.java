@@ -3,20 +3,13 @@ package me.bteuk.plotsystem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import me.bteuk.network.Network;
 import me.bteuk.plotsystem.events.EventManager;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.Inactive;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 public class Timers {
 
@@ -76,24 +69,12 @@ public class Timers {
             }
         }, 0L, 1L);
 
+        //1 hour timer.
+        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
-        //1 second timer.
-        instance.getServer().
+            //Remove inactive plots.
+            Inactive.cancelInactivePlots();
 
-                getScheduler().
-
-                scheduleSyncRepeatingTask(instance, () ->
-
-                {
-
-                    for (User u : users) {
-
-                        //Set the world of the player.
-                        u.world = u.player.getWorld();
-
-                    }
-
-                }, 0L, 20L);
+        }, 0L, 72000L);
     }
-
 }

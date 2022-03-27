@@ -76,21 +76,18 @@ public class WorldGuardFunctions {
 
     }
 
-    public static List<BlockVector2> getPoints(int plot) {
+    public static List<BlockVector2> getPoints(int plot, World world) {
 
         //Get instance of plugin and config
         PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
-
-        //Get worlds from config
-        World saveWorld = Bukkit.getServer().getWorld(config.getString("worlds.save"));
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
 
         //Get worldguard region data
         RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager buildRegions = container.get(BukkitAdapter.adapt(saveWorld));
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
 

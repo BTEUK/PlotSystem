@@ -24,9 +24,6 @@ public class DeleteEvent {
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
-            //Get the plot bounds.
-            List<BlockVector2> vector = WorldGuardFunctions.getPoints(id);
-
             //Get worlds of plot and save location.
             World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT name FROM world_data WHERE server=" + PlotSystem.SERVER_NAME + " AND type='save';"));
             World pasteWorld = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE name=" +
@@ -40,6 +37,9 @@ public class DeleteEvent {
                 return;
 
             }
+
+            //Get the plot bounds.
+            List<BlockVector2> vector = WorldGuardFunctions.getPoints(id, pasteWorld);
 
             //Revert plot to original state.
             WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
@@ -64,7 +64,7 @@ public class DeleteEvent {
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot " + id + "delete!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot " + id + "deleted!');");
 
             }
         }
