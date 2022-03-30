@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class ClaimCommand implements CommandExecutor {
 
@@ -23,7 +24,7 @@ public class ClaimCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         //Check if the sender is a player.
         if (!(sender instanceof Player)) {
@@ -42,7 +43,7 @@ public class ClaimCommand implements CommandExecutor {
 
             NetworkUser user = Network.getInstance().getUser(u.player);
 
-            user.uniqueGui = ClaimGui.createClaimGui(u);
+            user.uniqueGui = ClaimGui.claimPlotGui(u);
             user.uniqueGui.open(user);
 
         }

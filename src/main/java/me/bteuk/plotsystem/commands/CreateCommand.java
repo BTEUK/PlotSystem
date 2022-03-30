@@ -8,6 +8,7 @@ import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
+import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -51,6 +52,7 @@ public class CreateCommand {
 
             case "world":
 
+                createWorld(sender, args);
                 break;
 
             default:
@@ -76,7 +78,7 @@ public class CreateCommand {
         User u = PlotSystem.getInstance().getUser((Player) sender);
 
         //Check if the user has permission to use this command
-        if (!u.player.hasPermission("uknet.plots.createplot")) {
+        if (!u.player.hasPermission("uknet.plots.create.plot")) {
 
             u.player.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
             return;
@@ -110,7 +112,7 @@ public class CreateCommand {
 
             Player p = (Player) sender;
 
-            if (!p.hasPermission("uknet.plots.createlocation")) {
+            if (!p.hasPermission("uknet.plots.create.location")) {
 
                 p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
                 return;
@@ -175,7 +177,7 @@ public class CreateCommand {
         //Add the location to the database.
         if (plotSQL.update("INSERT INTO location_data(name, world, server, coordMin, coordMax) VALUES(" + args[2] + ", " + args[3] + ", " +  coordMin + ", " + coordMax + ");")) {
 
-            sender.sendMessage(Utils.chat("&aAdded new location " + args[2]) + " to world " + args[3]);
+            sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
 
         } else {
 
@@ -184,5 +186,58 @@ public class CreateCommand {
 
         }
 
+    }
+
+    private void createWorld(CommandSender sender, String[] args) {
+
+        //Check if the sender is a player.
+        //If so, check if they have permission.
+        if (sender instanceof Player) {
+
+            Player p = (Player) sender;
+
+            if (!p.hasPermission("uknet.plots.create.world")) {
+
+                p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
+                return;
+
+            }
+        }
+
+        //Check if they have enough args.
+        if (args.length < 3) {
+
+            sender.sendMessage(Utils.chat("&c/plotsystem create location [name]"));
+            return;
+
+        }
+
+        //Check for duplicate name.
+        if (plotSQL.hasRow("SELECT name FROM world_data WHERE server=" + PlotSystem.SERVER_NAME + " AND name=" + args[2] + ";")) {
+
+            sender.sendMessage(Utils.chat("&cA world with the name " + args[2] + " already exists."));
+            return;
+
+        }
+
+        //Create world
+        if (!Multiverse.createVoidWorld(args[2])) {
+
+            sender.sendMessage(Utils.chat("&cWorld failed to create, please check the console!"));
+            return;
+
+        }
+
+        //Add the world to the database.
+        if (plotSQL.update("INSERT INTO world_data(name, type, server) VALUES(" + args[2] + ", 'build', " + PlotSystem.SERVER_NAME + ");")) {
+
+            sender.sendMessage(Utils.chat("&aCreated new world " + args[2] + "."));
+
+        } else {
+
+            sender.sendMessage(Utils.chat("&cAn error occurred, please check the console for more info."));
+            Bukkit.getLogger().warning("An error occurred while creating a new world!");
+
+        }
     }
 }

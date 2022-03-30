@@ -17,7 +17,7 @@ import org.bukkit.Material;
 
 public class ClaimGui {
 
-    public static UniqueGui createClaimGui(User user) {
+    public static UniqueGui claimPlotGui(User user) {
 
         UniqueGui gui = new UniqueGui(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
 

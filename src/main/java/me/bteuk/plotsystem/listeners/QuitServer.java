@@ -14,18 +14,10 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.md_5.bungee.api.ChatColor;
 
 public class QuitServer implements Listener {
-
-	TutorialData tutorialData;
-	PlayerData playerData;
-	PlotData plotData;
 	
-	public QuitServer(PlotSystem plugin, TutorialData tutorialData, PlayerData playerData, PlotData plotData) {
+	public QuitServer(PlotSystem plugin) {
 
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
-		this.tutorialData = tutorialData;
-		this.playerData = playerData;
-		this.plotData = plotData;
-
 	}
 
 	@EventHandler
@@ -49,9 +41,6 @@ public class QuitServer implements Listener {
 
 		//Get player instance.
 		Player p = e.getPlayer();
-
-		//Set tutorial stage in PlayerData
-		tutorialData.updateValues(u);
 
 		//Update the last online time of player.
 		playerData.updateTime(p.getUniqueId().toString());

@@ -14,6 +14,7 @@ import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
+import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -37,27 +38,14 @@ import me.bteuk.plotsystem.utils.Holograms;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import org.jetbrains.annotations.NotNull;
 
 public class PlotSystem extends JavaPlugin {
 
-    //MySQL
-    private String host, username, password;
-    private int port;
-
-    //Global Database
-    private String global_database;
+    //SQL Classes.
     public GlobalSQL globalSQL;
-    private BasicDataSource global_dataSource;
-
-    //Plot Database
-    private String plot_database;
     public PlotSQL plotSQL;
-    private BasicDataSource plot_dataSource;
-
-    //Navigation Database
-    private String navigation_database;
-    private NavigationSQL navigationSQL;
-    private BasicDataSource navigation_dataSource;
+    public NavigationSQL navigationSQL;
 
     public Timers timers;
 
@@ -71,8 +59,6 @@ public class PlotSystem extends JavaPlugin {
 
     public static ItemStack gui;
 
-    int interval;
-
     //Holograms
     Holograms holograms;
 
@@ -81,7 +67,7 @@ public class PlotSystem extends JavaPlugin {
 
     //Set the default world generation to be void.
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         return new VoidChunkGen(this);
     }
 
@@ -105,16 +91,17 @@ public class PlotSystem extends JavaPlugin {
         //Setup MySQL
         try {
 
-            global_database = config.getString("database.global");
-            global_dataSource = mysqlSetup(global_database);
+            //Global Database
+            String global_database = config.getString("database.global");
+            BasicDataSource global_dataSource = mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
 
-            navigation_database = config.getString("database.navigation");
-            navigation_dataSource = mysqlSetup(navigation_database);
+            String navigation_database = config.getString("database.navigation");
+            BasicDataSource navigation_dataSource = mysqlSetup(navigation_database);
             navigationSQL = new NavigationSQL(navigation_dataSource);
 
-            plot_database = config.getString("database.plot");
-            plot_dataSource = mysqlSetup(plot_database);
+            String plot_database = config.getString("database.plot");
+            BasicDataSource plot_dataSource = mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource, navigationSQL);
 
         } catch (SQLException /*| IOException*/ e) {
@@ -133,13 +120,41 @@ public class PlotSystem extends JavaPlugin {
                     "INSERT INTO server_data(name,type) VALUES(" + SERVER_NAME + ",'plot');"
             )) {
 
+                //Create save world.
+                if (Multiverse.createVoidWorld("save")) {
+
+                    //Add save world to database.
+                    if (plotSQL.update("INSERT INTO world_data(name,type,server) VALUES('save','save'," + SERVER_NAME + ");")) {
+
+                        Bukkit.getLogger().info(Utils.chat("&aSuccessfully created save world."));
+
+                    } else {
+
+                        Bukkit.getLogger().severe(Utils.chat("&cFailed to add save world to database!"));
+
+                    }
+
+                } else {
+
+                    Bukkit.getLogger().warning(Utils.chat("&cFailed to create save world!"));
+
+                }
+
+                //Enable the server.
                 Bukkit.getLogger().info(Utils.chat("&aServer added to database, enabling server!"));
                 enableServer();
 
-                //If it fails close the plugin.
             } else {
+
                 Bukkit.getLogger().severe(Utils.chat("&cFailed to add server to database, shutting down PlotSystem!"));
+
             }
+
+        } else {
+
+            //If the server is already in the database enable it straight away.
+            enableServer();
+
         }
     }
 
@@ -249,17 +264,14 @@ public class PlotSystem extends JavaPlugin {
     //Creates the mysql connection.
     private BasicDataSource mysqlSetup(String database) throws SQLException {
 
-        host = config.getString("host");
-        port = config.getInt("port");
-        username = config.getString("username");
-        password = config.getString("password");
+        String host = config.getString("host");
+        int port = config.getInt("port");
+        String username = config.getString("username");
+        String password = config.getString("password");
 
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&useSSL=false&");
-        //dataSource.setServerName(host);
-        //dataSource.setPortNumber(port);
-        //dataSource.setDatabaseName(database + "?&useSSL=false&");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
