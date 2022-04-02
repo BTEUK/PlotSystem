@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.mysql.PlayerData;
-import me.bteuk.plotsystem.utils.Leaderboard;
 import me.bteuk.plotsystem.utils.User;
 
 public class BuildingPoints implements CommandExecutor {

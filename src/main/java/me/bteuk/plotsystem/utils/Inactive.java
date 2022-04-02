@@ -1,23 +1,17 @@
 package me.bteuk.plotsystem.utils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.sk89q.worldedit.math.BlockVector2;
-
-import me.bteuk.plotsystem.mysql.PlotData;
-import me.bteuk.plotsystem.mysql.PointsData;
-import org.bukkit.entity.Player;
 
 public class Inactive {
 

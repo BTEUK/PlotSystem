@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Accept;
 
 public class Review {
 	
