@@ -33,6 +33,10 @@ public class EventManager {
 
             ClaimEvent.event(uuid, event);
 
+        } else if (event[0].equals("review")) {
+
+            ReviewEvent.event(uuid, event);
+
         }
 
     }

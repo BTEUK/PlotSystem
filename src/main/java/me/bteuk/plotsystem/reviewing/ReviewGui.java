@@ -1,5 +1,9 @@
 package me.bteuk.plotsystem.reviewing;
 
+import me.bteuk.network.gui.UniqueGui;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,6 +20,14 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.md_5.bungee.api.ChatColor;
 
 public class ReviewGui {
+
+	public static UniqueGui createReviewGui(User u) {
+
+		UniqueGui gui = new UniqueGui(27, Component.text("Review xyz", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+		return gui;
+
+	}
 
 	public static Inventory inv;
 	public static String inventory_name;
