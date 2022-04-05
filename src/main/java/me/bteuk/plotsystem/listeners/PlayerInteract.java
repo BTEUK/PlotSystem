@@ -195,6 +195,5 @@ public class PlayerInteract implements Listener {
         if (e.getCursor().equals(PlotSystem.gui)) {
             e.setCancelled(true);
         }
-
     }
 }

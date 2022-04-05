@@ -29,7 +29,7 @@ public class Utils {
 
 		List<String> lore = new ArrayList<String>();
 
-		item = new ItemStack(material);
+		item = new ItemStack(material, amount);
 
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(me.bteuk.network.utils.Utils.chat(displayName));
@@ -49,7 +49,7 @@ public class Utils {
 
 		List<String> lore = new ArrayList<String>();
 
-		item = new ItemStack(Material.PLAYER_HEAD);
+		item = new ItemStack(Material.PLAYER_HEAD, amount);
 
 		SkullMeta meta = (SkullMeta) item.getItemMeta();
 		meta.setDisplayName(Utils.chat(displayName));
