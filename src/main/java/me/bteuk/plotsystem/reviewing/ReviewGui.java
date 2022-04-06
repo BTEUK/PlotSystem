@@ -1,113 +1,183 @@
 package me.bteuk.plotsystem.reviewing;
 
 import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.plotsystem.sql.GlobalSQL;
+import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.World;
 
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.gui.MainGui;
-import me.bteuk.plotsystem.mysql.PlayerData;
-import me.bteuk.plotsystem.mysql.PlotData;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.md_5.bungee.api.ChatColor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewGui {
 
-	public static UniqueGui createReviewGui(User u) {
+    public static UniqueGui createReviewGui(User user) {
 
-		UniqueGui gui = new UniqueGui(27, Component.text("Review xyz", NamedTextColor.AQUA, TextDecoration.BOLD));
+        UniqueGui gui = new UniqueGui(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-		return gui;
+        GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
+        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
-	}
+        //Get plot owner.
+        String plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
 
-	public static Inventory inv;
-	public static String inventory_name;
-	public static int inv_rows = 3 * 9;
+        //Get world of plot.
+        World world = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE location=" +
+                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";")
+                + ";"));
 
-	public static void initialize() {
-		inventory_name = ChatColor.AQUA + "" + ChatColor.BOLD + "Review Menu";
+        gui.setItem(12, Utils.createItem(Material.BOOK, 1,
+                Utils.chat("&b&lPlot Info"),
+                Utils.chat("&fPlot ID: " + user.review.plot),
+                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
+                        plotOwner
+                        + ";"))));
 
-		inv = Bukkit.createInventory(null, inv_rows);
+        gui.setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
+                        Utils.chat("&b&lBefore View"),
+                        Utils.chat("&fTeleport to the plot before it was claimed.")),
+                u -> {
 
-	}
+                    //Teleport to plot in original state.
+                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(user.review.plot));
 
-	public static Inventory GUI (User u) {
+                });
 
-		PlayerData playerData = PlotSystem.getInstance().playerData;
-		PlotData plotData = PlotSystem.getInstance().plotData;
-		Inventory toReturn = Bukkit.createInventory(null, inv_rows, inventory_name);
+        gui.setItem(12, Utils.createItem(Material.STONE_BRICKS, 1,
+                        Utils.chat("&b&lCurrent View"),
+                        Utils.chat("&fTeleport to the current view of the plot.")),
+                u -> {
 
-		inv.clear();
+                    //Teleport to plot in current state.
+                    u.player.teleport(WorldGuardFunctions.getCurrentLocation(user.review.plot, world));
 
-		Utils.createItem(inv, Material.SPRUCE_DOOR, 1, 27, ChatColor.AQUA + "" + ChatColor.BOLD + "Return", Utils.chat("&fGo back to the building menu."));
-		
-		Utils.createItem(inv, Material.BOOK, 1, 5, ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Info",
-				Utils.chat("&fPlot ID: " + u.review.plot),
-				Utils.chat("&fPlot Owner: " + playerData.getName(plotData.getOwner(u.review.plot))));
-		
-		Utils.createItem(inv, Material.GRASS_BLOCK, 1, 13, ChatColor.AQUA + "" + ChatColor.BOLD + "Before View",
-				Utils.chat("&fTeleport to the plot before it was claimed."));
-		Utils.createItem(inv, Material.STONE_BRICKS, 1, 15, ChatColor.AQUA + "" + ChatColor.BOLD + "Current View",
-				Utils.chat("&fTeleport to the current view of the plot."));
-		Utils.createItem(inv, Material.LIME_CONCRETE, 1, 11, ChatColor.AQUA + "" + ChatColor.BOLD + "Accept Plot",
-				Utils.chat("&fOpens the accept gui."));
-		Utils.createItem(inv, Material.RED_CONCRETE, 1, 17, ChatColor.AQUA + "" + ChatColor.BOLD + "Deny Plot",
-				Utils.chat("&fOpens the deny gui."));
-		
-		Utils.createItem(inv, Material.WRITABLE_BOOK, 1, 23, ChatColor.AQUA + "" + ChatColor.BOLD + "Feedback",
-				Utils.chat("&fOpens the feedback book."),
-				Utils.chat("&fWrite your feedback in here."),
-				Utils.chat("&fFor denying this is manditory,"),
-				Utils.chat("&fwhen accepting it is optional."));
+                });
 
-		toReturn.setContents(inv.getContents());
-		return toReturn;
-	}
+        gui.setItem(12, Utils.createItem(Material.LIME_CONCRETE, 1,
+                        Utils.chat("&b&lAccept Plot"),
+                        Utils.chat("&fOpens the accept gui.")),
+                u -> {
 
-	public static void clicked(User u, int slot, ItemStack clicked, Inventory inv) {
+                    //Open accept gui, create a new one if it is null.
+                    if (user.review.acceptGui == null) {
 
-		Player p = u.player;
-		if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Return")) {
-			p.closeInventory();
-			p.openInventory(MainGui.GUI(u));
-			return;
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Before View")) {
-			//Get the plot that is being reviewed and teleport the player do the plot in the saveWorld.
-			p.teleport(WorldGuardFunctions.getBeforeLocation(u.review.plot));
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Current View")) {
-			//Get the plot that is being reviwed and teleport the player to the plot in the buildWorld.
-			p.teleport(WorldGuardFunctions.getCurrentLocation(u.review.plot));
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Accept Plot")) {
-			//Open the acceptgui with default values.
-			p.closeInventory();
-			p.openInventory(AcceptGui.GUI(u));
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Deny Plot")) {
-			p.closeInventory();
-			
-			if (u.review.bookMeta.hasPages()) {
-				p.openInventory(DenyGui.GUI(p));
-			} else {
-				p.sendMessage(ChatColor.RED + "You must give feedback before you can deny the plot.");
-			}
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Feedback")) {
-					
-			u.review.book.setItemMeta(u.review.bookMeta);
-			u.review.previousItem = p.getInventory().getItem(4);
-			
-			p.getInventory().setItem(4, u.review.book);
-			p.closeInventory();
-			p.sendMessage(ChatColor.GREEN + "Please write the feedback in the book.");
-			
-		} else {}
-	}
+                        user.review.acceptGui = AcceptGui.createAcceptGui(user);
 
+                    }
+
+                    //Open accept gui.
+                    user.review.acceptGui.open(u);
+
+                });
+
+        gui.setItem(12, Utils.createItem(Material.RED_CONCRETE, 1,
+                        Utils.chat("&b&lDeny Plot"),
+                        Utils.chat("&fDeny the plot and return it to the plot owner.")),
+                u -> {
+
+                    //Close inventory.
+                    u.player.closeInventory();
+
+                    //Check if the feedback book has been edited.
+                    if (!user.review.editBook.isEdited) {
+
+                        u.player.sendMessage(Utils.chat("&cYou must provide feedback to deny the plot."));
+                        return;
+
+                    }
+
+                    //Get the feedback written in the book.
+                    //noinspection deprecation
+                    List<String> book = user.review.bookMeta.getPages();
+                    //Create new book id.
+                    int bookID = 1 + plotSQL.getInt("SELECT id FROM book_data ORDER BY id DESC;");
+
+                    //Iterate through all pages and store them in database.
+                    int i = 1;
+
+                    for (String text : book) {
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,text) VALUES(" + bookID + "," + i + "," + text + ");"))) {
+                            u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
+                            return;
+                        }
+                        i++;
+                    }
+
+                    //Update deny data.
+                    if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,time) VALUES(" + user.review.plot + "," +
+                            plotOwner + "," + bookID + "," +
+                            (1 + plotSQL.getInt("SELECT attempt FROM deny_data WHERE id=" + user.review.plot + " AND uuid=" + plotOwner + ";")) +
+                            "," + Time.currentTime() + ");")) {
+
+                        //Send message to plot owner.
+                        globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + plotOwner +
+                                ",'&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
+
+                        //Set status of plot back to claimed.
+                        plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
+
+                        //Update last visit time, to prevent inactivity removal of plot.
+                        plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + user.review.plot + ";");
+
+                        //Remove the reviewer from the plot.
+                        WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);
+
+                        //Send feedback.
+                        u.player.sendMessage(Utils.chat("&aPlot " + user.review.plot + " has been denied."));
+
+                        //If another plot is submitted tell the reviewer.
+                        int submittedPlots = 0;
+                        if (plotSQL.hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
+
+                            //Get arraylist of submitted plots.
+                            ArrayList<Integer> nPlots = plotSQL.getIntList("SELECT id FROM plot_data WHERE status='submitted';");
+
+                            //Iterate through all plots.
+                            for (int nPlot : nPlots) {
+
+                                //If you are not owner or member of the plot select it for the next review.
+                                if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
+
+                                    submittedPlots++;
+
+                                }
+                            }
+
+                            if (submittedPlots == 1) {
+                                u.player.sendMessage(Utils.chat("&aThere is 1 plot available for review."));
+                            } else {
+                                u.player.sendMessage(Utils.chat("&aThere are " + submittedPlots + " plots available for review."));
+                            }
+
+                        } else {
+
+                            u.player.sendMessage(Utils.chat("&aAll plots have been reviewed."));
+
+                        }
+
+                        //Close review.
+                        user.review.closeReview();
+                        user.review = null;
+
+                    } else {
+
+                        u.player.sendMessage(ChatColor.RED + "An error occured, please notify an admin.");
+
+                    }
+                });
+
+        return gui;
+
+    }
 }

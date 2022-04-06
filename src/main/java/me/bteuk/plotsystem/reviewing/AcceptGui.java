@@ -2,11 +2,15 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.List;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.plotsystem.PlotSystem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import me.bteuk.plotsystem.sql.GlobalSQL;
+import me.bteuk.plotsystem.sql.PlotSQL;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,6 +30,24 @@ import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 public class AcceptGui {
+
+	public static UniqueGui createAcceptGui(User user) {
+
+		UniqueGui gui = new UniqueGui(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+		GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
+		PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+		gui.setItem(12, Utils.createItem(Material.BOOK, 1,
+				Utils.chat("&b&lPlot Info"),
+				Utils.chat("&fPlot ID: " + user.review.plot),
+				Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
+						plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;")
+						+ ";"))));
+
+		return gui;
+
+	}
 
 	public static Inventory inv;
 	public static String inventory_name;
@@ -138,7 +160,7 @@ public class AcceptGui {
 		if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Return")) {
 			//Open the review gui.
 			p.closeInventory();
-			p.openInventory(ReviewGui.GUI(u));
+			u.review.reviewGui.open(Network.getInstance().getUser(u.player));
 			return;
 			//Set the value in the acceptgui based on the button that is clicked.
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Building Plot")) {

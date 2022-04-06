@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
-import me.bteuk.plotsystem.gui.*;
 import me.bteuk.plotsystem.listeners.InventoryClicked;
 import me.bteuk.plotsystem.listeners.ItemSpawn;
 import me.bteuk.plotsystem.listeners.JoinServer;
@@ -29,10 +28,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.bteuk.plotsystem.commands.BuildingPoints;
 import me.bteuk.plotsystem.commands.OpenGui;
-import me.bteuk.plotsystem.reviewing.AcceptGui;
-import me.bteuk.plotsystem.reviewing.DenyGui;
-import me.bteuk.plotsystem.reviewing.FeedbackGui;
-import me.bteuk.plotsystem.reviewing.ReviewGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Holograms;
 import me.bteuk.plotsystem.utils.User;
@@ -215,18 +210,6 @@ public class PlotSystem extends JavaPlugin {
         getCommand("buildingpoints").setExecutor(new BuildingPoints());
 
         //getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
-
-        //GUIs
-        MainGui.initialize();
-        ReviewGui.initialize();
-        AcceptGui.initialize();
-        DenyGui.initialize();
-        PlotGui.initialize();
-        PlotInfo.initialize();
-        LocationGUI.initialize();
-        ConfirmCancel.initialize();
-        SwitchServerGUI.initialize();
-        FeedbackGui.initialize();
 
     }
 

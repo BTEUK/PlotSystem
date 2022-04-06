@@ -34,8 +34,9 @@ public class ReviewHotbar implements Listener {
     //Timer ID.
     private int taskID;
 
-    //Itemstack for slot 1.
+    //Itemstack for slot 1 and 2.
     private ItemStack slot1;
+    private ItemStack slot2;
 
     public ReviewHotbar(PlotSystem plotSystem, User u) {
 
@@ -99,14 +100,15 @@ public class ReviewHotbar implements Listener {
         }
     }
 
-    //Timer to keep review gui in inventory.
+    //Timer to keep review gui and feedback book in inventory.
     private void timer() {
 
         //1 tick timer.
         taskID = plotSystem.getServer().getScheduler().scheduleSyncRepeatingTask(plotSystem, () -> {
 
-            //Get slot1.
+            //Get slot1 and slot2.
             slot1 = u.player.getInventory().getItem(0);
+            slot2 = u.player.getInventory().getItem(1);
 
             //If slot1 is null set to review gui.
             if (slot1 == null) {
@@ -121,6 +123,21 @@ public class ReviewHotbar implements Listener {
                 u.player.getInventory().setItem(0, reviewGuiItem);
 
             }
+
+            //If slot2 is null set to feedback book.
+            if (slot2 == null) {
+
+                //Set slot2 to feedback book.
+                u.player.getInventory().setItem(1, u.review.book);
+
+                //If slot2 is not feedback book set to feedback book.
+            } else if (!slot2.equals(u.review.book)) {
+
+                //Set slot to gui.
+                u.player.getInventory().setItem(1, u.review.book);
+
+            }
+
         }, 0L, 1L);
     }
 
@@ -150,6 +167,8 @@ public class ReviewHotbar implements Listener {
 
         if (e.getOffHandItem().equals(reviewGuiItem)) {
             e.setCancelled(true);
+        } else if (e.getOffHandItem().equals(u.review.book)) {
+            e.setCancelled(true);
         }
 
     }
@@ -159,6 +178,8 @@ public class ReviewHotbar implements Listener {
 
         if (e.getItemDrop().getItemStack().equals(reviewGuiItem)) {
             e.setCancelled(true);
+        } else if (e.getItemDrop().getItemStack().equals(u.review.book)) {
+            e.setCancelled(true);
         }
 
     }
@@ -166,6 +187,8 @@ public class ReviewHotbar implements Listener {
     @EventHandler
     public void moveItem(InventoryMoveItemEvent e) {
         if (e.getItem().equals(reviewGuiItem)) {
+            e.setCancelled(true);
+        } else if (e.getItem().equals(u.review.book)) {
             e.setCancelled(true);
         }
 
@@ -175,6 +198,8 @@ public class ReviewHotbar implements Listener {
     public void moveItem(InventoryDragEvent e) {
         if (e.getOldCursor().equals(reviewGuiItem)) {
             e.setCancelled(true);
+        } else if (e.getOldCursor().equals(u.review.book)) {
+            e.setCancelled(true);
         }
 
         if (e.getCursor() == null) {
@@ -182,6 +207,8 @@ public class ReviewHotbar implements Listener {
         }
 
         if (e.getCursor().equals(reviewGuiItem)) {
+            e.setCancelled(true);
+        } else if (e.getCursor().equals(u.review.book)) {
             e.setCancelled(true);
         }
     }

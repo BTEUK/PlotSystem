@@ -212,25 +212,6 @@ public class MainGui {
 
 			p.closeInventory();
 			p.performCommand("bm");
-
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Review Plot")) {
-			//Open the review gui.
-			p.closeInventory();
-			p.openInventory(ReviewGui.GUI(u));
-			return;
-		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "New Review")) {
-			//If there is a plot available to review, create a new review and open the review gui.
-			if (plotData.reviewExists(u)) {
-				u.review = new Review(plotData.newReview(u));
-				WorldGuardFunctions.addMember(u.review.plot, u.uuid);
-				p.closeInventory();
-				p.openInventory(ReviewGui.GUI(u));
-				return;
-			} else {
-				p.closeInventory();
-				p.sendMessage(Utils.chat("&cThere are no plots available for review!"));
-				return;
-			}
 		} else if (clicked.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.AQUA + "" + ChatColor.BOLD + "Plot Feedback")) {
 			//Open the feedback gui			
 			p.closeInventory();

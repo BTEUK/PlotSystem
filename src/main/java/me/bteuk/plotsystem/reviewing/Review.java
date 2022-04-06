@@ -20,6 +20,9 @@ public class Review {
 	public UniqueGui reviewGui;
 	private final ReviewHotbar hotbarListener;
 
+	//Accept Gui.
+	public UniqueGui acceptGui;
+
 	//Plot id.
 	public final int plot;
 	
@@ -47,6 +50,7 @@ public class Review {
 		//Feedback book details.
 		book = new ItemStack(Material.WRITABLE_BOOK);
 		bookMeta = (BookMeta) book.getItemMeta();
+		//noinspection deprecation
 		bookMeta.setDisplayName(ChatColor.GREEN + "Feedback");
 		editBook = new EditBook(PlotSystem.getInstance(), this);
 		
