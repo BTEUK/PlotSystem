@@ -244,6 +244,17 @@ public class SelectionTool extends WGCreatePlot {
 
         if (createPlot(u.player, world, location, vector, plotSQL, size, difficulty)) {
 
+            //Store plot bounds.
+            int i = 1;
+            for (BlockVector2 point : vector) {
+
+                plotSQL.update("INSERT INTO points_data(id,points_number,x,z) VALUES(" +
+                        plotID + "," + i + "," + point.getX() + "," + point.getZ() + ");");
+                i++;
+
+            }
+
+            //Send feedback.
             u.player.sendMessage(Utils.chat("&aPlot created with ID &3" + plotID +
                     " &awith difficulty &3" + difficultyName()) +
                     " &aand size &3" + sizeName());

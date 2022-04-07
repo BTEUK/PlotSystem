@@ -20,8 +20,9 @@ public class Review {
 	public UniqueGui reviewGui;
 	private final ReviewHotbar hotbarListener;
 
-	//Accept Gui.
+	//Accept Gui and accept data.
 	public UniqueGui acceptGui;
+	public Accept accept;
 
 	//Plot id.
 	public final int plot;
@@ -61,6 +62,14 @@ public class Review {
 		//Unregister Listeners
 		hotbarListener.unregister();
 		editBook.unregister();
+
+		//Remove any existing guis.
+		if (reviewGui != null) {
+			reviewGui.delete();
+		}
+		if (acceptGui != null) {
+			acceptGui.delete();
+		}
 
 		//Convert inventory back to how it was pre-review.
 		u.player.getInventory().setContents(inventory);
