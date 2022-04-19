@@ -166,18 +166,37 @@ public class CreateCommand {
 
         }
 
+        //Get the exact regions of the selected coordinates.
+        int regionXMin = Math.floorDiv(xmin,512);
+        int regionZMin = Math.floorDiv(zmin,512);
+
+        int regionXMax = Math.floorDiv(xmax,512);
+        int regionZMax = Math.floorDiv(zmax,512);
+
         int coordMin = navigationSQL.addCoordinate(new Location(
                 Bukkit.getWorld(args[3]),
-                xmin, 0, zmin, 0, 0));
+                (regionXMin*512), 0, (regionZMin*512), 0, 0));
 
         int coordMax = navigationSQL.addCoordinate(new Location(
                 Bukkit.getWorld(args[3]),
-                xmax, 256, zmax, 0, 0));
+                ((regionXMax*512)+511), 256, ((regionZMax*512)+511), 0, 0));
 
         //Add the location to the database.
         if (plotSQL.update("INSERT INTO location_data(name, world, server, coordMin, coordMax) VALUES(" + args[2] + ", " + args[3] + ", " +  coordMin + ", " + coordMax + ");")) {
 
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
+
+            //Set the status of all effected regions in the region database.
+            for (int i = regionXMin; i <= regionXMax) {
+
+                for (int j = regionZMin; i<= regionZMax) {
+
+                    //Access the Network plugin to edit the region status.
+                    RegionEditor.forPlotSystem(i, j);
+
+                }
+            }
+
 
         } else {
 
