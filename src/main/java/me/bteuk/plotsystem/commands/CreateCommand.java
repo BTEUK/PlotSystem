@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
+import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -16,11 +17,13 @@ import org.bukkit.entity.Player;
 
 public class CreateCommand {
 
+    GlobalSQL globalSQL;
     PlotSQL plotSQL;
     NavigationSQL navigationSQL;
 
-    public CreateCommand(PlotSQL plotSQL, NavigationSQL navigationSQL) {
+    public CreateCommand(GlobalSQL globalSQL, PlotSQL plotSQL, NavigationSQL navigationSQL) {
 
+        this.globalSQL = globalSQL;
         this.plotSQL = plotSQL;
         this.navigationSQL = navigationSQL;
 
@@ -187,12 +190,12 @@ public class CreateCommand {
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
 
             //Set the status of all effected regions in the region database.
-            for (int i = regionXMin; i <= regionXMax) {
+            for (int i = regionXMin; i <= regionXMax; i++) {
 
-                for (int j = regionZMin; i<= regionZMax) {
+                for (int j = regionZMin; i<= regionZMax; j++) {
 
-                    //Access the Network plugin to edit the region status.
-                    RegionEditor.forPlotSystem(i, j);
+                    //Add event for earth server to lock the region.
+                    globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(NULL,earth,'region plot " + i + " " + j + "');");
 
                 }
             }

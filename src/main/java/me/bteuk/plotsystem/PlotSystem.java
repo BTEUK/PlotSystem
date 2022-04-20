@@ -202,7 +202,7 @@ public class PlotSystem extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotSQL);
 
         //Commands
-        getCommand("plotsystem").setExecutor(new PlotSystemCommand(plotSQL, navigationSQL));
+        getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL, navigationSQL));
         getCommand("claim").setExecutor(claimCommand);
 
 

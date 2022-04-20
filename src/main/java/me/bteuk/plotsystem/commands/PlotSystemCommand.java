@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Utils;
@@ -17,11 +18,11 @@ public class PlotSystemCommand implements CommandExecutor {
     CreateCommand createCommand;
 
 
-    public PlotSystemCommand(PlotSQL plotSQL, NavigationSQL navigationSQL) {
+    public PlotSystemCommand(GlobalSQL globalSQL, PlotSQL plotSQL, NavigationSQL navigationSQL) {
 
         this.plotSQL = plotSQL;
 
-        createCommand = new CreateCommand(plotSQL, navigationSQL);
+        createCommand = new CreateCommand(globalSQL,plotSQL, navigationSQL);
 
     }
 
