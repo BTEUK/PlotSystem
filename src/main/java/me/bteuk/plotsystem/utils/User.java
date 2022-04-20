@@ -4,11 +4,8 @@ import me.bteuk.plotsystem.plots.SelectionTool;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.enums.Role;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.mysql.PlayerData;
 import me.bteuk.plotsystem.reviewing.Review;
 
 public class User {
@@ -24,7 +21,6 @@ public class User {
     //Player role.
     public Role role;
 
-
     public int buildingTime;
 
     public SelectionTool selectionTool;
@@ -36,8 +32,6 @@ public class User {
     public boolean plotOwner;
     public boolean plotMember;
     public boolean isClaimed;
-
-    public World world;
 
     public String previousGui;
 
@@ -67,9 +61,6 @@ public class User {
         if (role == Role.ARCHITECT || role == Role.REVIEWER) {
             selectionTool = new SelectionTool(this, plotSQL);
         }
-
-        //Set current world
-        world = player.getWorld();
 
     }
 
