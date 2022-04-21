@@ -27,13 +27,21 @@ plot_limit:
 plot_maximum: 15
 
 #Building points
-#Points multiplier for each level
-#Example if size is 3 and size_multiplier is 5 then the player will receive 3*5=15 points for size.
-#This is done for each of the three categories
-size_multiplier: 1
-accuracy_multiplier: 1
-quality_multiplier: 1
-points_base: 5
+#Formula is (size+difficulty)*((accuracy+quality)/2)
+#The multipliers for accuracy and quality mean that
+#for each level from the base of 3 the value shifts by the multiplier.
+#Example: at accuracy 1 this would mean 1-(2*accuracy_multiplier)=0.6
+size:
+  small: 5
+  medium: 10
+  large: 20
+difficulty:
+  easy: 3
+  normal: 6
+  hard: 9
+accuracy_multiplier: 0.2
+quality_multiplier: 0.2
+
 
 #Number of days a player can be inactive before their plots get cancelled
 plot_inactive_cancel: 14

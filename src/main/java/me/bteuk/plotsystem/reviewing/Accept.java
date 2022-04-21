@@ -1,5 +1,7 @@
 package me.bteuk.plotsystem.reviewing;
 
+import me.bteuk.plotsystem.PlotSystem;
+
 public class Accept {
 
     //Reviewing values.
@@ -13,7 +15,15 @@ public class Accept {
 
     }
 
+    public double accuracyMultiplier() {
 
+        return (1 + (accuracy-3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
 
+    }
 
+    public double qualityMultiplier() {
+
+        return (1 + (quality-3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
+
+    }
 }

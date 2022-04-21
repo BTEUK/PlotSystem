@@ -17,7 +17,7 @@ public class CreatePlotGui {
         UniqueGui gui = new UniqueGui(27, Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Choose plot size.
-        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(12, Utils.createItem(user.selectionTool.sizeMaterial(), 1,
                         Utils.chat("&b&l" + user.selectionTool.sizeName()),
                         Utils.chat("&fClick to cycle through different sizes.")),
                 u ->
@@ -40,13 +40,14 @@ public class CreatePlotGui {
                     //Update the inventory.
                     u.uniqueGui.delete();
                     u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
+                    u.uniqueGui.update(u);
                     u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
                     Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 
                 });
 
         //Choose plot difficulty.
-        gui.setItem(14, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(14, Utils.createItem(user.selectionTool.difficultyMaterial(), 1,
                         Utils.chat("&b&l" + user.selectionTool.difficultyName()),
                         Utils.chat("&fClick to cycle through different difficulties.")),
                 u ->
@@ -69,6 +70,7 @@ public class CreatePlotGui {
                     //Update the inventory.
                     u.uniqueGui.delete();
                     u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
+                    u.uniqueGui.update(u);
                     u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
                     Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.utils.Points;
+import me.bteuk.network.utils.enums.PointsType;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -180,7 +183,9 @@ public class AcceptGui {
                     }
 
                     //Calculate points.
-                    //int points = 1;
+                    int points = (int) Math.round((PlotValues.sizeValue(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.review.plot + ";")) +
+                            PlotValues.difficultyValue(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";"))) *
+                            ((ac.accuracyMultiplier()+ac.qualityMultiplier())/2));
 
                     //Add to accept data.
                     if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,time) VALUES(" +
@@ -203,7 +208,7 @@ public class AcceptGui {
 
                     //Add points to player.
                     //By referencing network plugin.
-                    //Points.addPoints(plotOwner, points);
+                    Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
 
                     //Save plot to save world.
                     List<BlockVector2> corners = WorldGuardFunctions.getPoints(user.review.plot, world);
