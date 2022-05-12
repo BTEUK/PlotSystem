@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.mysql.AcceptData;
 import me.bteuk.plotsystem.mysql.DenyData;
 import me.bteuk.plotsystem.mysql.PlayerData;

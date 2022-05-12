@@ -8,8 +8,6 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import me.bteuk.plotsystem.utils.CustomHologram;
-
 public class NavigationSQL {
 
     private BasicDataSource dataSource;

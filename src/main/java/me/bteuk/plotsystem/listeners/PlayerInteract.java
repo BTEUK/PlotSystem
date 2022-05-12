@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;

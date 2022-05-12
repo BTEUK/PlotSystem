@@ -1,7 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.gui.MainGui;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

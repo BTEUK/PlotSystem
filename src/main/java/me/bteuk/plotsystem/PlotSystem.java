@@ -26,10 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.bteuk.plotsystem.commands.BuildingPoints;
-import me.bteuk.plotsystem.commands.OpenGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.Holograms;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;

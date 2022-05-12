@@ -63,7 +63,7 @@ public class ClaimGui {
                         if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ", " + eUser.uuid + ", " + 1 + ", " + Time.currentTime() + ";")) {
 
                             //Add player to worldguard region.
-                            if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.world)) {
+                            if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
 
                                 eUser.player.sendMessage(Utils.chat("&aSuccessfully claimed plot &b" + eUser.inPlot + "&c, good luck building."));
                                 Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
