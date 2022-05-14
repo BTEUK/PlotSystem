@@ -29,7 +29,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.jetbrains.annotations.NotNull;
 
 public class PlotSystem extends JavaPlugin {
@@ -50,9 +49,6 @@ public class PlotSystem extends JavaPlugin {
     private ArrayList<User> users;
 
     public static ItemStack gui;
-
-    //Holograms
-    Holograms holograms;
 
     //Server Name
     public static String SERVER_NAME;
@@ -105,12 +101,12 @@ public class PlotSystem extends JavaPlugin {
         //Set the server name from config.
         SERVER_NAME = config.getString("server_name");
 
-        if (!navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+        //If the server is in the database.
+        if (navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
 
-            //Add server to database and enable server.
-            if (navigationSQL.insert(
-                    "INSERT INTO server_data(name,type) VALUES(" + SERVER_NAME + ",'plot');"
-            )) {
+            //Add save world if it does not yet exist.
+            //This implies first launch with plugin.
+            if (!Multiverse.hasWorld("save")) {
 
                 //Create save world.
                 if (Multiverse.createVoidWorld("save")) {
@@ -132,26 +128,28 @@ public class PlotSystem extends JavaPlugin {
 
                 }
 
-                //Enable the server.
-                Bukkit.getLogger().info(Utils.chat("&aServer added to database, enabling server!"));
-                enableServer();
+                //Enable plugin.
+                Bukkit.getLogger().info(me.bteuk.network.utils.Utils.chat("&cEnabling Plugin"));
+                enablePlugin();
 
             } else {
 
-                Bukkit.getLogger().severe(Utils.chat("&cFailed to add server to database, shutting down PlotSystem!"));
+                //If the server is not in the database the network plugin was not successful.
+                Bukkit.getLogger().warning(Utils.chat("&cServer is not in database, check that the Network plugin is working correctly."));
 
             }
 
         } else {
 
-            //If the server is already in the database enable it straight away.
-            enableServer();
+            //Enable plugin.
+            Bukkit.getLogger().info(me.bteuk.network.utils.Utils.chat("&cEnabling Plugin"));
+            enablePlugin();
 
         }
     }
 
     //Server enabling procedure when the config has been set up.
-    public void enableServer() {
+    public void enablePlugin() {
 
         //General Setup
         //Create list of users.
@@ -190,10 +188,6 @@ public class PlotSystem extends JavaPlugin {
         //Deals with tracking where players are in relation to plots.
         new ClaimEnter(instance, plotSQL, globalSQL);
 
-        //Holograms
-        //holograms = new Holograms(hologramData, hologramText, playerData);
-        //holograms.create();
-
         //Create instance of claim command,
         //as it is used to check whether a person is able to claim the plot they're standing in.
         ClaimCommand claimCommand = new ClaimCommand(plotSQL);
@@ -201,12 +195,6 @@ public class PlotSystem extends JavaPlugin {
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL, navigationSQL));
         getCommand("claim").setExecutor(claimCommand);
-
-
-        getCommand("gui").setExecutor(new OpenGui());
-        getCommand("buildingpoints").setExecutor(new BuildingPoints());
-
-        //getCommand("customholo").setExecutor(new CustomHolo(hologramData, hologramText, holograms));
 
     }
 
@@ -225,12 +213,7 @@ public class PlotSystem extends JavaPlugin {
             //If the player is in a review, cancel it.
             if (u.review != null) {
 
-                WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE name=" +
-                        plotSQL.getString(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")) + ";")));
-                //plotData.setStatus(u.review.plot, "submitted");
-                u.review.editBook.unregister();
-                u.player.getInventory().setItem(4, u.review.previousItem);
-                u.review = null;
+                //TODO: Cancel any active reviews.
 
             }
         }
@@ -290,9 +273,5 @@ public class PlotSystem extends JavaPlugin {
         }
 
         return null;
-    }
-
-    public Holograms getHolograms() {
-        return holograms;
     }
 }

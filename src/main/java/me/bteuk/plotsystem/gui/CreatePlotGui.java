@@ -42,7 +42,6 @@ public class CreatePlotGui {
                     u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
                     u.uniqueGui.update(u);
                     u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
-                    Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 
                 });
 
@@ -72,7 +71,6 @@ public class CreatePlotGui {
                     u.uniqueGui = CreatePlotGui.createPlotGui(eUser);
                     u.uniqueGui.update(u);
                     u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
-                    Gui.openInventories.put(u.player.getUniqueId(), u.uniqueGui.getUuid());
 
                 });
 

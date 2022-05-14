@@ -221,34 +221,6 @@ public class NavigationSQL {
         }
     }
 
-    public ArrayList<CustomHologram> getHolos() {
-
-        ArrayList<CustomHologram> holos = new ArrayList<>();
-        CustomHologram holo;
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT * FROM hologram_data;"
-        )) {
-
-            ResultSet results = statement.executeQuery();
-
-            while (results.next()) {
-                holo = new CustomHologram(results.getString("name"), new Location(
-                        Bukkit.getWorld(results.getString("world")),
-                        results.getDouble("x"), results.getDouble("y"), results.getDouble("z")),
-                        results.getBoolean("visible"));
-                holos.add(holo);
-            }
-
-            return holos;
-
-        } catch (SQLException sql) {
-            sql.printStackTrace();
-            return null;
-        }
-
-    }
-
     public boolean addLine(String name, int line, String text) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
@@ -466,8 +438,8 @@ public class NavigationSQL {
 
     }
 
-    //Generic insert statement, return true is successful.
-    public boolean insert(String sql) {
+    //Generic update statement, return true is successful.
+    public boolean update(String sql) {
 
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
