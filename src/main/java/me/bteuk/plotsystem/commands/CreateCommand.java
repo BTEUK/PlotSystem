@@ -226,7 +226,7 @@ public class CreateCommand {
             //Set the status of all effected regions in the region database.
             for (int i = regionXMin; i <= regionXMax; i++) {
 
-                for (int j = regionZMin; i <= regionZMax; j++) {
+                for (int j = regionZMin; j <= regionZMax; j++) {
 
                     //Add event for earth server to lock the region.
                     globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(NULL,earth,'region plotsystem " + i + " " + j + "');");

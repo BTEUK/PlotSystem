@@ -61,7 +61,7 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.hasRow("SELECT name FROM world_data WHERE name=" + e.getClickedBlock().getWorld() + " AND type='build';")) {
+                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + e.getClickedBlock().getWorld() + " AND type='build';")) {
 
                     u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
 
@@ -75,11 +75,8 @@ public class PlayerInteract implements Listener {
 
                 }
 
-                //Get the location that is in this world.
-                String location = plotSQL.getString("SELECT name FROM location_data WHERE world=" + e.getClickedBlock().getWorld() + ";");
-
                 //Passed the checks, start a new selection at the clicked block.
-                u.selectionTool.startSelection(e.getClickedBlock(), location);
+                u.selectionTool.startSelection(e.getClickedBlock(), e.getClickedBlock().getWorld().toString());
                 u.player.sendMessage(Utils.chat("&aStarted a new selection at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
                 //If the player right clicks then add a point to the existing selection.

@@ -109,20 +109,7 @@ public class PlotSystem extends JavaPlugin {
             if (!Multiverse.hasWorld("save")) {
 
                 //Create save world.
-                if (Multiverse.createVoidWorld("save")) {
-
-                    //Add save world to database.
-                    if (plotSQL.update("INSERT INTO world_data(name,type,server) VALUES('save','save'," + SERVER_NAME + ");")) {
-
-                        Bukkit.getLogger().info(Utils.chat("&aSuccessfully created save world."));
-
-                    } else {
-
-                        Bukkit.getLogger().severe(Utils.chat("&cFailed to add save world to database!"));
-
-                    }
-
-                } else {
+                if (!Multiverse.createVoidWorld("save")) {
 
                     Bukkit.getLogger().warning(Utils.chat("&cFailed to create save world!"));
 
@@ -138,13 +125,6 @@ public class PlotSystem extends JavaPlugin {
                 Bukkit.getLogger().warning(Utils.chat("&cServer is not in database, check that the Network plugin is working correctly."));
 
             }
-
-        } else {
-
-            //Enable plugin.
-            Bukkit.getLogger().info(me.bteuk.network.utils.Utils.chat("&cEnabling Plugin"));
-            enablePlugin();
-
         }
     }
 
