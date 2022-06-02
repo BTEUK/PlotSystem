@@ -10,10 +10,14 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.IOException;
 
 public class CreateCommand {
 
@@ -126,9 +130,9 @@ public class CreateCommand {
         }
 
         //Check if they have enough args.
-        if (args.length < 8) {
+        if (args.length < 7) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] [world] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
             return;
 
         }
@@ -142,15 +146,15 @@ public class CreateCommand {
         //Check if the coordinates are actual numbers.
         try {
 
-            xmin = Integer.parseInt(args[4]);
-            zmin = Integer.parseInt(args[5]);
+            xmin = Integer.parseInt(args[3]);
+            zmin = Integer.parseInt(args[4]);
 
-            xmax = Integer.parseInt(args[6]);
-            zmax = Integer.parseInt(args[7]);
+            xmax = Integer.parseInt(args[5]);
+            zmax = Integer.parseInt(args[6]);
 
         } catch (NumberFormatException e) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] [world] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
             return;
 
         }
@@ -163,45 +167,72 @@ public class CreateCommand {
 
         }
 
-        //Check if the world exists.
-        if (!plotSQL.hasRow("SELECT name FROM world_data WHERE name=" +args[3] + ", server= " + PlotSystem.SERVER_NAME + ";")) {
+        //Get the exact regions of the selected coordinates.
+        int regionXMin = Math.floorDiv(xmin, 512);
+        int regionZMin = Math.floorDiv(zmin, 512);
 
-            sender.sendMessage(Utils.chat("&cThe world " + args[3] + " does not exist on this server."));
+        int regionXMax = Math.floorDiv(xmax, 512);
+        int regionZMax = Math.floorDiv(zmax, 512);
+
+        //Calculate the coordinate transformation.
+        int xTransform = -(regionXMin * 512);
+        int zTransform = -(regionZMin * 512);
+
+        //Create the world and add the regions.
+        Multiverse.createVoidWorld(args[2]);
+
+        //Copy regions from save world and add them to build world with transformed coordinates.
+        String path = PlotSystem.getInstance().getDataFolder().getParent();
+        File copy;
+        File paste;
+
+        //Iterate through regions.
+        try {
+            for (int i = regionXMin; i <= regionXMax; i++) {
+
+                for (int j = regionZMin; j <= regionZMax; j++) {
+
+                    //Get the file of the existing and new region.
+                    copy = new File(path + "/" + PlotSystem.getInstance().getConfig().getString("save_world"
+                            + "/region/r." + i + "." + j + ".mca"));
+                    paste = new File(path + "/" + args[2] + "/region/r." + (i + xTransform/512) + "." + (j + zTransform/512) + ".mca");
+
+                    FileUtils.copyFile(copy, paste);
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage(Utils.chat("&cAn error occurred while copying the terrain."));
             return;
-
         }
 
-        //Get the exact regions of the selected coordinates.
-        int regionXMin = Math.floorDiv(xmin,512);
-        int regionZMin = Math.floorDiv(zmin,512);
-
-        int regionXMax = Math.floorDiv(xmax,512);
-        int regionZMax = Math.floorDiv(zmax,512);
 
         int coordMin = navigationSQL.addCoordinate(new Location(
-                Bukkit.getWorld(args[3]),
-                (regionXMin*512), 0, (regionZMin*512), 0, 0));
+                Bukkit.getWorld(args[2]),
+                (regionXMin * 512), 0, (regionZMin * 512), 0, 0));
 
         int coordMax = navigationSQL.addCoordinate(new Location(
-                Bukkit.getWorld(args[3]),
-                ((regionXMax*512)+511), 256, ((regionZMax*512)+511), 0, 0));
+                Bukkit.getWorld(args[2]),
+                ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
+
 
         //Add the location to the database.
-        if (plotSQL.update("INSERT INTO location_data(name, world, server, coordMin, coordMax) VALUES(" + args[2] + ", " + args[3] + ", " +  coordMin + ", " + coordMax + ");")) {
+        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax) VALUES("
+                + args[2] + ", " + PlotSystem.SERVER_NAME + ", " + coordMin + ", " + coordMax + ", " + xTransform + ", " + zTransform + ");")) {
 
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
 
             //Set the status of all effected regions in the region database.
             for (int i = regionXMin; i <= regionXMax; i++) {
 
-                for (int j = regionZMin; i<= regionZMax; j++) {
+                for (int j = regionZMin; i <= regionZMax; j++) {
 
                     //Add event for earth server to lock the region.
-                    globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(NULL,earth,'region plot " + i + " " + j + "');");
+                    globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(NULL,earth,'region plotsystem " + i + " " + j + "');");
 
                 }
             }
-
 
         } else {
 

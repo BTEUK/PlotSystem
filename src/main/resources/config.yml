@@ -15,6 +15,10 @@ database:
 enabled: false
 server_name: plotserver
 
+#Save world name
+#This is where all completed plots are stored.
+save_world: saveWorld
+
 #Limit on active claimed plots
 #If user is at the limit they will no longer be able to create a new plot
 #Submitted plots are not counted towards the total.
