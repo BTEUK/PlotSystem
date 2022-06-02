@@ -97,33 +97,17 @@ public class WorldGuardFunctions {
 
     public static boolean inRegion(Block block, PlotSQL plotSQL) {
 
-        //Get the saveWorld from database.
-        String worldName = plotSQL.getSaveWorld();
-
-        //If the world is null return true and post error in discord.
-        if (worldName == null) {
-
-            //Insert discord warning message in #dev-chat
-            return false;
-
-        }
-
-        //Get the saveWorld.
-        World saveWorld = Bukkit.getServer().getWorld(plotSQL.getSaveWorld());
-
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
 
         //Get worldguard region data
-        RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager saveRegions = container.get(BukkitAdapter.adapt(saveWorld));
-
+        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(block.getWorld()));
 
         //Get the blockvector3 at the block.
         BlockVector3 v = BlockVector3.at(block.getX(), block.getY(), block.getZ());
 
         //Check whether the region overlaps an existing plot, if true stop the process.
-        ApplicableRegionSet set = saveRegions.getApplicableRegions(v);
+        ApplicableRegionSet set = regions.getApplicableRegions(v);
 
         if (set.size() > 0) {
 

@@ -2,7 +2,6 @@ package me.bteuk.plotsystem.listeners;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.plots.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,12 +42,6 @@ public class PlayerInteract implements Listener {
             return;
         }
 
-        if (e.getPlayer().getInventory().getItemInMainHand().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-            e.getPlayer().closeInventory();
-            e.getPlayer().openInventory(MainGui.GUI(u));
-        }
-
         //Selection tool
         if (u.player.getInventory().getItemInMainHand().equals(PlotSystem.selectionTool)) {
 
@@ -68,7 +61,7 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.buildable(e.getClickedBlock().getWorld().getName())) {
+                if (!plotSQL.hasRow("SELECT name FROM world_data WHERE name=" + e.getClickedBlock().getWorld() + " AND type='build';")) {
 
                     u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
 
@@ -82,29 +75,8 @@ public class PlayerInteract implements Listener {
 
                 }
 
-                //If the selected point in't in a valid location cancel.
-                String location = null;
-                BlockVector2 bv = BlockVector2.at(e.getClickedBlock().getX(), e.getClickedBlock().getZ());
-
-                for (Location l : plotSQL.getLocations(e.getClickedBlock().getWorld().getName())) {
-
-                    //If the block is in the location set the location and stop the loop.
-                    if (l.inLocation(bv)) {
-
-                        location = l.getName();
-                        break;
-
-                    }
-                }
-
-                //Check if the location is not null.
-                if (location == null) {
-
-                    u.player.sendMessage(Utils.chat("&cThis point is not in a valid location"));
-                    return;
-
-                }
-
+                //Get the location that is in this world.
+                String location = plotSQL.getString("SELECT name FROM location_data WHERE world=" + e.getClickedBlock().getWorld() + ";");
 
                 //Passed the checks, start a new selection at the clicked block.
                 u.selectionTool.startSelection(e.getClickedBlock(), location);
@@ -116,23 +88,16 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are making their plot in the same world as their first point.
-                if (!u.player.getWorld().equals(u.selectionTool.world())) {
+                if (!e.getClickedBlock().getWorld().equals(u.selectionTool.world())) {
 
-                    u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection."));
-
-                }
-
-                //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.buildable(e.getClickedBlock().getWorld().getName())) {
-
-                    u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
+                    u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection first."));
 
                 }
 
                 //If the player hasn't selected their first point cancel.
                 if (u.selectionTool.size() == 0) {
 
-                    u.player.sendMessage(Utils.chat("&cYou must first begin your selection with left click!"));
+                    u.player.sendMessage(Utils.chat("&cYou must first start your selection by left-clicking."));
                     return;
 
                 }
@@ -147,10 +112,10 @@ public class PlayerInteract implements Listener {
 
                 if (!u.selectionTool.addPoint(e.getClickedBlock())) {
 
-                    u.player.sendMessage(Utils.chat("&cThis point is more than 500 blocks away from the first point."));
                     return;
 
                 }
+
                 u.player.sendMessage(Utils.chat("&aAdded point at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
             }

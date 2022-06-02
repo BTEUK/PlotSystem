@@ -88,7 +88,7 @@ public class CreateCommand {
 
         }
 
-        //Check if the plot is valid
+        //Check if the plot is valid, meaning that at least 3 points are selected with the selection tool.
         if (u.selectionTool.size() < 3) {
 
             u.player.sendMessage(Utils.chat("&cYou must select at least 3 points for a valid plot!"));
@@ -97,11 +97,13 @@ public class CreateCommand {
         }
 
         //Open the plot creation menu
+        //Calculate the area of the plot and set a default size estimate.
         u.selectionTool.area();
         u.selectionTool.setDefaultSize();
 
-        //Get the user from the network plugin.
+        //Get the user from the network plugin, this plugin handles all guis.
         NetworkUser user = Network.getInstance().getUser(u.player);
+        //UniqueGui allows the creation of a gui that is unique to this player.
         user.uniqueGui = CreatePlotGui.createPlotGui(u);
         user.uniqueGui.open(user);
 

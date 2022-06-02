@@ -17,6 +17,7 @@ server_name: plotserver
 
 #Limit on active claimed plots
 #If user is at the limit they will no longer be able to create a new plot
+#Submitted plots are not counted towards the total.
 plot_limit:
   guest: 1
   apprentice: 2
@@ -42,9 +43,15 @@ difficulty:
 accuracy_multiplier: 0.2
 quality_multiplier: 0.2
 
-
 #Number of days a player can be inactive before their plots get cancelled
 plot_inactive_cancel: 14
 
 #Cooldown between plot submissions in minutes
 submit_cooldown: 5
+
+#Default area size
+#When a player creates a new plot the area of the selection is calculated and will give a default size for the plot.
+#The values here represent the largest area in m^2 that will show this size in the plot creation menu.
+default_size:
+  small: 500
+  medium: 1000

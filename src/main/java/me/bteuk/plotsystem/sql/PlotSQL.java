@@ -1,7 +1,6 @@
 package me.bteuk.plotsystem.sql;
 
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.plots.Location;
 import me.bteuk.plotsystem.utils.Time;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -66,36 +65,6 @@ public class PlotSQL {
             //If for some reason an error occurred in the sql then return false.
             sql.printStackTrace();
             return false;
-        }
-    }
-
-    //Returns the name of the save world.
-    public String getSaveWorld() {
-
-        //Create a statement to select the type where type = save.
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM world_data WHERE server='" + PlotSystem.SERVER_NAME + "', type='save';"
-        )) {
-
-            try (ResultSet results = statement.executeQuery()) {
-
-                //If there is a value for save the return the name, else return null.
-                if (results.next()) {
-
-                    return results.getString("name");
-
-                } else {
-
-                    return null;
-
-                }
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return null.
-            sql.printStackTrace();
-            return null;
         }
     }
 
@@ -260,42 +229,6 @@ public class PlotSQL {
             sql.printStackTrace();
             return false;
         }
-    }
-
-    //Get location bounds for specific world + server.
-    public ArrayList<Location> getLocations(String world) {
-
-        ArrayList<Location> locations = new ArrayList<>();
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT name, coordMin, coordMax FROM location_data WHERE world=?, server=?;"
-        )) {
-
-            statement.setString(1, world);
-            statement.setString(2, PlotSystem.SERVER_NAME);
-
-            try (ResultSet results = statement.executeQuery()) {
-
-                while (results.next()) {
-
-                    locations.add(new Location(
-                            results.getString("name"),
-                            (int) navigationSQL.getX(results.getInt("coordMin")),
-                            (int) navigationSQL.getX(results.getInt("coordMax")),
-                            (int) navigationSQL.getZ(results.getInt("coordMin")),
-                            (int) navigationSQL.getZ(results.getInt("coordMax"))
-                    ));
-                }
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return null;
-        }
-
-        return locations;
     }
 
     //Creates a new plot and returns the id of the plot.

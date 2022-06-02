@@ -14,7 +14,6 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.entity.Player;
 
 /*
@@ -35,15 +34,18 @@ public class WGCreatePlot {
         WorldGuard wg = WorldGuard.getInstance();
 
         //Get regions.
-        RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager saveRegions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(plotSQL.getSaveWorld())));
-        RegionManager buildRegions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(world.getName())));
+        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(Bukkit.getWorld(world.getName())));
 
-        //Create region
+        //Checking if regions isn't null, would indicate that the world doesn't exist.
+        if (regions == null) {
+            return false;
+        }
+
+        //Create region to test.
         ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, 1, 256);
 
         //Check whether the region overlaps an existing plot, if true stop the process.
-        ApplicableRegionSet set = saveRegions.getApplicableRegions(region);
+        ApplicableRegionSet set = regions.getApplicableRegions(region);
         if (set.size() > 0) {
 
             p.sendMessage(Utils.chat("&cYour selection overlaps with an existing plot."));
@@ -54,20 +56,15 @@ public class WGCreatePlot {
         //Create an entry in the database for the plot.
         plotID = plotSQL.createPlot(size, difficulty, location);
 
-        //Set the region name.
+        //Create the region with valid name.
         region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, 1, 256);
 
-        //Set the region priority to 1
-        region.setPriority(1);
+        //Add the regions to the world
+        regions.addRegion(region);
 
-        //Add the regions to the worlds
-        saveRegions.addRegion(region);
-        buildRegions.addRegion(region);
-
-        //Save the new regions
+        //Save the new region
         try {
-            saveRegions.save();
-            buildRegions.save();
+            regions.save();
         } catch (
                 StorageException e1) {
             e1.printStackTrace();

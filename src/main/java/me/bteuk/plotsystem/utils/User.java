@@ -1,6 +1,5 @@
 package me.bteuk.plotsystem.utils;
 
-import me.bteuk.plotsystem.plots.SelectionTool;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.enums.Role;
@@ -18,9 +17,6 @@ public class User {
     //Important tutorial information.
     public boolean tutorial_complete;
 
-    //Player role.
-    public Role role;
-
     public int buildingTime;
 
     public SelectionTool selectionTool;
@@ -32,8 +28,6 @@ public class User {
     public boolean plotOwner;
     public boolean plotMember;
     public boolean isClaimed;
-
-    public String previousGui;
 
     public Review review = null;
 
@@ -51,51 +45,8 @@ public class User {
         uuid = player.getUniqueId().toString();
         name = player.getName();
 
-        //Update player info.
-        updatePlayerData();
+        //Set selection tool, only players with the valid roles can use it.
+        selectionTool = new SelectionTool(this, plotSQL);
 
-        //Continue the tutorial from where they last were.
-        //if tutorial is incomplete
-
-        //If the player is architect or above create plot creation functions.
-        if (role == Role.ARCHITECT || role == Role.REVIEWER) {
-            selectionTool = new SelectionTool(this, plotSQL);
-        }
-
-    }
-
-    //Update playerdata or create a new instance if it's their first time joining the server.
-    public void updatePlayerData() {
-
-        //Set the role of the player.
-        if (player.hasPermission("group.reviewer")) {
-            role = Role.REVIEWER;
-        } else if (player.hasPermission("group.architect")) {
-            role = Role.ARCHITECT;
-        } else if (player.hasPermission("group.builder")) {
-            role = Role.BUILDER;
-        } else if (player.hasPermission("group.jrbuilder")) {
-            role = Role.JRBUILDER;
-        } else if (player.hasPermission("group.apprentice")) {
-            role = Role.APPRENTICE;
-        } else if (player.hasPermission("group.applicant")) {
-            role = Role.APPLICANT;
-        } else {
-            role = Role.GUEST;
-        }
-
-        if (globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid = " + uuid + ";")) {
-
-            //If true then update their last online time and username.
-            globalSQL.update("UPDATE player_data SET last_online = " + Time.currentTime() + " WHERE uuid = " + uuid + ";");
-            globalSQL.update("UPDATE player_data SET name = " + player.getName() + " WHERE uuid = " + uuid + ";");
-            globalSQL.update("UPDATE player_data SET role = " + role + " WHERE uuid = " + uuid + ";");
-
-        } else {
-
-            globalSQL.update("INSERT INTO player_data(uuid, name, role, last_online, last_submit) " +
-                    "VALUES(" + player.getUniqueId().toString() + ", " + player.getName() + ", " + role +", " + Time.currentTime() + ", " + 0 + ");");
-
-        }
     }
 }

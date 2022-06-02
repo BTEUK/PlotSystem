@@ -1,12 +1,15 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class PlotSystemCommand implements CommandExecutor {
 
@@ -38,6 +41,11 @@ public class PlotSystemCommand implements CommandExecutor {
 
         switch (args[0]) {
 
+            case "selectiontool":
+
+                selectionTool(sender);
+                break;
+
             case "create":
 
                 createCommand.create(sender, args);
@@ -63,6 +71,30 @@ public class PlotSystemCommand implements CommandExecutor {
     }
 
     private void help(CommandSender sender) {
+
+    }
+
+    private void selectionTool(CommandSender sender) {
+
+        //Check if the sender is a player.
+        if (!(sender instanceof Player)) {
+
+            sender.sendMessage(Utils.chat("&cYou must be a player to use this command."));
+
+        }
+
+        //Get the user.
+        User u = PlotSystem.getInstance().getUser((Player) sender);
+
+        //Check if the user has permission.
+        if (!u.player.hasPermission("uknet.plots.select")) {
+
+            u.player.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+
+        }
+
+        //Give the player a selection tool.
+        u.selectionTool.giveSelectionTool();
 
     }
 
