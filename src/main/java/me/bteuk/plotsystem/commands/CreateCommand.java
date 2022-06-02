@@ -217,6 +217,7 @@ public class CreateCommand {
                 ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
 
 
+
         //Add the location to the database.
         if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax) VALUES("
                 + args[2] + ", " + PlotSystem.SERVER_NAME + ", " + coordMin + ", " + coordMax + ", " + xTransform + ", " + zTransform + ");")) {
@@ -228,8 +229,13 @@ public class CreateCommand {
 
                 for (int j = regionZMin; j <= regionZMax; j++) {
 
-                    //Add event for earth server to lock the region.
-                    globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(NULL,earth,'region plotsystem " + i + " " + j + "');");
+                    //Change region status in region database.
+                    //If it already exists remove members.
+                    //TODO: Lock Regions in RegionSQL
+
+                    //Add region to database.
+                    String region = i + "," + j;
+                    plotSQL.update("INSERT INTO regions(region,server,location) VALUES(" + region + "," + PlotSystem.SERVER_NAME + "," + args[2] + ");");
 
                 }
             }
