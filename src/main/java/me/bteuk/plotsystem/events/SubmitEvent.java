@@ -46,7 +46,7 @@ public class SubmitEvent {
                     }
                 }
 
-                message = Utils.chat("&cYou have a " + time + " cooldown before you can submit another plot.");
+                message = Utils.chat("&cYou have a &3" + time + " &acooldown before you can submit another plot.");
 
             } else {
 
@@ -56,12 +56,15 @@ public class SubmitEvent {
                     //Set plot status to submitted.
                     PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + id + ";");
 
-                    message = Utils.chat("&aSubmitted plot " + id + ".");
+                    //Update last submit time in playerdata.
+                    PlotSystem.getInstance().globalSQL.update("UPDATE player_data SET last_submit=" + Time.currentTime() + " WHERE uuid=" + uuid + ";");
+
+                    message = "&aSubmitted plot &3" + id + "&a.";
 
                 } else {
 
                     //If plot is not claimed set the message accordingly.
-                    message = Utils.chat("&cPlot can not be submitted.");
+                    message = "&cPlot can not be submitted.";
 
                 }
             }
@@ -69,7 +72,12 @@ public class SubmitEvent {
             //Send message to player if they are on the server.
             if (p != null) {
 
-                p.sendMessage(message);
+                p.sendMessage(Utils.chat(message));
+
+            } else {
+
+                //Send a cross-server message.
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + p.getUniqueId() + "," + message);
 
             }
 

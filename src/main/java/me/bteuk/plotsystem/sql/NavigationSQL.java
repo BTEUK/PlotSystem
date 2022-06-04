@@ -476,4 +476,26 @@ public class NavigationSQL {
             return false;
         }
     }
+
+    public String getString(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getString(1);
+
+            } else {
+
+                return null;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

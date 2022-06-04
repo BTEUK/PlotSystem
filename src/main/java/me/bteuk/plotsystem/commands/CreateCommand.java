@@ -117,16 +117,20 @@ public class CreateCommand {
 
         //Check if the sender is a player.
         //If so, check if they have permission.
-        if (sender instanceof Player) {
+        if (!(sender instanceof Player)) {
 
-            Player p = (Player) sender;
+            sender.sendMessage(Utils.chat("&cThis command can only be executed by a player."));
+            return;
 
-            if (!p.hasPermission("uknet.plots.create.location")) {
+        }
 
-                p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
-                return;
+        Player p = (Player) sender;
 
-            }
+        if (!p.hasPermission("uknet.plots.create.location")) {
+
+            p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
+            return;
+
         }
 
         //Check if they have enough args.
@@ -216,8 +220,6 @@ public class CreateCommand {
                 Bukkit.getWorld(args[2]),
                 ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
 
-
-
         //Add the location to the database.
         if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax) VALUES("
                 + args[2] + ", " + PlotSystem.SERVER_NAME + ", " + coordMin + ", " + coordMax + ", " + xTransform + ", " + zTransform + ");")) {
@@ -231,7 +233,9 @@ public class CreateCommand {
 
                     //Change region status in region database.
                     //If it already exists remove members.
-                    //TODO: Lock Regions in RegionSQL
+                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + p.getUniqueId() + ",'network',"
+                            + navigationSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "," +
+                            "region set plotsystem " + i + " " + j);
 
                     //Add region to database.
                     String region = i + "," + j;
