@@ -2,14 +2,16 @@ package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +23,19 @@ public class DeleteEvent {
         //Events for deleting
         if (event[1].equals("plot")) {
 
+            //PlotSQL
+            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
+            //Get location which is the world.
+            String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";");
+
             //Get worlds of plot and save location.
-            World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT name FROM world_data WHERE server=" + PlotSystem.SERVER_NAME + " AND type='save';"));
-            World pasteWorld = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE name=" +
-                    PlotSystem.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")+ ";"));
+            World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
+            //Location name is the same as the world name.
+            World pasteWorld = Bukkit.getWorld(location);
 
             if (copyWorld == null || pasteWorld == null) {
 
@@ -38,11 +46,21 @@ public class DeleteEvent {
 
             }
 
+            int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
+            int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
+
             //Get the plot bounds.
-            List<BlockVector2> vector = WorldGuardFunctions.getPoints(id, pasteWorld);
+            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(id, pasteWorld);
+
+            //Create the copyVector by transforming the points in the paste vector with the negative transform.
+            //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+            List<BlockVector2> copyVector = new ArrayList<>();
+            for (BlockVector2 bv : pasteVector) {
+                copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
+            }
 
             //Revert plot to original state.
-            WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
+            WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
             //Remove all members from the worldguard plot.
             WorldGuardFunctions.clearMembers(id, pasteWorld);

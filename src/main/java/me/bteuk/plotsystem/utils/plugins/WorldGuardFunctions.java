@@ -78,10 +78,6 @@ public class WorldGuardFunctions {
 
     public static List<BlockVector2> getPoints(int plot, World world) {
 
-        //Get instance of plugin and config
-        PlotSystem instance = PlotSystem.getInstance();
-        FileConfiguration config = instance.getConfig();
-
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
 
