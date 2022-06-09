@@ -1,13 +1,16 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.Utils;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class RetractEvent {
+public class JoinEvent {
 
     public static void event(String uuid, String[] event) {
 
@@ -20,22 +23,15 @@ public class RetractEvent {
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
-            String message;
+            String message = "&aYou have joined plot &3" + id;
 
-            //Check if plot is submitted.
-            if (PlotSystem.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + id + " AND status='submitted';")) {
+            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
-                //Set plot status to submitted.
-                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + id + ";");
+            //Add the player to the database.
+            plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + id + "," + uuid + ",'0'," + Time.currentTime() + ");");
 
-                message = Utils.chat("&aRetracted submission for plot " + id + ".");
-
-            } else {
-
-                //If plot is not submitted set the message accordingly.
-                message = "&cPlot submission can not be retracted as it is not submitted.";
-
-            }
+            //Add the player to the worldguard region.
+            WorldGuardFunctions.addMember(id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
 
             if (p != null) {
 

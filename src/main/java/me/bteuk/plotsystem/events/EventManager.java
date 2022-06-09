@@ -37,6 +37,10 @@ public class EventManager {
 
             ReviewEvent.event(uuid, event);
 
+        } else if (event[0].equals("join")) {
+
+            JoinEvent.event(uuid, event);
+
         }
 
     }

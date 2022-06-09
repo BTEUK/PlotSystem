@@ -50,8 +50,9 @@ public class Inactive {
                 //Get the plot bounds.
                 List<BlockVector2> vector = WorldGuardFunctions.getPoints(plot, pasteWorld);
 
+                //TODO take into account coordinate transform.
                 //Revert plot to original state.
-                WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
+                //WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
                 WorldGuardFunctions.clearMembers(plot, pasteWorld);

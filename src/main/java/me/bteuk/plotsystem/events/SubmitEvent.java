@@ -77,7 +77,7 @@ public class SubmitEvent {
             } else {
 
                 //Send a cross-server message.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + p.getUniqueId() + "," + message);
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + "," + message);
 
             }
 

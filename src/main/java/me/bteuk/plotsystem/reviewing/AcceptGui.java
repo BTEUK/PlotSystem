@@ -211,8 +211,9 @@ public class AcceptGui {
                     Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
 
                     //Save plot to save world.
+                    //TODO take into account coordinate transform.
                     List<BlockVector2> corners = WorldGuardFunctions.getPoints(user.review.plot, world);
-                    WorldEditor.updateWorld(corners, world, saveWorld);
+                    //WorldEditor.updateWorld(corners, world, saveWorld);
 
                     PlotSystem.getInstance().getLogger().info(Utils.chat("&aPlot " + user.review.plot + " successfully saved."));
 
