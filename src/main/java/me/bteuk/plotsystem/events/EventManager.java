@@ -41,6 +41,10 @@ public class EventManager {
 
             JoinEvent.event(uuid, event);
 
+        } else if (event[0].equals("kick")) {
+
+            KickEvent.event(uuid, event);
+
         }
 
     }
