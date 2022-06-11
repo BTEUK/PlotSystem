@@ -29,7 +29,7 @@ plot_limit:
   builder: 5
 
 #Maximum number of total plots, this includes submitted plots
-plot_maximum: 15
+plot_maximum: 21
 
 #Building points
 #Formula is (size+difficulty)*((accuracy+quality)/2)

@@ -54,6 +54,14 @@ public class ClaimEvent {
 
             }
 
+            //Check if you do not already have the maximum number of plots.
+            if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid=" + uuid + ";") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
+
+                p.sendMessage(Utils.chat("&aYou have reached the maximum number of plots."));
+                return;
+
+            }
+
             //Claim the plot.
             //Add user to worldguard region.
             WorldGuardFunctions.addMember(u.inPlot, u.uuid, u.player.getWorld());
