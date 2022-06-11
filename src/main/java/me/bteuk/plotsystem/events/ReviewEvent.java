@@ -22,7 +22,7 @@ public class ReviewEvent {
 
             if (p == null) {
 
-                Bukkit.getLogger().warning(Utils.chat("Player " + uuid + " is not on the server the event was sent to!"));
+                Bukkit.getLogger().warning(Utils.chat("&cPlayer " + uuid + " is not on the server the event was sent to!"));
                 return;
 
             }

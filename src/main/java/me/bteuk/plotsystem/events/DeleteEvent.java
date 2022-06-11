@@ -76,12 +76,12 @@ public class DeleteEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.chat("&cPlot " + id + " deleted!"));
+                p.sendMessage(Utils.chat("&cPlot &4" + id + " &cdeleted"));
 
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot " + id + "deleted!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot &4" + id + "&cdeleted');");
 
             }
         }

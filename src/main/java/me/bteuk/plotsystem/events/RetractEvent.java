@@ -28,7 +28,7 @@ public class RetractEvent {
                 //Set plot status to submitted.
                 PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + id + ";");
 
-                message = Utils.chat("&aRetracted submission for plot " + id + ".");
+                message = Utils.chat("&aRetracted submission for plot &3" + id);
 
             } else {
 

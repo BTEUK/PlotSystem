@@ -21,8 +21,7 @@ public class LeaveEvent {
             int id = Integer.parseInt(event[2]);
 
             //Get worlds of plot.
-            World world = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE name=" +
-                    PlotSystem.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")+ ";"));
+            World world = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
             if (world == null) {
 
@@ -45,12 +44,12 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.chat("&cYou have left plot " + id + "!"));
+                p.sendMessage(Utils.chat("&cYou have left plot &3" + id));
 
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cYou have left plot " + id + "!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cYou have left plot &4" + id + ");");
 
             }
         }

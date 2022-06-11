@@ -27,8 +27,8 @@ public class KickEvent {
             Player member = Bukkit.getPlayer(UUID.fromString(uuid));
             Player owner = Bukkit.getPlayer(UUID.fromString(plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1")));
 
-            String messageOwner = "&aYou have kicked &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";") + " &afrom plot &3" + id;
-            String messageMember = "&aYou have been kicked from plot &3" + id;
+            String messageOwner = "&cYou have kicked &4" + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";") + " &cfrom plot &4" + id;
+            String messageMember = "&aYou have been kicked from plot &4" + id;
 
             //Remove the player to the database.
             plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid=" + uuid + ";");

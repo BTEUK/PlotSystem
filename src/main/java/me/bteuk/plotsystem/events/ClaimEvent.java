@@ -65,7 +65,7 @@ public class ClaimEvent {
             u.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + "," + u.uuid + ",1," + Time.currentTime() + ");");
 
             //Send plot claimed message.
-            u.player.sendMessage(Utils.chat("&aYou have claimed plot " + u.inPlot + ", good luck building!"));
+            u.player.sendMessage(Utils.chat("&aYou have claimed plot &3" + u.inPlot + "&a, good luck building!"));
 
         }
     }
