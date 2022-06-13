@@ -11,6 +11,7 @@ import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.Time;
+import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,7 +20,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class AcceptGui {
 
     public static UniqueGui createAcceptGui(User user) {
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        UniqueGui gui = new UniqueGui(54, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Set accept for easy access.
         Accept ac = user.review.accept;
@@ -122,21 +122,8 @@ public class AcceptGui {
         }
 
         gui.setItem(4, Utils.createItem(Material.EMERALD, 1,
-                        Utils.chat("&b&lSubmit"),
+                        Utils.chat("&b&lAccept Plot"),
                         Utils.chat("&fClick to accept the plot with the current settings.")),
-
-                u -> {
-
-                    //Go back to the review gui and delete the accept gui.
-                    u.player.closeInventory();
-                    user.review.reviewGui.open(u);
-
-                }
-        );
-
-        gui.setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fGo back to the review menu.")),
 
                 u -> {
 
@@ -148,12 +135,10 @@ public class AcceptGui {
                     String plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
 
                     //Get world of plot.
-                    World world = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE location=" +
-                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";")
-                            + ";"));
+                    World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
 
                     //Get save world.
-                    World saveWorld = Bukkit.getWorld(plotSQL.getString("SELECT name FROM world_data WHERE type='save' AND server=" + PlotSystem.SERVER_NAME + ";"));
+                    World saveWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
 
                     //Set bookID to 0 if it has not been edited.
                     int bookID = 0;
@@ -210,10 +195,22 @@ public class AcceptGui {
                     //By referencing network plugin.
                     Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
 
-                    //Save plot to save world.
-                    //TODO take into account coordinate transform.
-                    List<BlockVector2> corners = WorldGuardFunctions.getPoints(user.review.plot, world);
-                    //WorldEditor.updateWorld(corners, world, saveWorld);
+                    //Get negative coordinate transform.
+                    int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + world.getName() + ";");
+                    int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + world.getName() + ";");
+
+                    List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(user.review.plot, world);
+                    List<BlockVector2> pasteVector = new ArrayList<>();
+
+                    //Create paste vector by taking the copy vector coordinate and adding the coordinate transform.
+                    for (BlockVector2 bv : copyVector) {
+
+                        pasteVector.add(BlockVector2.at(bv.getX() + xTransform, bv.getZ() + zTransform));
+
+                    }
+
+                    //Update the world by copying the build world to the save world.
+                    WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
 
                     PlotSystem.getInstance().getLogger().info(Utils.chat("&aPlot " + user.review.plot + " successfully saved."));
 
@@ -256,6 +253,19 @@ public class AcceptGui {
                     //Close gui and clear review.
                     user.review.closeReview();
                     user.review = null;
+
+                }
+        );
+
+        gui.setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.chat("&b&lReturn"),
+                        Utils.chat("&fGo back to the review menu.")),
+
+                u -> {
+
+                    //Go back to the review gui and delete the accept gui.
+                    u.player.closeInventory();
+                    user.review.reviewGui.open(u);
 
                 }
         );

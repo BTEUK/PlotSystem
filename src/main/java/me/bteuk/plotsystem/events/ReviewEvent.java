@@ -36,16 +36,28 @@ public class ReviewEvent {
             PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
             //Get world of plot.
-            World world = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE name=" +
-                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                    + ";"));
+            World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
-            //Create new review instance for user.
-            u.review = new Review(id, u);
+            //Check if the plot is still submitted.
+            if (plotSQL.hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
 
-            //Teleport the reviewer to the plot.
-            p.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
+                //Set the plot to under review.
+                plotSQL.update("UPDATE plot_data SET status='reviewing' WHERE id=" + id + ";");
 
+                //Create new review instance for user.
+                u.review = new Review(id, u);
+
+                //Add the reviewer to the plot.
+                WorldGuardFunctions.addMember(id, uuid, world);
+
+                //Teleport the reviewer to the plot.
+                p.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
+
+            } else {
+
+                p.sendMessage(Utils.chat("&cThe plot is not submitted."));
+
+            }
         }
     }
 }

@@ -33,11 +33,9 @@ public class ReviewGui {
         String plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
 
         //Get world of plot.
-        World world = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE location=" +
-                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";")
-                + ";"));
+        World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
 
-        gui.setItem(12, Utils.createItem(Material.BOOK, 1,
+        gui.setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lPlot Info"),
                 Utils.chat("&fPlot ID: " + user.review.plot),
                 Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
@@ -50,11 +48,11 @@ public class ReviewGui {
                 u -> {
 
                     //Teleport to plot in original state.
-                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(user.review.plot));
+                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(user.review.plot, world));
 
                 });
 
-        gui.setItem(12, Utils.createItem(Material.STONE_BRICKS, 1,
+        gui.setItem(14, Utils.createItem(Material.STONE_BRICKS, 1,
                         Utils.chat("&b&lCurrent View"),
                         Utils.chat("&fTeleport to the current view of the plot.")),
                 u -> {
@@ -64,7 +62,7 @@ public class ReviewGui {
 
                 });
 
-        gui.setItem(12, Utils.createItem(Material.LIME_CONCRETE, 1,
+        gui.setItem(10, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.chat("&b&lAccept Plot"),
                         Utils.chat("&fOpens the accept gui.")),
                 u -> {
@@ -77,11 +75,12 @@ public class ReviewGui {
                     }
 
                     //Open accept gui.
+                    u.player.closeInventory();
                     user.review.acceptGui.open(u);
 
                 });
 
-        gui.setItem(12, Utils.createItem(Material.RED_CONCRETE, 1,
+        gui.setItem(16, Utils.createItem(Material.RED_CONCRETE, 1,
                         Utils.chat("&b&lDeny Plot"),
                         Utils.chat("&fDeny the plot and return it to the plot owner.")),
                 u -> {
@@ -167,14 +166,37 @@ public class ReviewGui {
                         }
 
                         //Close review.
+                        u.player.closeInventory();
                         user.review.closeReview();
                         user.review = null;
 
                     } else {
 
-                        u.player.sendMessage(ChatColor.RED + "An error occured, please notify an admin.");
+                        u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
 
                     }
+                });
+
+        //Cancel review.
+        gui.setItem(22, Utils.createItem(Material.BARRIER, 1,
+                        Utils.chat("&b&lCancel Review"),
+                        Utils.chat("&fStop reviewing this plot.")),
+                u -> {
+
+                    //Remove the reviewer from the plot.
+                    WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);
+
+                    //Set the plot back to submitted.
+                    plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");
+
+                    //Close review.
+                    u.player.closeInventory();
+                    user.review.closeReview();
+                    user.review = null;
+
+                    //Send feedback.
+                    u.player.sendMessage(Utils.chat("&cCancelled reviewing of plot " + user.review.plot));
+
                 });
 
         return gui;

@@ -50,14 +50,14 @@ public class WorldGuardFunctions {
 
     }
 
-    public static Location getBeforeLocation(int plot) {
+    public static Location getBeforeLocation(int plot, World buildWorld) {
 
         //Get instance of plugin and config
         PlotSystem instance = PlotSystem.getInstance();
         FileConfiguration config = instance.getConfig();
 
         //Get worlds from config
-        World saveWorld = Bukkit.getServer().getWorld(config.getString("worlds.save"));
+        World saveWorld = Bukkit.getServer().getWorld(config.getString("save_world"));
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
@@ -70,7 +70,15 @@ public class WorldGuardFunctions {
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
-        Location l = new Location(saveWorld, bv.getX(), Utils.getHighestYAt(saveWorld, bv.getX(), bv.getZ()), bv.getZ());
+        //To get the actual location we need to take the negative coordinate transform of the plot.
+        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+        int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + buildWorld + ";");
+        int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + buildWorld + ";");
+
+        BlockVector2 bv2 = BlockVector2.at(bv.getX() + xTransform, bv.getZ() + zTransform);
+
+        Location l = new Location(saveWorld, bv2.getX(), Utils.getHighestYAt(saveWorld, bv2.getX(), bv2.getZ()), bv2.getZ());
 
         return (l);
 
