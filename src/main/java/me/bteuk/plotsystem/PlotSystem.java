@@ -6,14 +6,14 @@ import java.util.ArrayList;
 
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
-import me.bteuk.plotsystem.listeners.InventoryClicked;
-import me.bteuk.plotsystem.listeners.ItemSpawn;
 import me.bteuk.plotsystem.listeners.JoinServer;
 import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.ClaimEnter;
+import me.bteuk.plotsystem.listeners.QuitServer;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -90,7 +90,7 @@ public class PlotSystem extends JavaPlugin {
 
             String plot_database = config.getString("database.plot");
             BasicDataSource plot_dataSource = mysqlSetup(plot_database);
-            plotSQL = new PlotSQL(plot_dataSource, navigationSQL);
+            plotSQL = new PlotSQL(plot_dataSource);
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
@@ -135,16 +135,14 @@ public class PlotSystem extends JavaPlugin {
         //Create list of users.
         users = new ArrayList<>();
 
+        //Remove all plots 'under review'
+        plotSQL.update("UPDATE plot_data SET status='submitted' WHERE status='reviewing'");
+
         //Create gui item
         gui = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta2 = gui.getItemMeta();
         meta2.setLocalizedName(ChatColor.AQUA + "" + ChatColor.BOLD + "Building Menu");
         gui.setItemMeta(meta2);
-
-        //plotData.clearReview();
-
-        //Global Join listener
-        new JoinServer(instance, globalSQL, plotSQL);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, plotSQL);
@@ -160,10 +158,9 @@ public class PlotSystem extends JavaPlugin {
         selectionTool.setItemMeta(meta);
 
         //Listeners
-        //new QuitServer(this, tutorialData, playerData, plotData);
-        new InventoryClicked(instance);
+        new JoinServer(this, globalSQL, plotSQL);
+        new QuitServer(this);
         new PlayerInteract(instance, plotSQL);
-        new ItemSpawn(instance);
 
         //Deals with tracking where players are in relation to plots.
         new ClaimEnter(instance, plotSQL, globalSQL);
@@ -193,7 +190,16 @@ public class PlotSystem extends JavaPlugin {
             //If the player is in a review, cancel it.
             if (u.review != null) {
 
-                //TODO: Cancel any active reviews.
+                PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+                //Remove the reviewer from the plot.
+                WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+
+                //Set status back to submitted.
+                plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
+
+                //Close review.
+                u.review.closeReview();
 
             }
         }

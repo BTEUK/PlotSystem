@@ -42,44 +42,6 @@ public class Utils {
 		return item;
 
 	}
-
-	public static ItemStack createPlayerSkull(Inventory inv, Player p, int amount, int invSlot, String displayName, String... loreString) {
-
-		ItemStack item;
-
-		List<String> lore = new ArrayList<String>();
-
-		item = new ItemStack(Material.PLAYER_HEAD, amount);
-
-		SkullMeta meta = (SkullMeta) item.getItemMeta();
-		meta.setDisplayName(Utils.chat(displayName));
-		for (String s : loreString) {
-			lore.add(Utils.chat(s));
-		}
-		meta.setLore(lore);
-		meta.setOwningPlayer(p);
-		item.setItemMeta(meta);
-
-		inv.setItem(invSlot - 1,  item);
-
-		return item;
-
-	}
-
-	public static boolean isPlayerInGroup(Player player, String group) {
-		return player.hasPermission("group." + group);
-	}
-	
-	public static void spawnFireWork(Player p) {
-		
-		Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
-		FireworkMeta fm = f.getFireworkMeta();
-		fm.addEffect(FireworkEffect.builder().flicker(true).trail(true).with(Type.BALL_LARGE).withColor(Color.RED).withColor(Color.BLUE).withColor(Color.WHITE).build());
-		fm.setPower(1);
-		f.setFireworkMeta(fm);
-		
-		
-	}
 	
 	public static int getHighestYAt(World w, int x, int z) {
 		

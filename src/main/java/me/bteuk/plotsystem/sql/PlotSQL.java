@@ -1,7 +1,5 @@
 package me.bteuk.plotsystem.sql;
 
-import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Time;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 
@@ -10,15 +8,13 @@ import java.util.ArrayList;
 
 public class PlotSQL {
 
-    private BasicDataSource dataSource;
-    private NavigationSQL navigationSQL;
+    private final BasicDataSource dataSource;
     private int success;
 
     //Set the dataSource for the plot_data database.
-    public PlotSQL(BasicDataSource dataSource, NavigationSQL navigationSQL) {
+    public PlotSQL(BasicDataSource dataSource) {
 
         this.dataSource = dataSource;
-        this.navigationSQL = navigationSQL;
 
     }
 
@@ -26,209 +22,6 @@ public class PlotSQL {
 
         return dataSource.getConnection();
 
-    }
-
-    //Returns whether you are able to build in the specified world.
-    public boolean buildable(String world) {
-
-        //Create a statement to select the type where name = world.
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT type FROM world_data WHERE name=?;"
-        )) {
-
-            statement.setString(1, world);
-
-            try (ResultSet results = statement.executeQuery()) {
-
-                //If there is a result for this world, and it is of type build then return true, else return false.
-                if (results.next()) {
-
-                    if (results.getString("type").equals("build")) {
-
-                        return true;
-
-                    } else {
-
-                        return false;
-
-                    }
-
-                } else {
-
-                    return false;
-
-                }
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Adds a new world to the database
-    public boolean addWorld(String name, String type) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO world_data(name, type, server) VALUES(?, ?, ?);"
-        )) {
-
-            statement.setString(1, name);
-            statement.setString(2, type);
-            statement.setString(3, PlotSystem.SERVER_NAME);
-            statement.executeUpdate();
-
-            return true;
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Checks whether the plot is claimed.
-    public boolean isClaimed(int plotID) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT id FROM plot_members WHERE id=?;"
-        )) {
-
-            statement.setInt(1, plotID);
-
-            try (ResultSet results = statement.executeQuery()) {
-
-                if (results.next()) {
-
-                    return true;
-
-                } else {
-
-                    return false;
-
-                }
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Checks whether you are the plot owner.
-    public boolean isOwner(int plotID, String uuid) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT id FROM plot_members WHERE id=?, uuid=?, is_owner=?;"
-        )) {
-
-            statement.setInt(1, plotID);
-            statement.setString(2, uuid);
-            statement.setBoolean(3, true);
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-
-                return true;
-
-            } else {
-
-                return false;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Checks whether you are the plot owner.
-    public boolean isMember(int plotID, String uuid) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT id FROM plot_members WHERE id=?, uuid=?, is_owner=?;"
-        )) {
-
-            statement.setInt(1, plotID);
-            statement.setString(2, uuid);
-            statement.setBoolean(3, false);
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-
-                return true;
-
-            } else {
-
-                return false;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
-    }
-
-    //Get the owner of a plot.
-    public String getOwner(int plotID) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "SELECT uuid FROM plot_members WHERE id=?, is_owner=?;"
-        )) {
-
-            statement.setInt(1, plotID);
-            statement.setBoolean(2, true);
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-
-                return results.getString(1);
-
-            } else {
-
-                return null;
-
-            }
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return null;
-        }
-    }
-
-    //Checks whether you are the plot owner.
-    public boolean updateLastEnter(int plotID, String uuid) {
-
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "UPDATE plot_members SET last_enter WHERE id=?, uuid=?;"
-        )) {
-
-            statement.setLong(1, Time.currentTime());
-            statement.setInt(2, plotID);
-            statement.setString(3, uuid);
-            statement.executeUpdate();
-
-            return true;
-
-        } catch (SQLException sql) {
-
-            //If for some reason an error occurred in the sql then return false.
-            sql.printStackTrace();
-            return false;
-        }
     }
 
     //Creates a new plot and returns the id of the plot.

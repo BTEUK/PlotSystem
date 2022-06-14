@@ -99,7 +99,7 @@ public class WorldGuardFunctions {
 
     }
 
-    public static boolean inRegion(Block block, PlotSQL plotSQL) {
+    public static boolean inRegion(Block block) {
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
@@ -187,52 +187,6 @@ public class WorldGuardFunctions {
         }
 
         return list;
-    }
-
-    public static boolean includesRegion(int plot, ProtectedPolygonalRegion region) {
-
-        //Get the points of the old region.
-        List<BlockVector2> points = WorldGuardFunctions.getPoints(plot);
-
-        //If any of the points of the old region are not contained in the new region return false.
-        //This would mean the plot doesn't guarantee to include all of their previous plot.
-        for (BlockVector2 bv : points) {
-            if (!(region.contains(bv))) {
-                return false;
-            }
-        }
-
-        //Get the points of the new region.
-        points = region.getPoints();
-
-        //Get instance of plugin and config
-        PlotSystem instance = PlotSystem.getInstance();
-        FileConfiguration config = instance.getConfig();
-
-        //Get worlds from config
-        World saveWorld = Bukkit.getServer().getWorld(config.getString("worlds.save"));
-
-        //Get worldguard instance
-        WorldGuard wg = WorldGuard.getInstance();
-
-        //Get worldguard region data
-        RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager buildRegions = container.get(BukkitAdapter.adapt(saveWorld));
-
-        //Get the old region.
-        ProtectedPolygonalRegion region_old = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
-
-        //If any of the points in the new region are contained in the old region return false;
-        //This means that the plot does not completely surround the old plot, meaning some of their work could be excluded.
-        for (BlockVector2 bv : points) {
-            if (region_old.contains(bv)) {
-                return false;
-            }
-        }
-
-        //Return true after all the check have been run.
-        return true;
-
     }
 
     public static boolean addMember(int plot, String uuid, World world) {
@@ -327,29 +281,4 @@ public class WorldGuardFunctions {
             return false;
         }
     }
-
-    //Get the location of a plot.
-    public static Location plotLocation(int plot) {
-
-        //Get the world the plot is in.
-        String world = PlotSystem.getInstance().plotSQL.getString("SELECT world FROM location_data WHERE location=" + PlotSystem.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + ";");
-
-        //Get worldguard instance
-        WorldGuard wg = WorldGuard.getInstance();
-
-        //Get worldguard region data
-        RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(world)));
-
-        //Get the worldguard region and teleport to player to one of the corners.
-        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) regions.getRegion(String.valueOf(plot));
-
-        BlockVector2 bv = Point.getAveragePoint(region.getPoints());
-
-        Location l = new Location(Bukkit.getWorld(world), bv.getX(), Utils.getHighestYAt(Bukkit.getWorld(world), bv.getX(), bv.getZ()), bv.getZ());
-
-        return (l);
-
-    }
-
 }

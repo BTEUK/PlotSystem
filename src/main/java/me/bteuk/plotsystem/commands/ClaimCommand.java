@@ -76,7 +76,7 @@ public class ClaimCommand implements CommandExecutor {
         }
 
         //If the plot is already claimed, tell the player they can not claim it, but they can request to join it.
-        if (plotSQL.isClaimed(u.inPlot)) {
+        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
 
             u.player.sendMessage(Utils.chat("&cThis plot is already claimed, if you wish to build in this plot ask the plot owner to invite you."));
             return false;

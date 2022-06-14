@@ -2,7 +2,6 @@ package me.bteuk.plotsystem.utils;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.utils.enums.Role;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.reviewing.Review;
@@ -14,15 +13,7 @@ public class User {
     public String uuid;
     public String name;
 
-    //Important tutorial information.
-    public boolean tutorial_complete;
-
-    public int buildingTime;
-
     public SelectionTool selectionTool;
-
-    public int currentPlot = 0;
-    public String currentStatus = null;
 
     public int inPlot = 0;
     public boolean plotOwner;

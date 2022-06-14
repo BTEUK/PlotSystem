@@ -1,9 +1,11 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.User;
 
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,21 +33,21 @@ public class QuitServer implements Listener {
 			instance.getLogger().warning(Utils.chat("&cError: User " + e.getPlayer().getName() + " not found in the list of online users!" ));
 		}
 
-		//Get player instance.
-		Player p = e.getPlayer();
-
 		//If the player is in a review, cancel it.
-		//TODO: Reviewing must only be cancelled if the player disconnects from the network.
-		/*
 		if (u.review != null) {
 
-			WorldGuardFunctions.removeMember(u.review.plot, u.uuid);
-			plotData.setStatus(u.review.plot, "submitted");
-			u.review.editBook.unregister();
-			u.player.getInventory().setItem(4, u.review.previousItem);
+			PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+			//Remove the reviewer from the plot.
+			WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+
+			//Set status back to submitted.
+			plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
+
+			//Close review.
+			u.review.closeReview();
 
 		}
-		 */
 
 		//Remove user from list
 		instance.getUsers().remove(u);

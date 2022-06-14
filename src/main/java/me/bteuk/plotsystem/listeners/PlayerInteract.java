@@ -1,17 +1,12 @@
 package me.bteuk.plotsystem.listeners;
 
-import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -61,14 +56,14 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + e.getClickedBlock().getWorld() + " AND type='build';")) {
+                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + e.getClickedBlock().getWorld() + ";")) {
 
                     u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
 
                 }
 
                 //If the selected point is in an existing plot cancel.
-                if (WorldGuardFunctions.inRegion(e.getClickedBlock(), plotSQL)) {
+                if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
                     u.player.sendMessage(Utils.chat("&cThis point is in another plot!"));
                     return;
@@ -100,7 +95,7 @@ public class PlayerInteract implements Listener {
                 }
 
                 //If the selected point is in an existing plot cancel.
-                if (WorldGuardFunctions.inRegion(e.getClickedBlock(), plotSQL)) {
+                if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
                     u.player.sendMessage(Utils.chat("&cThis point is in another plot!"));
                     return;
@@ -120,41 +115,5 @@ public class PlayerInteract implements Listener {
 
         }
 
-    }
-
-    @EventHandler
-    public void swapHands(PlayerSwapHandItemsEvent e) {
-
-        if (e.getOffHandItem().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-        }
-
-    }
-
-    @EventHandler
-    public void dropItem(PlayerDropItemEvent e) {
-
-        if (e.getItemDrop().getItemStack().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-        }
-
-    }
-
-    @EventHandler
-    public void moveItem(InventoryMoveItemEvent e) {
-        if (e.getItem().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-        }
-
-    }
-
-    @EventHandler
-    public void moveItem(InventoryDragEvent e) {
-        if (e.getOldCursor().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-        }
-        if (e.getCursor().equals(PlotSystem.gui)) {
-            e.setCancelled(true);
-        }
     }
 }

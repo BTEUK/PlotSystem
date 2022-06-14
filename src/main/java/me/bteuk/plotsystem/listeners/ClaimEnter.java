@@ -10,6 +10,7 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
@@ -71,9 +72,7 @@ public class ClaimEnter implements Listener {
     @EventHandler
     public void moveEvent(PlayerMoveEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
-        if (plotSQL.buildable(u.player.getWorld().getName())) {
-            checkRegion(u);
-        }
+        checkRegion(u);
     }
 
     public void checkRegion(User u) {
@@ -96,7 +95,7 @@ public class ClaimEnter implements Listener {
                     if (u.inPlot != plot) {
 
                         //If the plot is claimed, send the relevant message.
-                        if (!plotSQL.isClaimed(plot)) {
+                        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + ";")) {
 
                             //Set the claimed value to false to indicate the plot is not claimed.
                             u.isClaimed = false;
@@ -111,19 +110,19 @@ public class ClaimEnter implements Listener {
                             u.isClaimed = true;
 
                             //If you are the owner of the plot send the relevant message.
-                            if (plotSQL.isOwner(plot, u.uuid)) {
+                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid=" + u.uuid + " AND is_owner=1;")) {
 
                                 u.plotOwner = true;
                                 u.plotMember = false;
-                                plotSQL.updateLastEnter(u.inPlot, u.uuid);
+                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
                                 u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are the owner of this plot.", NamedTextColor.GREEN));
 
                                 //If you are a member of the plot send the relevant message.
-                            } else if (plotSQL.isMember(plot, u.uuid)) {
+                            } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid=" + u.uuid + " AND is_owner=0;")) {
 
                                 u.plotOwner = false;
                                 u.plotMember = true;
-                                plotSQL.updateLastEnter(u.inPlot, u.uuid);
+                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
                                 u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are a member of this plot.", NamedTextColor.GREEN));
 
                             } else {
@@ -132,7 +131,7 @@ public class ClaimEnter implements Listener {
                                 u.plotOwner = false;
                                 u.plotMember = false;
                                 u.player.sendActionBar(Component.text("You have entered " +
-                                        globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getOwner(plot) + ";")
+                                        globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + "AND is_owner=1;") + ";")
                                         + "'s plot."));
 
                             }
@@ -161,9 +160,9 @@ public class ClaimEnter implements Listener {
                             p1 = corners.get(i);
 
                             if (i == 0) {
-                                p2 = corners.get(corners.size()-1);
+                                p2 = corners.get(corners.size() - 1);
                             } else {
-                                p2 = corners.get(i+1);
+                                p2 = corners.get(i + 1);
                             }
 
                             //Starting at p1 iterate in 1 steps in the direction of the biggest length (x or z).
@@ -171,14 +170,14 @@ public class ClaimEnter implements Listener {
                             length = Math.max(Math.abs(p1.getX() - p2.getX()), Math.abs(p1.getZ() - p2.getZ()));
 
                             //Iterate until 0.
-                            lengthX = p1.getX()-p2.getX();
-                            lengthZ = p1.getZ()-p2.getZ();
+                            lengthX = p1.getX() - p2.getX();
+                            lengthZ = p1.getZ() - p2.getZ();
                             for (i = 0; i < length; i++) {
 
                                 //Get location.
-                                loc = new Location(world, p1.getX() + i*(lengthX/length),
-                                        world.getHighestBlockYAt((int) (p1.getX() + i*(lengthX/length)), (int) (p1.getZ() + i*(lengthZ/length))),
-                                        p1.getZ() + i*(lengthZ/length));
+                                loc = new Location(world, p1.getX() + i * (lengthX / length),
+                                        world.getHighestBlockYAt((int) (p1.getX() + i * (lengthX / length)), (int) (p1.getZ() + i * (lengthZ / length))),
+                                        p1.getZ() + i * (lengthZ / length));
 
                                 //Set fake block.
                                 u.player.sendBlockChange(loc, yellowConc);
@@ -191,7 +190,7 @@ public class ClaimEnter implements Listener {
                         //If you are the owner or member of this plot update your last enter time.
                         if (u.plotMember || u.plotOwner) {
 
-                            plotSQL.updateLastEnter(u.inPlot, u.uuid);
+                            plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
 
                         }
 
@@ -207,31 +206,31 @@ public class ClaimEnter implements Listener {
         if (applicableRegionSet.size() < 1 && u.inPlot != 0) {
 
             //If the plot is claimed, send the relevant message.
-            if (!plotSQL.isClaimed(u.inPlot)) {
+            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
 
                 u.player.sendActionBar(Component.text("You have left plot " + u.inPlot, NamedTextColor.GREEN));
 
             } else {
 
                 //If you are the owner of the plot send the relevant message.
-                if (plotSQL.isOwner(u.inPlot, u.uuid)) {
+                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + " AND is_owner=1;")) {
 
                     u.plotOwner = false;
                     u.player.sendActionBar(Component.text("You have left your plot", NamedTextColor.GREEN));
 
                     //If you are a member of the plot send the relevant message.
-                } else if (plotSQL.isMember(u.inPlot, u.uuid)) {
+                } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + " AND is_owner=0;")) {
 
                     u.plotMember = false;
                     u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getOwner(u.inPlot) + ";")
+                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + ";")
                             + "'s plot."));
 
                 } else {
 
                     //If you are not an owner or member send the relevant message.
                     u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getOwner(u.inPlot) + ";")
+                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + ";")
                             + "'s plot."));
 
                 }

@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 
 public class EditBook implements Listener {
 	
-	private Review review;
+	private final Review review;
 	public boolean isEdited;
 	
 	public EditBook(PlotSystem plotSystem, Review review) {
