@@ -5,7 +5,6 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -23,13 +22,11 @@ public class CreateCommand {
 
     GlobalSQL globalSQL;
     PlotSQL plotSQL;
-    NavigationSQL navigationSQL;
 
-    public CreateCommand(GlobalSQL globalSQL, PlotSQL plotSQL, NavigationSQL navigationSQL) {
+    public CreateCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.globalSQL = globalSQL;
         this.plotSQL = plotSQL;
-        this.navigationSQL = navigationSQL;
 
     }
 
@@ -55,11 +52,6 @@ public class CreateCommand {
 
             case "zone":
 
-                break;
-
-            case "world":
-
-                createWorld(sender, args);
                 break;
 
             default:
@@ -212,16 +204,16 @@ public class CreateCommand {
         }
 
 
-        int coordMin = navigationSQL.addCoordinate(new Location(
+        int coordMin = globalSQL.addCoordinate(new Location(
                 Bukkit.getWorld(args[2]),
                 (regionXMin * 512), 0, (regionZMin * 512), 0, 0));
 
-        int coordMax = navigationSQL.addCoordinate(new Location(
+        int coordMax = globalSQL.addCoordinate(new Location(
                 Bukkit.getWorld(args[2]),
                 ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
 
         //Add the location to the database.
-        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax) VALUES("
+        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax, xTransform, zTransform) VALUES("
                 + args[2] + ", " + PlotSystem.SERVER_NAME + ", " + coordMin + ", " + coordMax + ", " + xTransform + ", " + zTransform + ");")) {
 
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
@@ -234,8 +226,8 @@ public class CreateCommand {
                     //Change region status in region database.
                     //If it already exists remove members.
                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + p.getUniqueId() + ",'network',"
-                            + navigationSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "," +
-                            "region set plotsystem " + i + " " + j);
+                            + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "," +
+                            "'region set plotsystem " + i + " " + j + "');");
 
                     //Add region to database.
                     String region = i + "," + j;
@@ -251,58 +243,5 @@ public class CreateCommand {
 
         }
 
-    }
-
-    private void createWorld(CommandSender sender, String[] args) {
-
-        //Check if the sender is a player.
-        //If so, check if they have permission.
-        if (sender instanceof Player) {
-
-            Player p = (Player) sender;
-
-            if (!p.hasPermission("uknet.plots.create.world")) {
-
-                p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
-                return;
-
-            }
-        }
-
-        //Check if they have enough args.
-        if (args.length < 3) {
-
-            sender.sendMessage(Utils.chat("&c/plotsystem create location [name]"));
-            return;
-
-        }
-
-        //Check for duplicate name.
-        if (plotSQL.hasRow("SELECT name FROM world_data WHERE server=" + PlotSystem.SERVER_NAME + " AND name=" + args[2] + ";")) {
-
-            sender.sendMessage(Utils.chat("&cA world with the name " + args[2] + " already exists."));
-            return;
-
-        }
-
-        //Create world
-        if (!Multiverse.createVoidWorld(args[2])) {
-
-            sender.sendMessage(Utils.chat("&cWorld failed to create, please check the console!"));
-            return;
-
-        }
-
-        //Add the world to the database.
-        if (plotSQL.update("INSERT INTO world_data(name, type, server) VALUES(" + args[2] + ", 'build', " + PlotSystem.SERVER_NAME + ");")) {
-
-            sender.sendMessage(Utils.chat("&aCreated new world " + args[2] + "."));
-
-        } else {
-
-            sender.sendMessage(Utils.chat("&cAn error occurred, please check the console for more info."));
-            Bukkit.getLogger().warning("An error occurred while creating a new world!");
-
-        }
     }
 }

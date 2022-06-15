@@ -2,7 +2,7 @@ name: PlotSystem
 version: 1.0.0
 main: me.elgamer.plotsystem.Main
 description: Plot System for UKnet
-depend: [ WorldGuard, WorldEdit, LuckPerms, Multiverse-Core ]
+depend: [ WorldGuard, WorldEdit, LuckPerms, Multiverse-Core , Network ]
 api-version: 1.18
 
 commands:

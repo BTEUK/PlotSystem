@@ -105,7 +105,7 @@ public class ReviewGui {
                     int i = 1;
 
                     for (String text : book) {
-                        if (!(plotSQL.update("INSERT INTO book_data(id,page,text) VALUES(" + bookID + "," + i + "," + text + ");"))) {
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + "," + text + ");"))) {
                             u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                             return;
                         }
@@ -113,7 +113,7 @@ public class ReviewGui {
                     }
 
                     //Update deny data.
-                    if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,time) VALUES(" + user.review.plot + "," +
+                    if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,deny_time) VALUES(" + user.review.plot + "," +
                             plotOwner + "," + bookID + "," +
                             (1 + plotSQL.getInt("SELECT attempt FROM deny_data WHERE id=" + user.review.plot + " AND uuid=" + plotOwner + ";")) +
                             "," + Time.currentTime() + ");")) {

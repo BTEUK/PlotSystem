@@ -1,7 +1,9 @@
 package me.bteuk.plotsystem.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -42,17 +44,28 @@ public class Inactive {
             //Check if the plot is on this server.
             if (plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + " AND server=" + PlotSystem.SERVER_NAME + ";")) {
 
+                //Get plot location.
+                String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");
+
                 //Get worlds of plot and save location.
-                World copyWorld = Bukkit.getWorld(plotSQL.getString("SELECT name FROM world_data WHERE server=" + PlotSystem.SERVER_NAME + " AND type='save';"));
-                World pasteWorld = Bukkit.getWorld(plotSQL.getString("SELECT world FROM location_data WHERE name=" +
-                        plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + ";"));
+                World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
+                World pasteWorld = Bukkit.getWorld(location);
+
+                int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
+                int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
 
                 //Get the plot bounds.
-                List<BlockVector2> vector = WorldGuardFunctions.getPoints(plot, pasteWorld);
+                List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(plot, pasteWorld);
 
-                //TODO take into account coordinate transform.
+                //Create the copyVector by transforming the points in the paste vector with the negative transform.
+                //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+                List<BlockVector2> copyVector = new ArrayList<>();
+                for (BlockVector2 bv : pasteVector) {
+                    copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
+                }
+
                 //Revert plot to original state.
-                //WorldEditor.updateWorld(vector, copyWorld, pasteWorld);
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
                 WorldGuardFunctions.clearMembers(plot, pasteWorld);

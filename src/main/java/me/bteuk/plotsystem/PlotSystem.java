@@ -11,7 +11,6 @@ import me.bteuk.plotsystem.listeners.PlayerInteract;
 import me.bteuk.plotsystem.listeners.ClaimEnter;
 import me.bteuk.plotsystem.listeners.QuitServer;
 import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.NavigationSQL;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import me.bteuk.plotsystem.voidgen.VoidChunkGen;
@@ -36,7 +35,6 @@ public class PlotSystem extends JavaPlugin {
     //SQL Classes.
     public GlobalSQL globalSQL;
     public PlotSQL plotSQL;
-    public NavigationSQL navigationSQL;
 
     public Timers timers;
 
@@ -84,10 +82,6 @@ public class PlotSystem extends JavaPlugin {
             BasicDataSource global_dataSource = mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
 
-            String navigation_database = config.getString("database.navigation");
-            BasicDataSource navigation_dataSource = mysqlSetup(navigation_database);
-            navigationSQL = new NavigationSQL(navigation_dataSource);
-
             String plot_database = config.getString("database.plot");
             BasicDataSource plot_dataSource = mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
@@ -102,7 +96,7 @@ public class PlotSystem extends JavaPlugin {
         SERVER_NAME = config.getString("server_name");
 
         //If the server is in the database.
-        if (navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+        if (globalSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
 
             //Add save world if it does not yet exist.
             //This implies first launch with plugin.
@@ -170,7 +164,7 @@ public class PlotSystem extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotSQL);
 
         //Commands
-        getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL, navigationSQL));
+        getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
         getCommand("claim").setExecutor(claimCommand);
 
     }

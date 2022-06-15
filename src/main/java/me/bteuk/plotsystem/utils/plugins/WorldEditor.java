@@ -36,7 +36,6 @@ public class WorldEditor {
             // configure here
             Operations.complete(forwardExtentCopy);
         } catch (WorldEditException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return false;
         }
@@ -51,7 +50,6 @@ public class WorldEditor {
                     .build();
             Operations.complete(operation);
         } catch (WorldEditException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return false;
         }

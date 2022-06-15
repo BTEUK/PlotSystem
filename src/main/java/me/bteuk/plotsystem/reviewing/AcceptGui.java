@@ -159,7 +159,7 @@ public class AcceptGui {
                         int i = 1;
 
                         for (String text : book) {
-                            if (!(plotSQL.update("INSERT INTO book_data(id,page,text) VALUES(" + bookID + "," + i + "," + text + ");"))) {
+                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + "," + text + ");"))) {
                                 u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                                 return;
                             }
@@ -173,7 +173,7 @@ public class AcceptGui {
                             ((ac.accuracyMultiplier()+ac.qualityMultiplier())/2));
 
                     //Add to accept data.
-                    if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,time) VALUES(" +
+                    if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,accept_time) VALUES(" +
                             user.review.plot + "," + plotOwner + "," + u.player.getUniqueId() + "," + bookID + "," +
                             user.review.accept.accuracy + "," + user.review.accept.quality + "," + Time.currentTime() + ");")) {
 

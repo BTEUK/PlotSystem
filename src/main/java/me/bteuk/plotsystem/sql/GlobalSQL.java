@@ -2,11 +2,9 @@ package me.bteuk.plotsystem.sql;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 
 public class GlobalSQL {
@@ -138,6 +136,41 @@ public class GlobalSQL {
             //If for some reason an error occurred in the sql then return false.
             e.printStackTrace();
             return false;
+        }
+    }
+
+    //Add new coordinate to database and return the id.
+    public int addCoordinate(Location l) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO coordinates(world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+            statement.setString(1, l.getWorld().getName());
+            statement.setDouble(2, l.getX());
+            statement.setDouble(3, l.getY());
+            statement.setDouble(4, l.getZ());
+            statement.setFloat(5, l.getYaw());
+            statement.setFloat(6, l.getPitch());
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            ResultSet results = statement.getGeneratedKeys();
+            if (results.next()) {
+
+                return results.getInt("id");
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
         }
     }
 }
