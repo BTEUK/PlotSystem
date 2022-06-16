@@ -156,7 +156,7 @@ public class CreateCommand {
         }
 
         //Check if the location name is unique.
-        if (plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + args[2] + ";")) {
+        if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';")) {
 
             sender.sendMessage(Utils.chat("&cThe location " + args[2] + " already exists."));
             return;
@@ -213,8 +213,8 @@ public class CreateCommand {
                 ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
 
         //Add the location to the database.
-        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax, xTransform, zTransform) VALUES("
-                + args[2] + ", " + PlotSystem.SERVER_NAME + ", " + coordMin + ", " + coordMax + ", " + xTransform + ", " + zTransform + ");")) {
+        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
+                + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
 
             sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
 
@@ -225,13 +225,13 @@ public class CreateCommand {
 
                     //Change region status in region database.
                     //If it already exists remove members.
-                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + p.getUniqueId() + ",'network',"
-                            + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "," +
+                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "','network','"
+                            + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
                             "'region set plotsystem " + i + " " + j + "');");
 
                     //Add region to database.
                     String region = i + "," + j;
-                    plotSQL.update("INSERT INTO regions(region,server,location) VALUES(" + region + "," + PlotSystem.SERVER_NAME + "," + args[2] + ");");
+                    plotSQL.update("INSERT INTO regions(region,server,location) VALUES('" + region + "','" + PlotSystem.SERVER_NAME + "','" + args[2] + "');");
 
                 }
             }

@@ -3,7 +3,6 @@ package me.bteuk.plotsystem.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -42,7 +41,8 @@ public class Inactive {
         for (int plot : inactivePlots) {
 
             //Check if the plot is on this server.
-            if (plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + " AND server=" + PlotSystem.SERVER_NAME + ";")) {
+            if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") +
+                    "' AND server='" + PlotSystem.SERVER_NAME + "';")) {
 
                 //Get plot location.
                 String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");
@@ -51,8 +51,8 @@ public class Inactive {
                 World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
                 World pasteWorld = Bukkit.getWorld(location);
 
-                int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
-                int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
+                int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the plot bounds.
                 List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(plot, pasteWorld);
@@ -80,7 +80,7 @@ public class Inactive {
                 plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot " + plot + "removed due to inactivity!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot " + plot + "removed due to inactivity!');");
 
                 //Log plot removal to console.
                 PlotSystem.getInstance().getLogger().info(Utils.chat("&cPlot " + plot + " removed due to inactivity!"));

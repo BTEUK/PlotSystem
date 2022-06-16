@@ -49,7 +49,7 @@ public class Timers {
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for new server_events.
-            if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server=" + SERVER_NAME + " AND type='plotsystem';")) {
+            if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='plotsystem';")) {
 
                 //Get events for this server.
                 events.clear();

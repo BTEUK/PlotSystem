@@ -56,7 +56,7 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name=" + e.getClickedBlock().getWorld() + ";")) {
+                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getClickedBlock().getWorld() + "';")) {
 
                     u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
 

@@ -110,19 +110,19 @@ public class ClaimEnter implements Listener {
                             u.isClaimed = true;
 
                             //If you are the owner of the plot send the relevant message.
-                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid=" + u.uuid + " AND is_owner=1;")) {
+                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
                                 u.plotOwner = true;
                                 u.plotMember = false;
-                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
+                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
                                 u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are the owner of this plot.", NamedTextColor.GREEN));
 
                                 //If you are a member of the plot send the relevant message.
-                            } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid=" + u.uuid + " AND is_owner=0;")) {
+                            } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
 
                                 u.plotOwner = false;
                                 u.plotMember = true;
-                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
+                                plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
                                 u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are a member of this plot.", NamedTextColor.GREEN));
 
                             } else {
@@ -190,7 +190,7 @@ public class ClaimEnter implements Listener {
                         //If you are the owner or member of this plot update your last enter time.
                         if (u.plotMember || u.plotOwner) {
 
-                            plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + ";");
+                            plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
 
                         }
 
@@ -213,24 +213,24 @@ public class ClaimEnter implements Listener {
             } else {
 
                 //If you are the owner of the plot send the relevant message.
-                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + " AND is_owner=1;")) {
+                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
                     u.plotOwner = false;
                     u.player.sendActionBar(Component.text("You have left your plot", NamedTextColor.GREEN));
 
                     //If you are a member of the plot send the relevant message.
-                } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid=" + u.uuid + " AND is_owner=0;")) {
+                } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
 
                     u.plotMember = false;
                     u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + ";")
+                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
                             + "'s plot."));
 
                 } else {
 
                     //If you are not an owner or member send the relevant message.
                     u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + ";")
+                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
                             + "'s plot."));
 
                 }

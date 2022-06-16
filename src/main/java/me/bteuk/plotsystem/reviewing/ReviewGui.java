@@ -37,9 +37,7 @@ public class ReviewGui {
         gui.setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lPlot Info"),
                 Utils.chat("&fPlot ID: " + user.review.plot),
-                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
-                        plotOwner
-                        + ";"))));
+                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + " ;"))));
 
         gui.setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
                         Utils.chat("&b&lBefore View"),
@@ -105,7 +103,7 @@ public class ReviewGui {
                     int i = 1;
 
                     for (String text : book) {
-                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + "," + text + ");"))) {
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text + "');"))) {
                             u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                             return;
                         }
@@ -113,14 +111,14 @@ public class ReviewGui {
                     }
 
                     //Update deny data.
-                    if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,deny_time) VALUES(" + user.review.plot + "," +
-                            plotOwner + "," + bookID + "," +
-                            (1 + plotSQL.getInt("SELECT attempt FROM deny_data WHERE id=" + user.review.plot + " AND uuid=" + plotOwner + ";")) +
+                    if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,deny_time) VALUES(" + user.review.plot + ",'" +
+                            plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
+                            (1 + plotSQL.getInt("SELECT attempt FROM deny_data WHERE id=" + user.review.plot + " AND uuid='" + plotOwner + "';")) +
                             "," + Time.currentTime() + ");")) {
 
                         //Send message to plot owner.
-                        globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + plotOwner +
-                                ",'&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
+                        globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
+                                "','&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
 
                         //Set status of plot back to claimed.
                         plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
@@ -145,7 +143,7 @@ public class ReviewGui {
                             for (int nPlot : nPlots) {
 
                                 //If you are not owner or member of the plot select it for the next review.
-                                if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
+                                if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
                                     submittedPlots++;
 

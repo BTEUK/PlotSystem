@@ -27,11 +27,11 @@ public class KickEvent {
             Player member = Bukkit.getPlayer(UUID.fromString(uuid));
             Player owner = Bukkit.getPlayer(UUID.fromString(plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1")));
 
-            String messageOwner = "&cYou have kicked &4" + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";") + " &cfrom plot &4" + id;
+            String messageOwner = "&cYou have kicked &4" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &cfrom plot &4" + id;
             String messageMember = "&aYou have been kicked from plot &4" + id;
 
             //Remove the player to the database.
-            plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid=" + uuid + ";");
+            plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Remove the player to the worldguard region.
             WorldGuardFunctions.removeMember(id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
@@ -44,7 +44,7 @@ public class KickEvent {
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1") + "," + messageOwner);
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1") + "','" + messageOwner + "';");
 
             }
 
@@ -56,7 +56,7 @@ public class KickEvent {
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + "," + messageMember);
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + messageMember + "';");
 
             }
         }

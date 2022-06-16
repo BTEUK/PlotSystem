@@ -23,7 +23,7 @@ public class SubmitEvent {
 
             //Check if the player can submit a plot at this point in time.
             long lCoolDown = (long) PlotSystem.getInstance().getConfig().getInt("submit_cooldown") * 60 * 1000;
-            long lSubmit = PlotSystem.getInstance().globalSQL.getLong("SELECT last_submit FROM player_data WHERE uuid=" + uuid + ";");
+            long lSubmit = PlotSystem.getInstance().globalSQL.getLong("SELECT last_submit FROM player_data WHERE uuid='" + uuid + "';");
 
             String message;
 
@@ -57,7 +57,7 @@ public class SubmitEvent {
                     PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + id + ";");
 
                     //Update last submit time in playerdata.
-                    PlotSystem.getInstance().globalSQL.update("UPDATE player_data SET last_submit=" + Time.currentTime() + " WHERE uuid=" + uuid + ";");
+                    PlotSystem.getInstance().globalSQL.update("UPDATE player_data SET last_submit=" + Time.currentTime() + " WHERE uuid='" + uuid + "';");
 
                     message = "&aSubmitted plot &3" + id;
 
@@ -77,7 +77,7 @@ public class SubmitEvent {
             } else {
 
                 //Send a cross-server message.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + "," + message);
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
 
             }
 

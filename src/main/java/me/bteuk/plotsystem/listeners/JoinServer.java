@@ -40,10 +40,10 @@ public class JoinServer implements Listener {
         PlotSystem.getInstance().getUsers().add(u);
 
         //If the player has a join event, execute it.
-        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid=? AND type='plotsystem';")) {
+        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';")) {
 
             //Get the event from the database.
-            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid=? AND type='plotsystem'");
+            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem'");
 
             //Split the event by word.
             String[] aEvent = event.split(" ");
@@ -52,7 +52,7 @@ public class JoinServer implements Listener {
             EventManager.event(u.uuid, aEvent);
 
             //Clear the events.
-            globalSQL.update("DELETE FROM join_events WHERE uuid=? AND type='plotsystem';");
+            globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';");
 
         }
 

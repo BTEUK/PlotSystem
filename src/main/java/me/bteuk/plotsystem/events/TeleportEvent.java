@@ -38,18 +38,18 @@ public class TeleportEvent {
 
             //Teleport to specific plot id.
             //Get the server of the plot.
-            String server = u.plotSQL.getString("SELECT server FROM location_data WHERE name="
+            String server = u.plotSQL.getString("SELECT server FROM location_data WHERE name='"
                     + u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                    + ";");
+                    + "';");
 
             //If the plot is on the current server teleport them directly.
             //Else teleport them to the correct server and them teleport them to the plot.
             if (server.equals(Network.SERVER_NAME)) {
 
                 //Get world of plot.
-                World world = Bukkit.getWorld(u.plotSQL.getString("SELECT world FROM location_data WHERE name="
+                World world = Bukkit.getWorld(u.plotSQL.getString("SELECT world FROM location_data WHERE name='"
                         + u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                        + ";"));
+                        + "';"));
 
                 //Get location of plot and teleport the player there.
                 u.player.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
@@ -57,9 +57,9 @@ public class TeleportEvent {
             } else {
 
                 //Set the server join event.
-                u.globalSQL.update("INSERT INTO join_events(uuid,event) VALUES("
+                u.globalSQL.update("INSERT INTO join_events(uuid,event) VALUES('"
                         + u.player.getUniqueId()
-                        + "," + "teleport plot " + id + ");");
+                        + "','teleport plot " + id + "');");
 
                 //Teleport them to another server.
                 u.player.closeInventory();

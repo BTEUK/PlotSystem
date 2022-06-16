@@ -96,7 +96,7 @@ public class PlotSystem extends JavaPlugin {
         SERVER_NAME = config.getString("server_name");
 
         //If the server is in the database.
-        if (globalSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+        if (globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
             //Add save world if it does not yet exist.
             //This implies first launch with plugin.

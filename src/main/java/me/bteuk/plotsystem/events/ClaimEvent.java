@@ -55,7 +55,7 @@ public class ClaimEvent {
             }
 
             //Check if you do not already have the maximum number of plots.
-            if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid=" + uuid + ";") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
+            if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
                 p.sendMessage(Utils.chat("&aYou have reached the maximum number of plots."));
                 return;
@@ -70,7 +70,7 @@ public class ClaimEvent {
             u.plotSQL.update("UDPATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";");
 
             //Add user as plot owner in database.
-            u.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + "," + u.uuid + ",1," + Time.currentTime() + ");");
+            u.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + ",'" + u.uuid + "',1," + Time.currentTime() + ");");
 
             //Send plot claimed message.
             u.player.sendMessage(Utils.chat("&aYou have claimed plot &3" + u.inPlot + "&a, good luck building!"));

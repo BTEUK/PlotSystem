@@ -44,7 +44,7 @@ public class RetractEvent {
             } else {
 
                 //Send a cross-server message.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + "," + message);
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
 
             }
         }

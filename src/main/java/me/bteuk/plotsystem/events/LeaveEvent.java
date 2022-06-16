@@ -36,7 +36,7 @@ public class LeaveEvent {
             WorldGuardFunctions.removeMember(id, uuid, world);
 
             //Remove members from plot in database.
-            PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid= " + uuid + ";");
+            PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Send message to plot owner.
             Player p = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -49,7 +49,7 @@ public class LeaveEvent {
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cYou have left plot &4" + id + ");");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &4" + id + "');");
 
             }
         }

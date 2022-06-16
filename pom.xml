@@ -73,6 +73,10 @@
             <id>codemc-repo</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -112,9 +116,9 @@
             <version>2.9.0</version>
         </dependency>
         <dependency>
-            <groupId>com.onarandombox.multiversecore</groupId> <!-- Don't forget to replace this -->
-            <artifactId>Multiverse-Core</artifactId> <!-- Replace this as well -->
-            <version>4.3.1</version> <!-- This too -->
+            <groupId>com.onarandombox.multiversecore</groupId>
+            <artifactId>Multiverse-Core</artifactId>
+            <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -123,12 +127,9 @@
             <version>2.11.0</version>
         </dependency>
         <dependency>
-            <groupId>me.bteuk.network</groupId>
-            <artifactId>network</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/Network-1.0.0.jar</systemPath>
-
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>Network</artifactId>
+            <version>main-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

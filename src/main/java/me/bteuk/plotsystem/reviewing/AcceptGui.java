@@ -159,7 +159,7 @@ public class AcceptGui {
                         int i = 1;
 
                         for (String text : book) {
-                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + "," + text + ");"))) {
+                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text + "');"))) {
                                 u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                                 return;
                             }
@@ -174,7 +174,7 @@ public class AcceptGui {
 
                     //Add to accept data.
                     if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,accept_time) VALUES(" +
-                            user.review.plot + "," + plotOwner + "," + u.player.getUniqueId() + "," + bookID + "," +
+                            user.review.plot + ",'" + plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
                             user.review.accept.accuracy + "," + user.review.accept.quality + "," + Time.currentTime() + ");")) {
 
                         PlotSystem.getInstance().getLogger().severe(Utils.chat("&cAn error occured while inserting to accept_data."));
@@ -182,8 +182,8 @@ public class AcceptGui {
                     }
 
                     //Send message to plot owner.
-                    globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + plotOwner +
-                            ",'&aPlot " + user.review.plot + " has been accepted.');");
+                    globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
+                            "','&aPlot " + user.review.plot + " has been accepted.');");
 
                     //Remove plot members.
                     plotSQL.update("DELETE FROM plot_members WHERE id=" + user.review.plot + ";");
@@ -196,8 +196,8 @@ public class AcceptGui {
                     Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
 
                     //Get negative coordinate transform.
-                    int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + world.getName() + ";");
-                    int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + world.getName() + ";");
+                    int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world.getName() + "';");
+                    int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world.getName() + "';");
 
                     List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(user.review.plot, world);
                     List<BlockVector2> pasteVector = new ArrayList<>();
@@ -231,7 +231,7 @@ public class AcceptGui {
                         for (int nPlot : nPlots) {
 
                             //If you are not owner or member of the plot select it for the next review.
-                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
+                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
                                 submittedPlots++;
 

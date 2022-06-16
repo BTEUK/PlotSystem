@@ -45,8 +45,8 @@ public class DeleteEvent {
 
             }
 
-            int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
-            int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
+            int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+            int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //Get the plot bounds.
             List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(id, pasteWorld);
@@ -81,7 +81,7 @@ public class DeleteEvent {
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES(" + uuid + ",'&cPlot &4" + id + "&cdeleted');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
             }
         }

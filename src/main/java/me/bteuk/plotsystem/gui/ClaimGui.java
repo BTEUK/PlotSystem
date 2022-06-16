@@ -60,7 +60,7 @@ public class ClaimGui {
                     if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
 
                         //If the player can't be given owner, set the plot status back to unclaimed.
-                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ", " + eUser.uuid + ", " + 1 + ", " + Time.currentTime() + ";")) {
+                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES('" + eUser.inPlot + "','" + eUser.uuid + "',1," + Time.currentTime() + ";")) {
 
                             //Add player to worldguard region.
                             if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
