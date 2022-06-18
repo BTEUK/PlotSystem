@@ -50,7 +50,7 @@ public class QuitServer implements Listener {
 		}
 
 		//Remove user from list
-		instance.getUsers().remove(u);
+		instance.removeUser(u);
 
 	}
 

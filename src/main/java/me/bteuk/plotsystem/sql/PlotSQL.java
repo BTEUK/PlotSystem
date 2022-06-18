@@ -1,7 +1,6 @@
 package me.bteuk.plotsystem.sql;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.Bukkit;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 public class PlotSQL {
 
     private final BasicDataSource dataSource;
-    private int success;
 
     //Set the dataSource for the plot_data database.
     public PlotSQL(BasicDataSource dataSource) {
@@ -66,22 +64,15 @@ public class PlotSQL {
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            success = statement.executeUpdate();
-
-            //If the insert was successful return true;
-            if (success > 0) {return true;}
-            else {
-
-                Bukkit.getLogger().warning("SQL update " + sql + " failed!");
-                return false;
-
-            }
+            statement.executeUpdate();
 
         } catch (SQLException e) {
             //If for some reason an error occurred in the sql then return false.
             e.printStackTrace();
             return false;
         }
+
+        return true;
     }
 
     //Check whether the database has the specific row, return boolean.

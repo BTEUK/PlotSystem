@@ -13,7 +13,6 @@ import me.bteuk.plotsystem.listeners.QuitServer;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import me.bteuk.plotsystem.voidgen.VoidChunkGen;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,12 +50,6 @@ public class PlotSystem extends JavaPlugin {
     //Server Name
     public static String SERVER_NAME;
 
-    //Set the default world generation to be void.
-    @Override
-    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
-        return new VoidChunkGen(this);
-    }
-
     @Override
     public void onEnable() {
 
@@ -68,8 +61,8 @@ public class PlotSystem extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            Bukkit.getLogger().warning(Utils.chat("&cThe config must be configured before the plugin can be enabled!"));
-            Bukkit.getLogger().warning(Utils.chat("&cPlease edit the database values in the config, give the server a unique name and then set 'enabled: true'"));
+            Bukkit.getLogger().warning("The config must be configured before the plugin can be enabled!");
+            Bukkit.getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
             return;
 
         }
@@ -88,7 +81,7 @@ public class PlotSystem extends JavaPlugin {
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
-            Bukkit.getLogger().severe(Utils.chat("&cFailed to connect to the database, please check that you have set the config values correctly."));
+            Bukkit.getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -99,26 +92,34 @@ public class PlotSystem extends JavaPlugin {
         if (globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
             //Add save world if it does not yet exist.
+            //Save world name is in config.
             //This implies first launch with plugin.
-            if (!Multiverse.hasWorld("save")) {
+            if (!Multiverse.hasWorld(config.getString("save_world"))) {
 
                 //Create save world.
-                if (!Multiverse.createVoidWorld("save")) {
+                if (!Multiverse.createVoidWorld(config.getString("save_world"))) {
 
-                    Bukkit.getLogger().warning(Utils.chat("&cFailed to create save world!"));
+                    Bukkit.getLogger().warning("Failed to create save world!");
 
                 }
 
                 //Enable plugin.
-                Bukkit.getLogger().info(me.bteuk.network.utils.Utils.chat("&cEnabling Plugin"));
+                Bukkit.getLogger().info("Enabling Plugin");
                 enablePlugin();
 
             } else {
 
-                //If the server is not in the database the network plugin was not successful.
-                Bukkit.getLogger().warning(Utils.chat("&cServer is not in database, check that the Network plugin is working correctly."));
+                //Save world has already been created, enable plugin.
+                Bukkit.getLogger().info("Enabling Plugin");
+                enablePlugin();
+
 
             }
+        } else {
+
+            //If the server is not in the database the network plugin was not successful.
+            Bukkit.getLogger().warning("Server is not in database, check that the Network plugin is working correctly.");
+
         }
     }
 
@@ -157,7 +158,7 @@ public class PlotSystem extends JavaPlugin {
         new PlayerInteract(instance, plotSQL);
 
         //Deals with tracking where players are in relation to plots.
-        new ClaimEnter(instance, plotSQL, globalSQL);
+        new ClaimEnter(this, plotSQL, globalSQL);
 
         //Create instance of claim command,
         //as it is used to check whether a person is able to claim the plot they're standing in.
@@ -173,28 +174,31 @@ public class PlotSystem extends JavaPlugin {
     public void onDisable() {
 
         //Remove all players who are in review.
-        for (User u : users) {
+        //If users is not empty.
+        if (!users.isEmpty()) {
+            for (User u : users) {
 
-            //Set tutorialStage in PlayData.
-            //tutorialData.updateValues(u);
+                //Set tutorialStage in PlayData.
+                //tutorialData.updateValues(u);
 
-            //Update the last online time of player.
-            //playerData.updateTime(u.uuid);
+                //Update the last online time of player.
+                //playerData.updateTime(u.uuid);
 
-            //If the player is in a review, cancel it.
-            if (u.review != null) {
+                //If the player is in a review, cancel it.
+                if (u.review != null) {
 
-                PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+                    PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
-                //Remove the reviewer from the plot.
-                WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+                    //Remove the reviewer from the plot.
+                    WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
 
-                //Set status back to submitted.
-                plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
+                    //Set status back to submitted.
+                    plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
 
-                //Close review.
-                u.review.closeReview();
+                    //Close review.
+                    u.review.closeReview();
 
+                }
             }
         }
 
@@ -253,5 +257,19 @@ public class PlotSystem extends JavaPlugin {
         }
 
         return null;
+    }
+
+    //Add user to list.
+    public void addUser(User u) {
+
+        users.add(u);
+
+    }
+
+    //Get user from player.
+    public void removeUser(User u) {
+
+        users.remove(u);
+
     }
 }

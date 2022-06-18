@@ -23,21 +23,23 @@ public class JoinServer implements Listener {
 
     private final GlobalSQL globalSQL;
     private final PlotSQL plotSQL;
+    private final PlotSystem instance;
 
     public JoinServer(PlotSystem plugin, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+        this.instance = plugin;
         this.globalSQL = globalSQL;
         this.plotSQL = plotSQL;
 
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void joinEvent(PlayerJoinEvent e) {
 
         //Create instance of User and add it to list.
         User u = new User(e.getPlayer(), globalSQL, plotSQL);
-        PlotSystem.getInstance().getUsers().add(u);
+        instance.addUser(u);
 
         //If the player has a join event, execute it.
         if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';")) {

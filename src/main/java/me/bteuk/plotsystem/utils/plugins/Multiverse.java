@@ -26,7 +26,7 @@ public class Multiverse {
                 null,
                 WorldType.FLAT,
                 false,
-                null
+                "VoidGen:{biome:PLAINS}"
         );
 
         MultiverseWorld world = worldManager.getMVWorld(name);
