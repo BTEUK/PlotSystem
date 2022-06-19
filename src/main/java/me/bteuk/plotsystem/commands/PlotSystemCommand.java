@@ -35,6 +35,7 @@ public class PlotSystemCommand implements CommandExecutor {
         if (args.length == 0) {
 
             sender.sendMessage(Utils.chat("&c/plotsystem help"));
+            return true;
 
         }
 

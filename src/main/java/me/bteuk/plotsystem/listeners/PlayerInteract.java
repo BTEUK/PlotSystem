@@ -45,7 +45,7 @@ public class PlayerInteract implements Listener {
             if (!u.player.hasPermission("uknet.plots.select")) {
 
                 e.setCancelled(true);
-                u.player.sendMessage(Utils.chat("You do not have permission to use this tool!"));
+                u.player.sendMessage(Utils.chat("&cYou do not have permission to use this tool!"));
                 return;
 
             }
@@ -59,6 +59,7 @@ public class PlayerInteract implements Listener {
                 if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getClickedBlock().getWorld() + "';")) {
 
                     u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
+                    return;
 
                 }
 
@@ -79,17 +80,18 @@ public class PlayerInteract implements Listener {
 
                 e.setCancelled(true);
 
-                //Check if they are making their plot in the same world as their first point.
-                if (!e.getClickedBlock().getWorld().equals(u.selectionTool.world())) {
-
-                    u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection first."));
-
-                }
-
                 //If the player hasn't selected their first point cancel.
                 if (u.selectionTool.size() == 0) {
 
                     u.player.sendMessage(Utils.chat("&cYou must first start your selection by left-clicking."));
+                    return;
+
+                }
+
+                //Check if they are making their plot in the same world as their first point.
+                if (!e.getClickedBlock().getWorld().equals(u.selectionTool.world())) {
+
+                    u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection first."));
                     return;
 
                 }

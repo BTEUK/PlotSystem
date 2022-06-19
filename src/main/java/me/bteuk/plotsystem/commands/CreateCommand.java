@@ -34,7 +34,7 @@ public class CreateCommand {
 
         if (args.length < 2) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone, world]"));
+            sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone]"));
             return;
 
         }
@@ -44,6 +44,7 @@ public class CreateCommand {
             case "plot":
 
                 createPlot(sender);
+                break;
 
             case "location":
 
@@ -56,7 +57,7 @@ public class CreateCommand {
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone, world]"));
+                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone]"));
 
         }
 
@@ -109,18 +110,16 @@ public class CreateCommand {
 
         //Check if the sender is a player.
         //If so, check if they have permission.
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player p)) {
 
             sender.sendMessage(Utils.chat("&cThis command can only be executed by a player."));
             return;
 
         }
 
-        Player p = (Player) sender;
-
         if (!p.hasPermission("uknet.plots.create.location")) {
 
-            p.sendMessage(Utils.chat("&cYou to not have permission to use this command!"));
+            p.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
             return;
 
         }
@@ -178,9 +177,11 @@ public class CreateCommand {
         Multiverse.createVoidWorld(args[2]);
 
         //Copy regions from save world and add them to build world with transformed coordinates.
-        String path = PlotSystem.getInstance().getDataFolder().getParent();
-        File copy;
-        File paste;
+        File copy = new File(PlotSystem.getInstance().getConfig().getString("save_world")).getAbsoluteFile();
+        File paste = new File(args[2]).getAbsoluteFile();
+
+        //Worlds must be unloaded before copying terrain to prevent corrupted files.
+        //TODO: unload worlds
 
         //Iterate through regions.
         try {
@@ -188,18 +189,19 @@ public class CreateCommand {
 
                 for (int j = regionZMin; j <= regionZMax; j++) {
 
-                    //Get the file of the existing and new region.
-                    copy = new File(path + "/" + PlotSystem.getInstance().getConfig().getString("save_world"
-                            + "/region/r." + i + "." + j + ".mca"));
-                    paste = new File(path + "/" + args[2] + "/region/r." + (i + xTransform/512) + "." + (j + zTransform/512) + ".mca");
-
-                    FileUtils.copyFile(copy, paste);
+                    FileUtils.copyFile(new File(copy + "/region/r." + i + "." + j + ".mca"),
+                            new File(paste + "/region/r." + (i + xTransform / 512) + "." + (j + zTransform / 512) + ".mca"));
 
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            sender.sendMessage(Utils.chat("&cAn error occurred while copying the terrain."));
+            p.sendMessage(Utils.chat("&cAn error occurred while copying the terrain."));
+            p.sendMessage(Utils.chat("&cMake sure all the region files exist."));
+
+            //Since file-copy failed remove world from server.
+            Multiverse.deleteWorld(args[2]);
+
             return;
         }
 
@@ -216,7 +218,7 @@ public class CreateCommand {
         if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
                 + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
 
-            sender.sendMessage(Utils.chat("&aAdded new location " + args[2] + " to world " + args[3]));
+            sender.sendMessage(Utils.chat("&aCreated new location " + args[2]));
 
             //Set the status of all effected regions in the region database.
             for (int i = regionXMin; i <= regionXMax; i++) {

@@ -63,4 +63,27 @@ public class Multiverse {
             return true;
         }
     }
+
+    public static boolean deleteWorld(String name) {
+
+        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
+
+        if (core == null) {
+            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            return false;
+        }
+
+        //If world exists delete it.
+        MVWorldManager worldManager = core.getMVWorldManager();
+
+        MultiverseWorld world = worldManager.getMVWorld(name);
+
+        if (world == null) {
+            return false;
+        } else {
+            worldManager.deleteWorld(name);
+            return true;
+        }
+
+    }
 }

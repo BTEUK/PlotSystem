@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.sql;
 
+import me.bteuk.plotsystem.PlotSystem;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -143,22 +144,23 @@ public class GlobalSQL {
     public int addCoordinate(Location l) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO coordinates(world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?);",
+                "INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
-            statement.setString(1, l.getWorld().getName());
-            statement.setDouble(2, l.getX());
-            statement.setDouble(3, l.getY());
-            statement.setDouble(4, l.getZ());
-            statement.setFloat(5, l.getYaw());
-            statement.setFloat(6, l.getPitch());
+            statement.setString(1, PlotSystem.SERVER_NAME);
+            statement.setString(2, l.getWorld().getName());
+            statement.setDouble(3, l.getX());
+            statement.setDouble(4, l.getY());
+            statement.setDouble(5, l.getZ());
+            statement.setFloat(6, l.getYaw());
+            statement.setFloat(7, l.getPitch());
             statement.executeUpdate();
 
             //If the id does not exist return 0.
             ResultSet results = statement.getGeneratedKeys();
             if (results.next()) {
 
-                return results.getInt("id");
+                return results.getInt(1);
 
             } else {
 
