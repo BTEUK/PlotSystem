@@ -86,4 +86,50 @@ public class Multiverse {
         }
 
     }
+
+    public static boolean unloadWorld(String name) {
+
+        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
+
+        if (core == null) {
+            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            return false;
+        }
+
+        //If world exists delete it.
+        MVWorldManager worldManager = core.getMVWorldManager();
+
+        MultiverseWorld world = worldManager.getMVWorld(name);
+
+        if (world == null) {
+            return false;
+        } else {
+            worldManager.unloadWorld(name);
+            return true;
+        }
+
+    }
+
+    public static boolean loadWorld(String name) {
+
+        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
+
+        if (core == null) {
+            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            return false;
+        }
+
+        //If world exists delete it.
+        MVWorldManager worldManager = core.getMVWorldManager();
+
+        MultiverseWorld world = worldManager.getMVWorld(name);
+
+        if (world == null) {
+            return false;
+        } else {
+            worldManager.loadWorld(name);
+            return true;
+        }
+
+    }
 }

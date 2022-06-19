@@ -176,12 +176,20 @@ public class CreateCommand {
         //Create the world and add the regions.
         Multiverse.createVoidWorld(args[2]);
 
+        String saveWorld = PlotSystem.getInstance().getConfig().getString("save_world");
+
+        if (saveWorld == null) {
+            p.sendMessage(Utils.chat("&cThe save world is not set in config."));
+            return;
+        }
+
         //Copy regions from save world and add them to build world with transformed coordinates.
-        File copy = new File(PlotSystem.getInstance().getConfig().getString("save_world")).getAbsoluteFile();
+        File copy = new File(saveWorld).getAbsoluteFile();
         File paste = new File(args[2]).getAbsoluteFile();
 
         //Worlds must be unloaded before copying terrain to prevent corrupted files.
-        //TODO: unload worlds
+        Multiverse.unloadWorld(saveWorld);
+        Multiverse.unloadWorld(args[2]);
 
         //Iterate through regions.
         try {
@@ -205,6 +213,9 @@ public class CreateCommand {
             return;
         }
 
+        //Load the worlds now that the chunks have been copied over.
+        Multiverse.loadWorld(saveWorld);
+        Multiverse.loadWorld(args[2]);
 
         int coordMin = globalSQL.addCoordinate(new Location(
                 Bukkit.getWorld(args[2]),
@@ -244,6 +255,5 @@ public class CreateCommand {
             Bukkit.getLogger().warning("An error occured while adding new location!");
 
         }
-
     }
 }
