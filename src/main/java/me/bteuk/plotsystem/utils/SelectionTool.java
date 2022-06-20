@@ -3,12 +3,7 @@ package me.bteuk.plotsystem.utils;
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.enums.PlotDifficulty;
-import me.bteuk.plotsystem.utils.enums.PlotSize;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.PlayerInventory;
@@ -181,74 +176,6 @@ public class SelectionTool extends WGCreatePlot {
         }
     }
 
-    //Returns the plot difficulty name.
-    public PlotDifficulty difficultyName() {
-
-        switch (difficulty) {
-
-            case 1:
-                return PlotDifficulty.EASY;
-            case 2:
-                return PlotDifficulty.NORMAL;
-            case 3:
-                return PlotDifficulty.HARD;
-            default:
-                return null;
-
-        }
-    }
-
-    //Returns the plot size name.
-    public PlotSize sizeName() {
-
-        switch (size) {
-
-            case 1:
-                return PlotSize.SMALL;
-            case 2:
-                return PlotSize.MEDIUM;
-            case 3:
-                return PlotSize.LARGE;
-            default:
-                return null;
-
-        }
-    }
-
-    //Returns the plot size material.
-    public Material sizeMaterial() {
-
-        switch (size) {
-
-            case 1:
-                return Material.LIME_CONCRETE;
-            case 2:
-                return Material.YELLOW_CONCRETE;
-            case 3:
-                return Material.RED_CONCRETE;
-            default:
-                return null;
-
-        }
-    }
-
-    //Returns the plot difficulty material.
-    public Material difficultyMaterial() {
-
-        switch (difficulty) {
-
-            case 1:
-                return Material.LIME_CONCRETE;
-            case 2:
-                return Material.YELLOW_CONCRETE;
-            case 3:
-                return Material.RED_CONCRETE;
-            default:
-                return null;
-
-        }
-    }
-
     //Before this method can be run the player must have gone through the plot creation gui.
     //This will make sure the difficulty and size are set.
     public boolean createPlot() {
@@ -260,7 +187,7 @@ public class SelectionTool extends WGCreatePlot {
             int i = 1;
             for (BlockVector2 point : vector) {
 
-                plotSQL.update("INSERT INTO points_data(id,points_number,x,z) VALUES(" +
+                plotSQL.update("INSERT INTO plot_corners(id,corner,x,z) VALUES(" +
                         plotID + "," + i + "," + point.getX() + "," + point.getZ() + ");");
                 i++;
 
@@ -268,8 +195,11 @@ public class SelectionTool extends WGCreatePlot {
 
             //Send feedback.
             u.player.sendMessage(Utils.chat("&aPlot created with ID &3" + plotID +
-                    "&a, difficulty &3" + difficultyName()) +
-                    "&a and size &3" + sizeName());
+                    "&a, difficulty &3" + PlotValues.difficultyName(difficulty) +
+                    "&a and size &3" + PlotValues.sizeName(size)));
+            PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
+                    ", difficulty " + PlotValues.difficultyName(difficulty) +
+                    " and size " + PlotValues.sizeName(size));
 
             return true;
 

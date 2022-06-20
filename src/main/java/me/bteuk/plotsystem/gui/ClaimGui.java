@@ -21,15 +21,15 @@ public class ClaimGui {
 
         UniqueGui gui = new UniqueGui(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        gui.setItem(12, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        gui.setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
                 Utils.chat("&b&lPlot Size"),
                 Utils.chat("&f" + PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-        gui.setItem(12, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        gui.setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
                 Utils.chat("&b&lPlot Difficulty"),
                 Utils.chat("&f" + PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-        gui.setItem(12, Utils.createItem(Material.ENDER_EYE, 1,
+        gui.setItem(22, Utils.createItem(Material.ENDER_EYE, 1,
                         Utils.chat("&b&lView Plot in Google Maps"),
                         Utils.chat("&fClick to open a link to this plot in google maps.")),
                 u ->
@@ -45,7 +45,7 @@ public class ClaimGui {
 
                 });
 
-        gui.setItem(12, Utils.createItem(Material.EMERALD, 1,
+        gui.setItem(4, Utils.createItem(Material.EMERALD, 1,
                         Utils.chat("&b&lClaim Plot"),
                         Utils.chat("&fClick to claim the plot and start building.")),
                 u ->
@@ -60,12 +60,12 @@ public class ClaimGui {
                     if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
 
                         //If the player can't be given owner, set the plot status back to unclaimed.
-                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES('" + eUser.inPlot + "','" + eUser.uuid + "',1," + Time.currentTime() + ";")) {
+                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
 
                             //Add player to worldguard region.
                             if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
 
-                                eUser.player.sendMessage(Utils.chat("&aSuccessfully claimed plot &b" + eUser.inPlot + "&c, good luck building."));
+                                eUser.player.sendMessage(Utils.chat("&aSuccessfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
                                 Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
                             } else {
@@ -81,7 +81,7 @@ public class ClaimGui {
                             Bukkit.getLogger().warning("Plot owner insert failed for plot " + eUser.inPlot);
 
                             //Attempt to set plot back to unclaimed
-                            if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
+                            if (eUser.plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + eUser.inPlot + ";")) {
 
                                 Bukkit.getLogger().warning("Plot " + eUser.inPlot + " has been set back to unclaimed.");
 

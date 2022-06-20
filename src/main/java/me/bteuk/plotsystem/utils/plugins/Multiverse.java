@@ -36,6 +36,9 @@ public class Multiverse {
         world.setDifficulty(Difficulty.PEACEFUL);
         world.setEnableWeather(false);
         world.setHunger(false);
+        //TODO: disable daylightcycle
+
+        //TODO worldguard protection
 
         Bukkit.getLogger().info("Created new world with name " + name);
 

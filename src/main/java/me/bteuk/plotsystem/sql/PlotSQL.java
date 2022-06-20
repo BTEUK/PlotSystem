@@ -40,7 +40,7 @@ public class PlotSQL {
             try (ResultSet results = statement.getGeneratedKeys()) {
                 if (results.next()) {
 
-                    return results.getInt("id");
+                    return results.getInt(1);
 
                 } else {
 

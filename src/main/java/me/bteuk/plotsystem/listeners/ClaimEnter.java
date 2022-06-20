@@ -21,10 +21,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.List;
 
@@ -69,9 +69,14 @@ public class ClaimEnter implements Listener {
 
     }
 
-    //If the player is in a buildable world check whether they enter or exit a plot.
     @EventHandler
     public void moveEvent(PlayerMoveEvent e) {
+        User u = PlotSystem.getInstance().getUser(e.getPlayer());
+        checkRegion(u);
+    }
+
+    @EventHandler
+    public void teleportEvent(PlayerTeleportEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
     }

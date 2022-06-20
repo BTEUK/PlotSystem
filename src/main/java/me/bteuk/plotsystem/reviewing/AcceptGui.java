@@ -7,6 +7,7 @@ import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.network.utils.Points;
 import me.bteuk.network.utils.enums.PointsType;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.PlotValues;
@@ -51,10 +52,9 @@ public class AcceptGui {
 
                                     //Set accuracy and update the gui.
                                     ac.accuracy = finalI;
-                                    user.review.acceptGui.delete();
-                                    user.review.acceptGui = AcceptGui.createAcceptGui(user);
-                                    user.review.acceptGui.update(u);
-                                    u.player.getInventory().setContents(user.review.acceptGui.getInventory().getContents());
+
+                                    //Update the gui.
+                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
 
                                 }
                         );
@@ -67,10 +67,9 @@ public class AcceptGui {
 
                                     //Set accuracy and update the gui.
                                     ac.accuracy = finalI;
-                                    user.review.acceptGui.delete();
-                                    user.review.acceptGui = AcceptGui.createAcceptGui(user);
-                                    user.review.acceptGui.update(u);
-                                    u.player.getInventory().setContents(user.review.acceptGui.getInventory().getContents());
+
+                                    //Update the gui.
+                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
 
                                 }
                         );
@@ -91,10 +90,9 @@ public class AcceptGui {
 
                                     //Set quality and update the gui.
                                     ac.quality = finalI;
-                                    user.review.acceptGui.delete();
-                                    user.review.acceptGui = AcceptGui.createAcceptGui(user);
-                                    user.review.acceptGui.update(u);
-                                    u.player.getInventory().setContents(user.review.acceptGui.getInventory().getContents());
+
+                                    //Update the gui.
+                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
 
                                 }
                         );
@@ -108,10 +106,9 @@ public class AcceptGui {
 
                                     //Set quality and update the gui.
                                     ac.quality = finalI;
-                                    user.review.acceptGui.delete();
-                                    user.review.acceptGui = AcceptGui.createAcceptGui(user);
-                                    user.review.acceptGui.update(u);
-                                    u.player.getInventory().setContents(user.review.acceptGui.getInventory().getContents());
+
+                                    //Update the gui.
+                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
 
                                 }
                         );

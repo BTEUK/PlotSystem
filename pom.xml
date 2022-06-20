@@ -53,6 +53,10 @@
 
     <repositories>
         <repository>
+            <id>in-project</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+        <repository>
             <id>papermc-repo</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
@@ -125,8 +129,7 @@
             <groupId>me.bteuk.network</groupId>
             <artifactId>Network</artifactId>
             <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/Network-1.0.0.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

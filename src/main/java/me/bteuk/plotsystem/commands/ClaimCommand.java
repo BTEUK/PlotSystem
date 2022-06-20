@@ -27,15 +27,14 @@ public class ClaimCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player p)) {
 
             sender.sendMessage(Utils.chat("&cThis command can only be used by a player."));
             return true;
 
         }
 
-        //Get the player and user.
-        Player p = (Player) sender;
+        //Get the user.
         User u = PlotSystem.getInstance().getUser(p);
 
         //If the plot is valid open the claim plot gui.
@@ -75,7 +74,7 @@ public class ClaimCommand implements CommandExecutor {
 
         }
 
-        //If the plot is already claimed, tell the player they can not claim it, but they can request to join it.
+        //If the plot is already claimed, tell the player they can not claim it, but they can be invited by the owner.
         if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
 
             u.player.sendMessage(Utils.chat("&cThis plot is already claimed, if you wish to build in this plot ask the plot owner to invite you."));
