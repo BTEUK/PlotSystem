@@ -54,7 +54,7 @@
     <repositories>
         <repository>
             <id>in-project</id>
-            <url>file://${project.basedir}/lib</url>
+            <url>file:///${project.basedir}/lib</url>
         </repository>
         <repository>
             <id>papermc-repo</id>

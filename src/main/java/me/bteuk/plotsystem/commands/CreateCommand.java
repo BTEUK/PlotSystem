@@ -100,9 +100,15 @@ public class CreateCommand {
 
         //Get the user from the network plugin, this plugin handles all guis.
         NetworkUser user = Network.getInstance().getUser(u.player);
-        //UniqueGui allows the creation of a gui that is unique to this player.
-        user.uniqueGui = CreatePlotGui.createPlotGui(u);
-        user.uniqueGui.open(user);
+
+        //If the player already has a gui, delete.
+        if (user.uniqueGui != null) {
+            user.uniqueGui.delete(user);
+        }
+
+        //Open the create gui.
+        u.createGui = CreatePlotGui.createPlotGui(u);
+        u.createGui.open(user);
 
     }
 

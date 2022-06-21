@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.utils;
 
+import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import org.bukkit.entity.Player;
@@ -24,6 +25,10 @@ public class User {
 
     public final GlobalSQL globalSQL;
     public final PlotSQL plotSQL;
+
+    //Guis
+    public UniqueGui claimGui;
+    public UniqueGui createGui;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 

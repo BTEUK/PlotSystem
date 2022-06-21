@@ -53,7 +53,6 @@ public class ClaimGui {
                 {
 
                     User eUser = PlotSystem.getInstance().getUser(u.player);
-
                     u.player.closeInventory();
 
                     //If the plot status can be updated, add the player as plot owner.

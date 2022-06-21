@@ -1,15 +1,13 @@
 package me.bteuk.plotsystem;
 
+import java.nio.channels.ClosedChannelException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
-import me.bteuk.plotsystem.listeners.JoinServer;
-import me.bteuk.plotsystem.listeners.PlayerInteract;
-import me.bteuk.plotsystem.listeners.ClaimEnter;
-import me.bteuk.plotsystem.listeners.QuitServer;
+import me.bteuk.plotsystem.listeners.*;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -156,6 +154,7 @@ public class PlotSystem extends JavaPlugin {
         new JoinServer(this, globalSQL, plotSQL);
         new QuitServer(this);
         new PlayerInteract(instance, plotSQL);
+        new CloseInventory(this);
 
         //Deals with tracking where players are in relation to plots.
         new ClaimEnter(this, plotSQL, globalSQL);

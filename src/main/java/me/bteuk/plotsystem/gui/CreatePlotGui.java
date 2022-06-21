@@ -42,7 +42,7 @@ public class CreatePlotGui {
                     }
 
                     //Update the gui.
-                    u.uniqueGui.update(u, CreatePlotGui.createPlotGui(eUser));
+                    eUser.createGui.update(u, CreatePlotGui.createPlotGui(eUser));
 
                 });
 
@@ -69,7 +69,7 @@ public class CreatePlotGui {
                     }
 
                     //Update the gui.
-                    u.uniqueGui.update(u, CreatePlotGui.createPlotGui(eUser));
+                    eUser.createGui.update(u, CreatePlotGui.createPlotGui(eUser));
 
                 });
 
@@ -83,7 +83,7 @@ public class CreatePlotGui {
 
                     User eUser = PlotSystem.getInstance().getUser(u.player);
 
-                    //Close the inventory and delete the gui.
+                    //Close the inventory.
                     u.player.closeInventory();
 
                     //Create plot with the selection created by the user.
