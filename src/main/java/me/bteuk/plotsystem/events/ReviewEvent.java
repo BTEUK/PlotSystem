@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class ReviewEvent {
 
     public static void event(String uuid, String[] event) {
@@ -18,7 +20,7 @@ public class ReviewEvent {
         if (event[1].equals("plot")) {
 
             //Get the user.
-            Player p = Bukkit.getPlayer(uuid);
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
             if (p == null) {
 

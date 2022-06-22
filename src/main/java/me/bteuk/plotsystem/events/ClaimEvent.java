@@ -8,6 +8,8 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class ClaimEvent {
 
     public static void event(String uuid, String[] event) {
@@ -16,7 +18,7 @@ public class ClaimEvent {
         if (event[1].equals("plot")) {
 
             //Get the user.
-            Player p = Bukkit.getPlayer(uuid);
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
             if (p == null) {
 

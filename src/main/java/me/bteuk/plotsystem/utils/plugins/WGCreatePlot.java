@@ -57,7 +57,7 @@ public class WGCreatePlot {
         plotID = plotSQL.createPlot(size, difficulty, location);
 
         //Create the region with valid name.
-        region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, 1, 256);
+        region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, -60, 320);
 
         //Add the regions to the world
         regions.addRegion(region);

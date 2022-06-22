@@ -49,6 +49,15 @@ public class QuitServer implements Listener {
 
 		}
 
+		//If the player has a claim or create gui delete it.
+		if (u.claimGui != null) {
+			u.claimGui.delete();
+		}
+
+		if (u.createGui != null) {
+			u.createGui.delete();
+		}
+
 		//Remove user from list
 		instance.removeUser(u);
 

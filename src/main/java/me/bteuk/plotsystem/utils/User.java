@@ -3,6 +3,7 @@ package me.bteuk.plotsystem.utils;
 import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.reviewing.Review;
@@ -29,6 +30,9 @@ public class User {
     //Guis
     public UniqueGui claimGui;
     public UniqueGui createGui;
+
+    //Last plot outline update.
+    public Location last_outline_check;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 

@@ -1,24 +1,24 @@
 package me.bteuk.plotsystem.listeners;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.PlotOutline;
 import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,39 +26,32 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.List;
-
 public class ClaimEnter implements Listener {
 
     PlotSQL plotSQL;
     GlobalSQL globalSQL;
 
-    List<BlockVector2> corners;
-
-    //Points.
-    BlockVector2 p1;
-    BlockVector2 p2;
-
-    //Iterating value.
-    int length;
-    double lengthX;
-    double lengthZ;
-
-    //Location
-    Location loc;
-
-    //World
-    World world;
+    PlotOutline plotOutline;
+    int plotID;
+    int difficulty;
+    ProtectedRegion region;
+    RegionManager regions;
+    WorldGuard wg;
 
     //Block data
+    BlockData redConc = Material.RED_CONCRETE.createBlockData();
     BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
-
+    BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
 
     public ClaimEnter(PlotSystem plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
         this.plotSQL = plotSQL;
         this.globalSQL = globalSQl;
+
+        plotOutline = new PlotOutline();
+
+        wg = WorldGuard.getInstance();
     }
 
     @EventHandler
@@ -66,6 +59,8 @@ public class ClaimEnter implements Listener {
 
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
+        u.last_outline_check = e.getPlayer().getLocation();
+        checkLocation(u);
 
     }
 
@@ -73,12 +68,14 @@ public class ClaimEnter implements Listener {
     public void moveEvent(PlayerMoveEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
+        checkLocation(u);
     }
 
     @EventHandler
     public void teleportEvent(PlayerTeleportEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
+        checkLocation(u);
     }
 
     public void checkRegion(User u) {
@@ -145,52 +142,6 @@ public class ClaimEnter implements Listener {
 
                         u.inPlot = plot;
 
-                        /*
-                        Get the plot bounds.
-                        Calculate the locations of the blocks for the plot outline.
-                        Set all the blocks for the outlines as fake blocks for the player.
-                        The block differs based on the status of the plot.
-                         */
-
-                        //Get the corners of the plot.
-                        corners = WorldGuardFunctions.getPoints(plot, u.player.getWorld());
-
-                        //Get the world
-                        world = u.player.getWorld();
-
-                        //Iterate through corner size.
-                        for (int i = 0; i < corners.size(); i++) {
-
-                            //Get the corner for index i and the corner before that.
-                            //If the index is 0 get the last corner as second point.
-                            p1 = corners.get(i);
-
-                            if (i == 0) {
-                                p2 = corners.get(corners.size() - 1);
-                            } else {
-                                p2 = corners.get(i + 1);
-                            }
-
-                            //Starting at p1 iterate in 1 steps in the direction of the biggest length (x or z).
-                            //Increment the other axis with the at the correct scale.
-                            length = Math.max(Math.abs(p1.getX() - p2.getX()), Math.abs(p1.getZ() - p2.getZ()));
-
-                            //Iterate until 0.
-                            lengthX = p1.getX() - p2.getX();
-                            lengthZ = p1.getZ() - p2.getZ();
-                            for (i = 0; i < length; i++) {
-
-                                //Get location.
-                                loc = new Location(world, p1.getX() + i * (lengthX / length),
-                                        world.getHighestBlockYAt((int) (p1.getX() + i * (lengthX / length)), (int) (p1.getZ() + i * (lengthZ / length))),
-                                        p1.getZ() + i * (lengthZ / length));
-
-                                //Set fake block.
-                                u.player.sendBlockChange(loc, yellowConc);
-
-                            }
-                        }
-
                     } else {
 
                         //If you are the owner or member of this plot update your last enter time.
@@ -248,11 +199,63 @@ public class ClaimEnter implements Listener {
         }
     }
 
-    public static int tryParse(String text) {
+    public int tryParse(String text) {
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    public void checkLocation(User u) {
+
+        if (u.last_outline_check.getWorld().equals(u.player.getWorld())) {
+
+            //If the player is over 100 blocks from the previous check update outlines.
+            if (u.last_outline_check.distance(u.player.getLocation()) > 50) {
+                updateOutlines(u);
+            }
+
+        } else {
+            updateOutlines(u);
+        }
+    }
+
+    public void updateOutlines(User u) {
+
+        //Get regions.
+        regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.last_outline_check.getWorld()));
+
+        if (regions == null) {return;}
+
+        //Update last outline check and create outlines for all plots in 100 block area around the player.
+        u.last_outline_check = u.player.getLocation();
+
+        region = new ProtectedCuboidRegion("test",
+                BlockVector3.at(u.last_outline_check.getX() - 100, -60, u.last_outline_check.getZ() - 100),
+                BlockVector3.at(u.last_outline_check.getX() + 100, 320, u.last_outline_check.getZ() + 100));
+        ApplicableRegionSet set = regions.getApplicableRegions(region);
+
+        for (ProtectedRegion protectedRegion : set) {
+
+            plotID = tryParse(protectedRegion.getId());
+
+            //Get plot difficulty.
+            difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
+
+            plotOutline.createPlotOutline(u.player, plotID, difficultyMaterial(difficulty));
+
+        }
+    }
+
+    //Returns the plot difficulty material.
+    public BlockData difficultyMaterial(int difficulty) {
+
+        return switch (difficulty) {
+            case 1 -> limeConc;
+            case 2 -> yellowConc;
+            case 3 -> redConc;
+            default -> null;
+        };
     }
 }

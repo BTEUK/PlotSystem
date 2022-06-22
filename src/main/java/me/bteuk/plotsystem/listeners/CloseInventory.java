@@ -8,8 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-import java.util.UUID;
-
 public class CloseInventory implements Listener {
 
     public CloseInventory(PlotSystem instance) {
@@ -23,6 +21,8 @@ public class CloseInventory implements Listener {
 
         Player p = (Player) e.getPlayer();
         User u = PlotSystem.getInstance().getUser(p);
+
+        if (u == null) { return; }
 
         //If the player has a claim or create gui delete it.
         if (u.claimGui != null) {

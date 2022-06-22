@@ -43,7 +43,7 @@ public class GlobalSQL {
 
         //Try and get all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server=" + serverName + " AND type='plotsystem';");
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server='" + serverName + "' AND type='plotsystem';");
              ResultSet results = statement.executeQuery()) {
 
             while (results.next()) {
@@ -58,7 +58,7 @@ public class GlobalSQL {
 
         //Try and delete all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server=" + serverName + " AND type='plotsystem';")) {
+             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND type='plotsystem';")) {
 
             statement.executeUpdate();
 
