@@ -4,8 +4,10 @@ import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
@@ -34,8 +36,16 @@ public class SelectionTool extends WGCreatePlot {
     public int size;
     public int difficulty;
 
+    public BlockData outlineBlock = Material.LIGHT_BLUE_CONCRETE.createBlockData();
+    public BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
+    public BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
+    public BlockData redConc = Material.RED_CONCRETE.createBlockData();
+
     //PlotSQL
     private final PlotSQL plotSQL;
+
+    //PlotOutline
+    private final PlotOutline plotOutline;
 
     //Constructor, sets up the basics of the selection tool, including default values fo size and difficulty.
     public SelectionTool(User u, PlotSQL plotSQL) {
@@ -47,6 +57,8 @@ public class SelectionTool extends WGCreatePlot {
         //Set default size and difficulty
         size = 1;
         difficulty = 1;
+
+        plotOutline = new PlotOutline();
 
     }
 
@@ -61,6 +73,9 @@ public class SelectionTool extends WGCreatePlot {
         difficulty = 1;
 
         vector.clear();
+
+        //Replace blocks back to original state.
+        plotOutline.revertBlocks(u.player);
 
     }
 
@@ -98,6 +113,18 @@ public class SelectionTool extends WGCreatePlot {
         } else {
 
             vector.add(bv2);
+
+            //Clear previous selection outline.
+            plotOutline.revertBlocks(u.player);
+
+            //Create new outline.
+            //Adding a point already means at least 2 points, so we can ignore the 1 point case.
+            if (vector.size() == 2) {
+                plotOutline.createSelectionLine(u.player, vector.get(0), vector.get(1), outlineBlock);
+            } else {
+                plotOutline.createSelectionOutline(u.player, vector, outlineBlock);
+            }
+
             return true;
 
         }
@@ -178,7 +205,7 @@ public class SelectionTool extends WGCreatePlot {
 
     //Before this method can be run the player must have gone through the plot creation gui.
     //This will make sure the difficulty and size are set.
-    public boolean createPlot() {
+    public void createPlot() {
 
         //Create the plot.
         if (createPlot(u.player, world, location, vector, plotSQL, size, difficulty)) {
@@ -201,12 +228,20 @@ public class SelectionTool extends WGCreatePlot {
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));
 
-            return true;
-
-        } else {
-
-            return false;
+            //Change plot outline to blockType of plot, rather than of selection.
+            plotOutline.createPlotOutline(u.player, plotID, difficultyMaterial(difficulty));
 
         }
+    }
+
+    //Returns the plot difficulty material.
+    public BlockData difficultyMaterial(int difficulty) {
+
+        return switch (difficulty) {
+            case 1 -> limeConc;
+            case 2 -> yellowConc;
+            case 3 -> redConc;
+            default -> null;
+        };
     }
 }
