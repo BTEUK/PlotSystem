@@ -32,6 +32,7 @@ public class PlotOutline {
     public PlotOutline() {
         pos = new double[2];
         intPos = new int[2];
+        previousBlocks = new HashMap<>();
     }
 
     public void createPlotOutline(Player p, int plotID, BlockData blockType) {
@@ -88,8 +89,8 @@ public class PlotOutline {
         //Set world
         world = p.getWorld();
 
-        //Create new hasMap.
-        previousBlocks = new HashMap<>();
+        //Clear the hashmap.
+        previousBlocks.clear();
 
         //Iterate through the corners.
         for (BlockVector2 p1 : corners) {
@@ -150,8 +151,8 @@ public class PlotOutline {
         //Set world
         world = p.getWorld();
 
-        //Create new hasMap.
-        previousBlocks = new HashMap<>();
+        //Clear the hashmap.
+        previousBlocks.clear();
 
         //Get location.
         l = new Location(world, bv.getX(),
@@ -170,8 +171,8 @@ public class PlotOutline {
         //Set world
         world = p.getWorld();
 
-        //Create new hasMap.
-        previousBlocks = new HashMap<>();
+        //Clean the hashmap
+        previousBlocks.clear();
 
         //Get starting position.
         pos[0] = min(p1.getX(),p2.getX());

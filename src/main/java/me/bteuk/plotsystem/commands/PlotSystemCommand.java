@@ -15,16 +15,13 @@ public class PlotSystemCommand implements CommandExecutor {
 
     //SQL
     PlotSQL plotSQL;
-
-    //Commands
-    CreateCommand createCommand;
+    GlobalSQL globalSQL;
 
 
     public PlotSystemCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.plotSQL = plotSQL;
-
-        createCommand = new CreateCommand(globalSQL,plotSQL);
+        this.globalSQL = globalSQL;
 
     }
 
@@ -48,6 +45,7 @@ public class PlotSystemCommand implements CommandExecutor {
 
             case "create":
 
+                CreateCommand createCommand = new CreateCommand(globalSQL, plotSQL);
                 createCommand.create(sender, args);
                 break;
 
@@ -58,6 +56,15 @@ public class PlotSystemCommand implements CommandExecutor {
             case "help":
 
                 help(sender);
+                break;
+
+            case "setalias":
+
+                if (args.length == 3) {
+                    setAlias(sender, args[1], args[2]);
+                } else {
+                    sender.sendMessage(Utils.chat("&c/plotsystem setalias [location] [alias]"));
+                }
                 break;
 
             default:
@@ -80,6 +87,7 @@ public class PlotSystemCommand implements CommandExecutor {
         if (!(sender instanceof Player)) {
 
             sender.sendMessage(Utils.chat("&cYou must be a player to use this command."));
+            return;
 
         }
 
@@ -98,4 +106,23 @@ public class PlotSystemCommand implements CommandExecutor {
 
     }
 
+    private void setAlias(CommandSender sender, String location, String alias) {
+
+        if (sender instanceof Player p) {
+
+            if (!p.hasPermission("uknet.plots.setalias")) {
+                p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+            }
+
+        }
+
+        if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location + "';")) {
+
+            plotSQL.update("UPDATE location_data SET alias='" + alias + "' WHERE name='" + location+ "';");
+            sender.sendMessage(Utils.chat("&aSet alias of location &3" + location + "&a to &3" + alias + "&a."));
+
+        } else {
+            sender.sendMessage(Utils.chat("&cThe location " + location + " does not exist."));
+        }
+    }
 }

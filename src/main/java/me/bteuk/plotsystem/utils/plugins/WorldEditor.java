@@ -2,6 +2,10 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 
+import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.EditSession;
@@ -24,8 +28,8 @@ public class WorldEditor {
         com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
         com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
 
-        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, 1, 256);
-        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, 1, 256);
+        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, -60, 320);
+        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, 319, 320);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
@@ -55,5 +59,51 @@ public class WorldEditor {
         }
 
         return true;
+    }
+
+    public static boolean largeCopy(BlockVector3 copyMin, BlockVector3 copyMax, BlockVector3 pasteMin, BlockVector3 pasteMax, World copy, World paste) {
+
+        //Get the worlds in worldEdit format
+        com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
+        com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
+
+        CuboidRegion copyRegion = new CuboidRegion(copyWorld, copyMin, copyMax);
+        CuboidRegion pasteRegion = new CuboidRegion(pasteWorld, pasteMin, pasteMax);
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(copyWorld).fastMode(false).checkMemory(true).limitUnlimited().build()) {
+            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
+                    editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
+            );
+            Operations.complete(forwardExtentCopy);
+        } catch (WorldEditException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(pasteWorld).fastMode(false).checkMemory(true).limitUnlimited().changeSetNull().build()) {
+            @SuppressWarnings("resource")
+            Operation operation = new ClipboardHolder(clipboard)
+                    .createPaste(editSession)
+                    .to(pasteRegion.getMinimumPoint())
+                    .ignoreAirBlocks(true)
+                    // configure here
+                    .build();
+            Operations.complete(operation);
+        } catch (WorldEditException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+
     }
 }

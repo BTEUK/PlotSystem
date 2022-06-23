@@ -2,10 +2,22 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.*;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Multiverse {
 
@@ -14,7 +26,7 @@ public class Multiverse {
         MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         if (core == null) {
-            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            PlotSystem.getInstance().getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
             return false;
         }
 
@@ -29,16 +41,83 @@ public class Multiverse {
                 "VoidGen:{biome:PLAINS}"
         );
 
-        MultiverseWorld world = worldManager.getMVWorld(name);
-        world.setGameMode(GameMode.CREATIVE);
-        world.setAllowAnimalSpawn(false);
-        world.setAllowMonsterSpawn(false);
-        world.setDifficulty(Difficulty.PEACEFUL);
-        world.setEnableWeather(false);
-        world.setHunger(false);
-        //TODO: disable daylightcycle
+        MultiverseWorld MVWorld = worldManager.getMVWorld(name);
+        MVWorld.setGameMode(GameMode.CREATIVE);
+        MVWorld.setAllowAnimalSpawn(false);
+        MVWorld.setAllowMonsterSpawn(false);
+        MVWorld.setDifficulty(Difficulty.PEACEFUL);
+        MVWorld.setEnableWeather(false);
+        MVWorld.setHunger(false);
 
-        //TODO worldguard protection
+        //Get world from bukkit.
+        World world = Bukkit.getWorld(name);
+
+        if (world == null) {
+            PlotSystem.getInstance().getLogger().warning("World is null!");
+            return false;
+        }
+
+        //Disable daylightcycle.
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setTime(6000);
+
+        //Disable fire tick.
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
+
+        //Disable random tick.
+        world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
+
+        //Get worldguard.
+        WorldGuard wg = WorldGuard.getInstance();
+        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+
+        if (regions == null) {
+            PlotSystem.getInstance().getLogger().warning("Regions is null!");
+            return false;
+        }
+
+        //Create global region and add all necessary flags.
+        GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("global");
+
+        Map<Flag<?>, Object> flags = new HashMap<>();
+        flags.put(Flags.OTHER_EXPLOSION, StateFlag.State.DENY);
+        flags.put(Flags.WATER_FLOW, StateFlag.State.DENY);
+        flags.put(Flags.LEAF_DECAY, StateFlag.State.DENY);
+        flags.put(Flags.CORAL_FADE, StateFlag.State.DENY);
+        flags.put(Flags.LIGHTNING, StateFlag.State.DENY);
+        flags.put(Flags.SNOW_MELT, StateFlag.State.DENY);
+        flags.put(Flags.FROSTED_ICE_FORM, StateFlag.State.DENY);
+        flags.put(Flags.ICE_MELT, StateFlag.State.DENY);
+        flags.put(Flags.TRAMPLE_BLOCKS, StateFlag.State.DENY);
+        flags.put(Flags.FIRE_SPREAD, StateFlag.State.DENY);
+        flags.put(Flags.PISTONS, StateFlag.State.DENY);
+        flags.put(Flags.SOIL_DRY, StateFlag.State.DENY);
+        flags.put(Flags.LAVA_FLOW, StateFlag.State.DENY);
+        flags.put(Flags.GRASS_SPREAD, StateFlag.State.DENY);
+        flags.put(Flags.LAVA_FIRE, StateFlag.State.DENY);
+        flags.put(Flags.SNOW_FALL, StateFlag.State.DENY);
+        flags.put(Flags.PASSTHROUGH, StateFlag.State.DENY);
+        flags.put(Flags.ICE_FORM, StateFlag.State.DENY);
+        flags.put(Flags.GHAST_FIREBALL, StateFlag.State.DENY);
+        flags.put(Flags.FROSTED_ICE_MELT, StateFlag.State.DENY);
+        flags.put(Flags.CHEST_ACCESS, StateFlag.State.DENY);
+        flags.put(Flags.ENDERDRAGON_BLOCK_DAMAGE, StateFlag.State.DENY);
+        flags.put(Flags.ENDER_BUILD, StateFlag.State.DENY);
+        flags.put(Flags.ENTITY_ITEM_FRAME_DESTROY, StateFlag.State.DENY);
+        flags.put(Flags.ENTITY_PAINTING_DESTROY, StateFlag.State.DENY);
+        flags.put(Flags.PLACE_VEHICLE, StateFlag.State.DENY);
+        flags.put(Flags.POTION_SPLASH, StateFlag.State.DENY);
+        flags.put(Flags.RIDE, StateFlag.State.DENY);
+
+        globalRegion.setFlags(flags);
+
+        regions.addRegion(globalRegion);
+
+        try {
+            regions.saveChanges();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
 
         Bukkit.getLogger().info("Created new world with name " + name);
 
@@ -60,11 +139,7 @@ public class Multiverse {
 
         MultiverseWorld world = worldManager.getMVWorld(name);
 
-        if (world == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return world != null;
     }
 
     public static boolean deleteWorld(String name) {
@@ -85,52 +160,6 @@ public class Multiverse {
             return false;
         } else {
             worldManager.deleteWorld(name);
-            return true;
-        }
-
-    }
-
-    public static boolean unloadWorld(String name) {
-
-        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
-
-        if (core == null) {
-            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
-            return false;
-        }
-
-        //If world exists delete it.
-        MVWorldManager worldManager = core.getMVWorldManager();
-
-        MultiverseWorld world = worldManager.getMVWorld(name);
-
-        if (world == null) {
-            return false;
-        } else {
-            worldManager.unloadWorld(name);
-            return true;
-        }
-
-    }
-
-    public static boolean loadWorld(String name) {
-
-        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
-
-        if (core == null) {
-            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
-            return false;
-        }
-
-        //If world exists delete it.
-        MVWorldManager worldManager = core.getMVWorldManager();
-
-        MultiverseWorld world = worldManager.getMVWorld(name);
-
-        if (world == null) {
-            return false;
-        } else {
-            worldManager.loadWorld(name);
             return true;
         }
 

@@ -209,6 +209,13 @@ public class ClaimEnter implements Listener {
 
     public void checkLocation(User u) {
 
+        if (u.last_outline_check.getWorld() == null) {
+
+            updateOutlines(u);
+            return;
+
+        }
+
         if (u.last_outline_check.getWorld().equals(u.player.getWorld())) {
 
             //If the player is over 100 blocks from the previous check update outlines.

@@ -1,5 +1,7 @@
 package me.bteuk.plotsystem.commands;
 
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.PlotSystem;
@@ -9,14 +11,14 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
-import org.apache.commons.io.FileUtils;
+import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 
 public class CreateCommand {
 
@@ -189,77 +191,73 @@ public class CreateCommand {
             return;
         }
 
-        //Copy regions from save world and add them to build world with transformed coordinates.
-        File copy = new File(saveWorld).getAbsoluteFile();
-        File paste = new File(args[2]).getAbsoluteFile();
+        //Get worlds.
+        World copy = Bukkit.getWorld(saveWorld);
+        World paste = Bukkit.getWorld(args[2]);
 
-        //Worlds must be unloaded before copying terrain to prevent corrupted files.
-        Multiverse.unloadWorld(saveWorld);
-        Multiverse.unloadWorld(args[2]);
+        //Copy paste the regions in the save world.
+        //Iterate through the regions one-by-one.
+        //Run it asynchronously to not freeze the server.
+        sender.sendMessage(Utils.chat("&aTransferring terrain, this may take a while."));
+        Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
 
-        //Iterate through regions.
-        try {
             for (int i = regionXMin; i <= regionXMax; i++) {
-
                 for (int j = regionZMin; j <= regionZMax; j++) {
 
-                    FileUtils.copyFile(new File(copy + "/region/r." + i + "." + j + ".mca"),
-                            new File(paste + "/region/r." + (i + xTransform / 512) + "." + (j + zTransform / 512) + ".mca"));
-
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            p.sendMessage(Utils.chat("&cAn error occurred while copying the terrain."));
-            p.sendMessage(Utils.chat("&cMake sure all the region files exist."));
-
-            //Since file-copy failed remove world from server.
-            Multiverse.deleteWorld(args[2]);
-
-            return;
-        }
-
-        //Load the worlds now that the chunks have been copied over.
-        Multiverse.loadWorld(saveWorld);
-        Multiverse.loadWorld(args[2]);
-
-        int coordMin = globalSQL.addCoordinate(new Location(
-                Bukkit.getWorld(args[2]),
-                (regionXMin * 512), 0, (regionZMin * 512), 0, 0));
-
-        int coordMax = globalSQL.addCoordinate(new Location(
-                Bukkit.getWorld(args[2]),
-                ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
-
-        //Add the location to the database.
-        if (plotSQL.update("INSERT INTO location_data(name, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
-                + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
-
-            sender.sendMessage(Utils.chat("&aCreated new location " + args[2]));
-
-            //Set the status of all effected regions in the region database.
-            for (int i = regionXMin; i <= regionXMax; i++) {
-
-                for (int j = regionZMin; j <= regionZMax; j++) {
-
-                    //Change region status in region database.
-                    //If it already exists remove members.
-                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "','network','"
-                            + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
-                            "'region set plotsystem " + i + " " + j + "');");
-
-                    //Add region to database.
-                    String region = i + "," + j;
-                    plotSQL.update("INSERT INTO regions(region,server,location) VALUES('" + region + "','" + PlotSystem.SERVER_NAME + "','" + args[2] + "');");
+                    if (!WorldEditor.largeCopy(BlockVector3.at(i * 512, -60, j * 512),
+                            BlockVector3.at(i * 512 + 511, 319, j * 512 + 511),
+                            BlockVector3.at(i * 512 + xTransform, -60, j * 512 + zTransform),
+                            BlockVector3.at(i * 512 + 511 + xTransform, 319, j * 512 + 511 + zTransform)
+                            , copy, paste)) {
+                        sender.sendMessage(Utils.chat("&cAn error occured while transferring the terrain."));
+                        return;
+                    } else {
+                        sender.sendMessage(Utils.chat("&aCopied region " + i + "," + j + " to " + args[2] + "."));
+                    }
 
                 }
             }
 
-        } else {
+            sender.sendMessage(Utils.chat("&aTerrain transfer has been completed."));
 
-            sender.sendMessage(Utils.chat("&cAn error occurred, please check the console for more info."));
-            Bukkit.getLogger().warning("An error occured while adding new location!");
+            int coordMin = globalSQL.addCoordinate(new Location(
+                    Bukkit.getWorld(args[2]),
+                    (regionXMin * 512), 0, (regionZMin * 512), 0, 0));
 
-        }
+            int coordMax = globalSQL.addCoordinate(new Location(
+                    Bukkit.getWorld(args[2]),
+                    ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
+
+            //Add the location to the database.
+            if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
+                    + args[2] + "','" + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
+
+                sender.sendMessage(Utils.chat("&aCreated new location " + args[2]));
+
+                //Set the status of all effected regions in the region database.
+                for (int i = regionXMin; i <= regionXMax; i++) {
+
+                    for (int j = regionZMin; j <= regionZMax; j++) {
+
+                        //Change region status in region database.
+                        //If it already exists remove members.
+                        globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "','network','"
+                                + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
+                                "'region set plotsystem " + i + " " + j + "');");
+
+                        //Add region to database.
+                        String region = i + "," + j;
+                        plotSQL.update("INSERT INTO regions(region,server,location) VALUES('" + region + "','" + PlotSystem.SERVER_NAME + "','" + args[2] + "');");
+
+                    }
+                }
+
+            } else {
+
+                sender.sendMessage(Utils.chat("&cAn error occurred, please check the console for more info."));
+                Bukkit.getLogger().warning("An error occured while adding new location!");
+
+            }
+        });
     }
 }
