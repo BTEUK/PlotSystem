@@ -47,9 +47,7 @@ public class TeleportEvent {
             if (server.equals(Network.SERVER_NAME)) {
 
                 //Get world of plot.
-                World world = Bukkit.getWorld(u.plotSQL.getString("SELECT world FROM location_data WHERE name='"
-                        + u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                        + "';"));
+                World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
                 //Get location of plot and teleport the player there.
                 u.player.teleport(WorldGuardFunctions.getCurrentLocation(id, world));

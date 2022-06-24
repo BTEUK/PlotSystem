@@ -3,11 +3,10 @@ package me.bteuk.plotsystem.reviewing;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Points;
 import me.bteuk.network.utils.enums.PointsType;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.PlotValues;
@@ -26,14 +25,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-public class AcceptGui {
+public class AcceptGui extends Gui {
 
-    public static UniqueGui createAcceptGui(User user) {
+    //Reviewing values.
+    private int accuracy;
+    private int quality;
 
-        UniqueGui gui = new UniqueGui(54, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private final User user;
 
-        //Set accept for easy access.
-        Accept ac = user.review.accept;
+    public AcceptGui(User user) {
+
+        super(54, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        //Set default values;
+        accuracy = 1;
+        quality = 1;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         for (int j = 1; j <= 3; j++) {
             for (int i = 1; i <= 5; i++) {
@@ -43,33 +57,35 @@ public class AcceptGui {
                     int finalI = i;
 
                     //Create accuracy buttons.
-                    if (ac.accuracy < i) {
+                    if (accuracy < i) {
 
-                        gui.setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
+                        setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
                                         Utils.chat("&b&lAccuracy: " + i)),
 
                                 u -> {
 
                                     //Set accuracy and update the gui.
-                                    ac.accuracy = finalI;
+                                    accuracy = finalI;
 
                                     //Update the gui.
-                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
+                                    refresh();
+                                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                                 }
                         );
                     } else {
 
-                        gui.setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
+                        setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
                                         Utils.chat("&b&lAccuracy: " + i)),
 
                                 u -> {
 
                                     //Set accuracy and update the gui.
-                                    ac.accuracy = finalI;
+                                    accuracy = finalI;
 
                                     //Update the gui.
-                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
+                                    refresh();
+                                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                                 }
                         );
@@ -81,34 +97,36 @@ public class AcceptGui {
                     int finalI = i;
 
                     //Create quality buttons.
-                    if (ac.quality < i) {
+                    if (quality < i) {
 
-                        gui.setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
+                        setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
                                         Utils.chat("&b&lQuality: " + i)),
 
                                 u -> {
 
                                     //Set quality and update the gui.
-                                    ac.quality = finalI;
+                                    quality = finalI;
 
                                     //Update the gui.
-                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
+                                    refresh();
+                                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                                 }
                         );
 
                     } else {
 
-                        gui.setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
+                        setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
                                         Utils.chat("&b&lQuality: " + i)),
 
                                 u -> {
 
                                     //Set quality and update the gui.
-                                    ac.quality = finalI;
+                                    quality = finalI;
 
                                     //Update the gui.
-                                    user.review.acceptGui.update(u, AcceptGui.createAcceptGui(user));
+                                    refresh();
+                                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                                 }
                         );
@@ -118,7 +136,7 @@ public class AcceptGui {
             }
         }
 
-        gui.setItem(4, Utils.createItem(Material.EMERALD, 1,
+        setItem(4, Utils.createItem(Material.EMERALD, 1,
                         Utils.chat("&b&lAccept Plot"),
                         Utils.chat("&fClick to accept the plot with the current settings.")),
 
@@ -167,12 +185,12 @@ public class AcceptGui {
                     //Calculate points.
                     int points = (int) Math.round((PlotValues.sizeValue(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.review.plot + ";")) +
                             PlotValues.difficultyValue(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";"))) *
-                            ((ac.accuracyMultiplier()+ac.qualityMultiplier())/2));
+                            ((accuracyMultiplier()+qualityMultiplier())/2));
 
                     //Add to accept data.
                     if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,accept_time) VALUES(" +
                             user.review.plot + ",'" + plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
-                            user.review.accept.accuracy + "," + user.review.accept.quality + "," + Time.currentTime() + ");")) {
+                            accuracy + "," + quality + "," + Time.currentTime() + ");")) {
 
                         PlotSystem.getInstance().getLogger().severe(Utils.chat("&cAn error occured while inserting to accept_data."));
 
@@ -254,7 +272,7 @@ public class AcceptGui {
                 }
         );
 
-        gui.setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fGo back to the review menu.")),
 
@@ -266,8 +284,24 @@ public class AcceptGui {
 
                 }
         );
+    }
 
-        return gui;
+    public void refresh() {
+
+        clearGui();
+        createGui();
+
+    }
+
+    public double accuracyMultiplier() {
+
+        return (1 + (accuracy-3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
+
+    }
+
+    public double qualityMultiplier() {
+
+        return (1 + (quality-3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
 
     }
 }

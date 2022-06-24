@@ -18,8 +18,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class CreateCommand {
 
     GlobalSQL globalSQL;
@@ -103,13 +101,8 @@ public class CreateCommand {
         //Get the user from the network plugin, this plugin handles all guis.
         NetworkUser user = Network.getInstance().getUser(u.player);
 
-        //If the player already has a gui, delete.
-        if (user.uniqueGui != null) {
-            user.uniqueGui.delete(user);
-        }
-
         //Open the create gui.
-        u.createGui = CreatePlotGui.createPlotGui(u);
+        u.createGui = new CreatePlotGui(u);
         u.createGui.open(user);
 
     }

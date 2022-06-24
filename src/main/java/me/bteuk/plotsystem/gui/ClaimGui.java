@@ -1,6 +1,6 @@
 package me.bteuk.plotsystem.gui;
 
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.Time;
@@ -15,21 +15,31 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
-public class ClaimGui {
+public class ClaimGui extends Gui {
 
-    public static UniqueGui claimPlotGui(User user) {
+    private final User user;
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
+    public ClaimGui(User user) {
 
-        gui.setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        super(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        createGui();
+
+    }
+
+    private void createGui() {
+
+        setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
                 Utils.chat("&b&lPlot Size"),
                 Utils.chat("&f" + PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-        gui.setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
                 Utils.chat("&b&lPlot Difficulty"),
                 Utils.chat("&f" + PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")))));
 
-        gui.setItem(22, Utils.createItem(Material.ENDER_EYE, 1,
+        setItem(22, Utils.createItem(Material.ENDER_EYE, 1,
                         Utils.chat("&b&lView Plot in Google Maps"),
                         Utils.chat("&fClick to open a link to this plot in google maps.")),
                 u ->
@@ -45,7 +55,7 @@ public class ClaimGui {
 
                 });
 
-        gui.setItem(4, Utils.createItem(Material.EMERALD, 1,
+        setItem(4, Utils.createItem(Material.EMERALD, 1,
                         Utils.chat("&b&lClaim Plot"),
                         Utils.chat("&fClick to claim the plot and start building.")),
                 u ->
@@ -99,8 +109,12 @@ public class ClaimGui {
                     }
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
+
+        clearGui();
+        createGui();
 
     }
 }

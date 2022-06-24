@@ -1,6 +1,6 @@
 package me.bteuk.plotsystem.reviewing;
 
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Time;
@@ -19,47 +19,65 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewGui {
+public class ReviewGui extends Gui {
 
-    public static UniqueGui createReviewGui(User user) {
+    private final GlobalSQL globalSQL;
+    private final PlotSQL plotSQL;
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private final User user;
 
-        GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
-        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+    private final String plotOwner;
+    private final World world;
+
+    public ReviewGui(User user) {
+
+        super(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        globalSQL = PlotSystem.getInstance().globalSQL;
+        plotSQL = PlotSystem.getInstance().plotSQL;
 
         //Get plot owner.
-        String plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
+        plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
 
         //Get world of plot.
-        World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
+        world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
 
-        gui.setItem(4, Utils.createItem(Material.BOOK, 1,
+        createGui();
+
+    }
+
+    private void createGui() {
+
+        setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lPlot Info"),
                 Utils.chat("&fPlot ID: " + user.review.plot),
                 Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + " ;"))));
 
-        gui.setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
+        setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
                         Utils.chat("&b&lBefore View"),
                         Utils.chat("&fTeleport to the plot before it was claimed.")),
                 u -> {
 
                     //Teleport to plot in original state.
+                    u.player.closeInventory();
                     u.player.teleport(WorldGuardFunctions.getBeforeLocation(user.review.plot, world));
 
                 });
 
-        gui.setItem(14, Utils.createItem(Material.STONE_BRICKS, 1,
+        setItem(14, Utils.createItem(Material.STONE_BRICKS, 1,
                         Utils.chat("&b&lCurrent View"),
                         Utils.chat("&fTeleport to the current view of the plot.")),
                 u -> {
 
                     //Teleport to plot in current state.
+                    u.player.closeInventory();
                     u.player.teleport(WorldGuardFunctions.getCurrentLocation(user.review.plot, world));
 
                 });
 
-        gui.setItem(10, Utils.createItem(Material.LIME_CONCRETE, 1,
+        setItem(10, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.chat("&b&lAccept Plot"),
                         Utils.chat("&fOpens the accept gui.")),
                 u -> {
@@ -67,7 +85,7 @@ public class ReviewGui {
                     //Open accept gui, create a new one if it is null.
                     if (user.review.acceptGui == null) {
 
-                        user.review.acceptGui = AcceptGui.createAcceptGui(user);
+                        user.review.acceptGui = new AcceptGui(user);
 
                     }
 
@@ -77,7 +95,7 @@ public class ReviewGui {
 
                 });
 
-        gui.setItem(16, Utils.createItem(Material.RED_CONCRETE, 1,
+        setItem(16, Utils.createItem(Material.RED_CONCRETE, 1,
                         Utils.chat("&b&lDeny Plot"),
                         Utils.chat("&fDeny the plot and return it to the plot owner.")),
                 u -> {
@@ -175,7 +193,7 @@ public class ReviewGui {
                 });
 
         //Cancel review.
-        gui.setItem(22, Utils.createItem(Material.BARRIER, 1,
+        setItem(22, Utils.createItem(Material.BARRIER, 1,
                         Utils.chat("&b&lCancel Review"),
                         Utils.chat("&fStop reviewing this plot.")),
                 u -> {
@@ -195,8 +213,5 @@ public class ReviewGui {
                     u.player.sendMessage(Utils.chat("&cCancelled reviewing of plot " + user.review.plot));
 
                 });
-
-        return gui;
-
     }
 }

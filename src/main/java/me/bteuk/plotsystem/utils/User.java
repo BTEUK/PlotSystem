@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils;
 
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.plotsystem.gui.ClaimGui;
+import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import org.bukkit.Location;
@@ -28,8 +29,8 @@ public class User {
     public final PlotSQL plotSQL;
 
     //Guis
-    public UniqueGui claimGui;
-    public UniqueGui createGui;
+    public ClaimGui claimGui;
+    public CreatePlotGui createGui;
 
     //Last plot outline update.
     public Location last_outline_check;

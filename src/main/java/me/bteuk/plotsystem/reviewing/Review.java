@@ -1,6 +1,5 @@
 package me.bteuk.plotsystem.reviewing;
 
-import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,12 +16,11 @@ public class Review {
 	private final User u;
 
 	//Review Gui and Listener.
-	public UniqueGui reviewGui;
+	public ReviewGui reviewGui;
 	private final ReviewHotbar hotbarListener;
 
 	//Accept Gui and accept data.
-	public UniqueGui acceptGui;
-	public Accept accept;
+	public AcceptGui acceptGui;
 
 	//Plot id.
 	public final int plot;
@@ -43,7 +41,7 @@ public class Review {
 		u.player.getInventory().clear();
 
 		//Set review gui.
-		reviewGui = ReviewGui.createReviewGui(u);
+		reviewGui = new ReviewGui(u);
 
 		//Create listener for review gui button in slot 1 of hotbar.
 		hotbarListener = new ReviewHotbar(PlotSystem.getInstance(), u);

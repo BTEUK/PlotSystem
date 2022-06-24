@@ -1,6 +1,6 @@
 package me.bteuk.plotsystem.gui;
 
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.User;
@@ -10,16 +10,25 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
-public class CreatePlotGui {
+public class CreatePlotGui extends Gui {
+
+    private final User user;
 
     //This gui handles the plot creation process, and will allow the user to set the parameters of the plot.
-    public static UniqueGui createPlotGui(User user) {
+    public CreatePlotGui(User user) {
 
-        //Create an empty gui with size and name.
-        UniqueGui gui = new UniqueGui(27, Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Create Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         //Choose plot size.
-        gui.setItem(11, Utils.createItem(PlotValues.sizeMaterial(user.selectionTool.size), 1,
+        setItem(11, Utils.createItem(PlotValues.sizeMaterial(user.selectionTool.size), 1,
                         Utils.chat("&b&l" + PlotValues.sizeName(user.selectionTool.size)),
                         Utils.chat("&fClick to cycle through sizes.")),
                 u ->
@@ -42,12 +51,13 @@ public class CreatePlotGui {
                     }
 
                     //Update the gui.
-                    eUser.createGui.update(u, CreatePlotGui.createPlotGui(eUser));
+                    refresh();
+                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                 });
 
         //Choose plot difficulty.
-        gui.setItem(15, Utils.createItem(PlotValues.difficultyMaterial(user.selectionTool.difficulty), 1,
+        setItem(15, Utils.createItem(PlotValues.difficultyMaterial(user.selectionTool.difficulty), 1,
                         Utils.chat("&b&l" + PlotValues.difficultyName(user.selectionTool.difficulty)),
                         Utils.chat("&fClick to cycle through different difficulties.")),
                 u ->
@@ -69,12 +79,13 @@ public class CreatePlotGui {
                     }
 
                     //Update the gui.
-                    eUser.createGui.update(u, CreatePlotGui.createPlotGui(eUser));
+                    refresh();
+                    u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                 });
 
         //Create plot.
-        gui.setItem(13, Utils.createItem(Material.DIAMOND, 1,
+        setItem(13, Utils.createItem(Material.DIAMOND, 1,
                         Utils.chat("&b&lCreate Plot"),
                         Utils.chat("&fClick create a new plot with the settings selected.")),
                 u ->
@@ -99,10 +110,14 @@ public class CreatePlotGui {
                 i = 17;
             }
 
-            gui.setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""));
+            setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""));
         }
+    }
 
-        return gui;
+    public void refresh() {
+
+        clearGui();
+        createGui();
 
     }
 }

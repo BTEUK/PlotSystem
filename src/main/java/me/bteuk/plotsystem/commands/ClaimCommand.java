@@ -43,7 +43,7 @@ public class ClaimCommand implements CommandExecutor {
             NetworkUser user = Network.getInstance().getUser(u.player);
 
             //Open claim gui.
-            u.claimGui = ClaimGui.claimPlotGui(u);
+            u.claimGui = new ClaimGui(u);
             u.claimGui.open(user);
 
         }

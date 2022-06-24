@@ -61,6 +61,8 @@ public class DeleteEvent {
             //Revert plot to original state.
             WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
+            //TODO update plot outlines for anyone near the plot since they would be removed due to the world update.
+
             //Remove all members from the worldguard plot.
             WorldGuardFunctions.clearMembers(id, pasteWorld);
 

@@ -57,11 +57,11 @@ public class ClaimEnter implements Listener {
     @EventHandler
     public void joinEvent(PlayerJoinEvent e) {
 
-        User u = PlotSystem.getInstance().getUser(e.getPlayer());
-        checkRegion(u);
-        u.last_outline_check = e.getPlayer().getLocation();
-        checkLocation(u);
-
+        Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(), () -> {
+            User u = PlotSystem.getInstance().getUser(e.getPlayer());
+            checkRegion(u);
+            checkLocation(u);
+        },20L);
     }
 
     @EventHandler
@@ -209,7 +209,12 @@ public class ClaimEnter implements Listener {
 
     public void checkLocation(User u) {
 
-        if (u.last_outline_check.getWorld() == null) {
+        if (u.last_outline_check == null) {
+
+            updateOutlines(u);
+            return;
+
+        } else if (u.last_outline_check.getWorld() == null) {
 
             updateOutlines(u);
             return;
@@ -230,18 +235,20 @@ public class ClaimEnter implements Listener {
 
     public void updateOutlines(User u) {
 
+        //Update last outline check and create outlines for all plots in 100 block area around the player.
+        u.last_outline_check = u.player.getLocation();
+
         //Get regions.
         regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.last_outline_check.getWorld()));
 
         if (regions == null) {return;}
 
-        //Update last outline check and create outlines for all plots in 100 block area around the player.
-        u.last_outline_check = u.player.getLocation();
-
         region = new ProtectedCuboidRegion("test",
                 BlockVector3.at(u.last_outline_check.getX() - 100, -60, u.last_outline_check.getZ() - 100),
                 BlockVector3.at(u.last_outline_check.getX() + 100, 320, u.last_outline_check.getZ() + 100));
         ApplicableRegionSet set = regions.getApplicableRegions(region);
+
+        PlotSystem.getInstance().getLogger().info("Regions: " + set.size());
 
         for (ProtectedRegion protectedRegion : set) {
 
@@ -250,7 +257,7 @@ public class ClaimEnter implements Listener {
             //Get plot difficulty.
             difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
 
-            plotOutline.createPlotOutline(u.player, plotID, difficultyMaterial(difficulty));
+            plotOutline.createOutline(u.player, protectedRegion.getPoints(), difficultyMaterial(difficulty), false);
 
         }
     }

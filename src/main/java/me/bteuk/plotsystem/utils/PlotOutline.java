@@ -1,7 +1,7 @@
 package me.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,7 +15,6 @@ import static java.lang.Math.*;
 
 public class PlotOutline {
 
-    List<BlockVector2> corners;
     int index;
     BlockVector2 p2;
     double[] pos;
@@ -35,62 +34,15 @@ public class PlotOutline {
         previousBlocks = new HashMap<>();
     }
 
-    public void createPlotOutline(Player p, int plotID, BlockData blockType) {
-
-        //Set world
-        world = p.getWorld();
-
-        //Get the corners of the plot.
-        corners = WorldGuardFunctions.getPoints(plotID, world);
-
-        //Iterate through the corners.
-        for (BlockVector2 p1 : corners) {
-
-            //Get the index of the corner in the list.
-            index = corners.indexOf(p1);
-
-            //If the index is the last corner then select the first as p2, else select the next corner as p2.
-            if ((index + 1) == corners.size()) {
-                p2 = corners.get(0);
-            } else {
-                p2 = corners.get((index + 1));
-            }
-
-            //Get starting position.
-            pos[0] = min(p1.getX(),p2.getX());
-            pos[1] = min(p1.getZ(),p2.getZ());
-
-            //Get length in x and z direction.
-            lengthX = abs(p1.getX() - p2.getX());
-            lengthZ = abs(p1.getZ() - p2.getZ());
-
-            length = max(lengthX, lengthZ);
-
-            //Iterate over the largest length of the two.
-            for (int i = 0; i < length; i++) {
-
-                //Set int position.
-                intPos[0] = (int) pos[0];
-                intPos[1] = (int) pos[1];
-
-                //Get location.
-                l = new Location(world, intPos[0],
-                        world.getHighestBlockYAt(intPos[0], intPos[1]), intPos[1]);
-
-                //Set fake block.
-                p.sendBlockChange(l, blockType);
-
-            }
-        }
-    }
-
-    public void createSelectionOutline(Player p, List<BlockVector2> corners, BlockData blockType) {
+    public void createOutline(Player p, List<BlockVector2> corners, BlockData blockType, boolean saveBlocks) {
 
         //Set world
         world = p.getWorld();
 
         //Clear the hashmap.
-        previousBlocks.clear();
+        if (saveBlocks) {
+            previousBlocks.clear();
+        }
 
         //Iterate through the corners.
         for (BlockVector2 p1 : corners) {
@@ -106,28 +58,30 @@ public class PlotOutline {
             }
 
             //Get starting position.
-            pos[0] = min(p1.getX(),p2.getX());
-            pos[1] = min(p1.getZ(),p2.getZ());
+            pos[0] = p1.getX();
+            pos[1] = p1.getZ();
 
             //Get length in x and z direction.
-            lengthX = abs(p1.getX() - p2.getX());
-            lengthZ = abs(p1.getZ() - p2.getZ());
+            lengthX = p2.getX()-p1.getX();
+            lengthZ = p2.getZ()-p1.getZ();
 
-            length = max(lengthX, lengthZ);
+            length = max(abs(lengthX), abs(lengthZ));
 
             //Iterate over the largest length of the two.
             for (int i = 0; i < length; i++) {
 
                 //Set int position.
-                intPos[0] = (int) pos[0];
-                intPos[1] = (int) pos[1];
+                intPos[0] = (int) (round(pos[0] + ((i*lengthX)/(double)length)));
+                intPos[1] = (int) (round(pos[1] + ((i*lengthZ)/(double)length)));
 
                 //Get location.
                 l = new Location(world, intPos[0],
                         world.getHighestBlockYAt(intPos[0], intPos[1]), intPos[1]);
 
                 //Add previous block to list.
-                previousBlocks.put(l, l.getBlock().getBlockData());
+                if (saveBlocks) {
+                    previousBlocks.put(l, l.getBlock().getBlockData());
+                }
 
                 //Set fake block.
                 p.sendBlockChange(l, blockType);
@@ -166,7 +120,7 @@ public class PlotOutline {
 
     }
 
-    public void createSelectionLine(Player p, BlockVector2 p1, BlockVector2 p2, BlockData blockType) {
+    public void createLine(Player p, BlockVector2 p1, BlockVector2 p2, BlockData blockType) {
 
         //Set world
         world = p.getWorld();
@@ -175,25 +129,21 @@ public class PlotOutline {
         previousBlocks.clear();
 
         //Get starting position.
-        pos[0] = min(p1.getX(),p2.getX());
-        pos[1] = min(p1.getZ(),p2.getZ());
+        pos[0] = p1.getX();
+        pos[1] = p1.getZ();
 
         //Get length in x and z direction.
-        lengthX = abs(p1.getX() - p2.getX());
-        lengthZ = abs(p1.getZ() - p2.getZ());
+        lengthX = p2.getX()-p1.getX();
+        lengthZ = p2.getZ()-p1.getZ();
 
-        length = max(lengthX, lengthZ);
+        length = max(abs(lengthX), abs(lengthZ));
 
         //Iterate over the largest length of the two.
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i <= length; i++) {
 
             //Set int position.
-            intPos[0] = (int) pos[0];
-            intPos[1] = (int) pos[1];
-
-            //Get location.
-            l = new Location(world, intPos[0],
-                    world.getHighestBlockYAt(intPos[0], intPos[1]), intPos[1]);
+            intPos[0] = (int) (round(pos[0] + ((i*lengthX)/(double)length)));
+            intPos[1] = (int) (round(pos[1] + ((i*lengthZ)/(double)length)));
 
             //Get location.
             l = new Location(world, intPos[0],

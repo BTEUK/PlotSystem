@@ -4,6 +4,8 @@ import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
+import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -92,6 +94,9 @@ public class SelectionTool extends WGCreatePlot {
         BlockVector2 bv2 = BlockVector2.at(block.getX(), block.getZ());
         vector.add(bv2);
 
+        Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
+                () -> plotOutline.sendBlockChange(u.player, bv2, outlineBlock),1L);
+
         //Set the location.
         this.location = location;
 
@@ -120,9 +125,11 @@ public class SelectionTool extends WGCreatePlot {
             //Create new outline.
             //Adding a point already means at least 2 points, so we can ignore the 1 point case.
             if (vector.size() == 2) {
-                plotOutline.createSelectionLine(u.player, vector.get(0), vector.get(1), outlineBlock);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
+                        () -> plotOutline.createLine(u.player, vector.get(0), vector.get(1), outlineBlock),1L);
             } else {
-                plotOutline.createSelectionOutline(u.player, vector, outlineBlock);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
+                        () -> plotOutline.createOutline(u.player, vector, outlineBlock, true),1L);
             }
 
             return true;
@@ -229,7 +236,7 @@ public class SelectionTool extends WGCreatePlot {
                     " and size " + PlotValues.sizeName(size));
 
             //Change plot outline to blockType of plot, rather than of selection.
-            plotOutline.createPlotOutline(u.player, plotID, difficultyMaterial(difficulty));
+            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(plotID, world), difficultyMaterial(difficulty), false);
 
         }
     }

@@ -69,7 +69,7 @@ public class ClaimEvent {
             WorldGuardFunctions.addMember(u.inPlot, u.uuid, u.player.getWorld());
 
             //Set plot to claimed in database.
-            u.plotSQL.update("UDPATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";");
+            u.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";");
 
             //Add user as plot owner in database.
             u.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + ",'" + u.uuid + "',1," + Time.currentTime() + ");");
