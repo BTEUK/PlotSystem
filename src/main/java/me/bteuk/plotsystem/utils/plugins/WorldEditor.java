@@ -28,8 +28,8 @@ public class WorldEditor {
         com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
         com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
 
-        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, -60, 320);
-        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, 319, 320);
+        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, -60, 319);
+        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, -60, 319);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()

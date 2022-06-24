@@ -235,6 +235,9 @@ public class SelectionTool extends WGCreatePlot {
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));
 
+            //Clear previous blocks.
+            plotOutline.previousBlocks.clear();
+
             //Change plot outline to blockType of plot, rather than of selection.
             plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(plotID, world), difficultyMaterial(difficulty), false);
 

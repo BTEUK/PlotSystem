@@ -1,10 +1,11 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Time;
+import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -64,18 +65,11 @@ public class ClaimEvent {
 
             }
 
-            //Claim the plot.
-            //Add user to worldguard region.
-            WorldGuardFunctions.addMember(u.inPlot, u.uuid, u.player.getWorld());
-
-            //Set plot to claimed in database.
-            u.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + u.inPlot + ";");
-
-            //Add user as plot owner in database.
-            u.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + u.inPlot + ",'" + u.uuid + "',1," + Time.currentTime() + ");");
-
-            //Send plot claimed message.
-            u.player.sendMessage(Utils.chat("&aYou have claimed plot &3" + u.inPlot + "&a, good luck building!"));
+            //Open the claim gui.
+            NetworkUser user = Network.getInstance().getUser(u.player);
+            u.player.closeInventory();
+            u.claimGui = new ClaimGui(u);
+            u.claimGui.open(user);
 
         }
     }

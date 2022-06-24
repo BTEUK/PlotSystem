@@ -54,31 +54,37 @@ public class ClaimCommand implements CommandExecutor {
 
     public boolean validPlot(User u) {
 
-        //If the player is not in a plot return false.
+        //If the player is not in a plot tell them.
         if (u.inPlot == 0) {
 
-            u.player.sendMessage(Utils.chat("&cYou are not in a plot."));
+            u.player.sendMessage(Utils.chat("&cYou are not in a plot!"));
             return false;
 
         }
 
-        //If you already own the plot, return.
+        //If the plot is already claimed tell them.
+        //If they are the owner or a member tell them.
         if (u.plotOwner) {
 
-            u.player.sendMessage(Utils.chat("&cYou already own this plot."));
+            u.player.sendMessage(Utils.chat("&cYou are already the owner of this plot!"));
             return false;
 
         } else if (u.plotMember) {
 
-            u.player.sendMessage(Utils.chat("&cYou are a member of this plot."));
+            u.player.sendMessage(Utils.chat("&cYou are already a member of this plot!"));
+            return false;
+
+        } else if (u.isClaimed) {
+
+            u.player.sendMessage(Utils.chat("&cThis plot is already claimed!"));
             return false;
 
         }
 
-        //If the plot is already claimed, tell the player they can not claim it, but they can be invited by the owner.
-        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
+        //Check if you do not already have the maximum number of plots.
+        if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + u.uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
-            u.player.sendMessage(Utils.chat("&cThis plot is already claimed, if you wish to build in this plot ask the plot owner to invite you."));
+            u.player.sendMessage(Utils.chat("&aYou have reached the maximum number of plots."));
             return false;
 
         }
