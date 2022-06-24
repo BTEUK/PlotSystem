@@ -1,8 +1,10 @@
 package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -61,7 +63,14 @@ public class DeleteEvent {
             //Revert plot to original state.
             WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-            //TODO update plot outlines for anyone near the plot since they would be removed due to the world update.
+            for (User u : PlotSystem.getInstance().getUsers()) {
+
+                //Update outlines for all users in this world.
+                if (pasteWorld.equals(u.player.getWorld())) {
+                    PlotSystem.getInstance().claimEnter.updateOutlines(u);
+                }
+
+            }
 
             //Remove all members from the worldguard plot.
             WorldGuardFunctions.clearMembers(id, pasteWorld);

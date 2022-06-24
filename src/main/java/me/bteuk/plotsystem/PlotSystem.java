@@ -46,6 +46,9 @@ public class PlotSystem extends JavaPlugin {
     //Server Name
     public static String SERVER_NAME;
 
+    //Listeners
+    public ClaimEnter claimEnter;
+
     @Override
     public void onEnable() {
 
@@ -155,7 +158,7 @@ public class PlotSystem extends JavaPlugin {
         new CloseInventory(this);
 
         //Deals with tracking where players are in relation to plots.
-        new ClaimEnter(this, plotSQL, globalSQL);
+        claimEnter = new ClaimEnter(this, plotSQL, globalSQL);
 
         //Create instance of claim command,
         //as it is used to check whether a person is able to claim the plot they're standing in.
