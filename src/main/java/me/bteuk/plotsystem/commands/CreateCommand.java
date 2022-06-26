@@ -20,8 +20,8 @@ import org.bukkit.entity.Player;
 
 public class CreateCommand {
 
-    GlobalSQL globalSQL;
-    PlotSQL plotSQL;
+    private final GlobalSQL globalSQL;
+    private final PlotSQL plotSQL;
 
     public CreateCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {
 

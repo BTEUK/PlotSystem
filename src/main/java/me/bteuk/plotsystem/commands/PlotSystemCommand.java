@@ -51,6 +51,8 @@ public class PlotSystemCommand implements CommandExecutor {
 
             case "delete":
 
+                DeleteCommand deleteCommand = new DeleteCommand(globalSQL, plotSQL);
+                deleteCommand.delete(sender, args);
                 break;
 
             case "help":
