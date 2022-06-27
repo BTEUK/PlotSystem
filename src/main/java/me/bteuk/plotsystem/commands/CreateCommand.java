@@ -111,18 +111,13 @@ public class CreateCommand {
 
         //Check if the sender is a player.
         //If so, check if they have permission.
-        if (!(sender instanceof Player p)) {
+        if (sender instanceof Player p) {
+            if (!p.hasPermission("uknet.plots.create.location")) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be executed by a player."));
-            return;
+                p.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
+                return;
 
-        }
-
-        if (!p.hasPermission("uknet.plots.create.location")) {
-
-            p.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
-            return;
-
+            }
         }
 
         //Check if they have enough args.
@@ -180,7 +175,7 @@ public class CreateCommand {
         String saveWorld = PlotSystem.getInstance().getConfig().getString("save_world");
 
         if (saveWorld == null) {
-            p.sendMessage(Utils.chat("&cThe save world is not set in config."));
+            sender.sendMessage(Utils.chat("&cThe save world is not set in config."));
             return;
         }
 
@@ -234,7 +229,7 @@ public class CreateCommand {
 
                         //Change region status in region database.
                         //If it already exists remove members.
-                        globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "','network','"
+                        globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(NULL,'network','"
                                 + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
                                 "'region set plotsystem " + i + " " + j + "');");
 

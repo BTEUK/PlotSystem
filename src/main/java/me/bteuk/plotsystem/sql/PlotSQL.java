@@ -158,4 +158,27 @@ public class PlotSQL {
         return list;
 
     }
+
+    //Return all strings into a list.
+    public ArrayList<String> getStringList(String sql) {
+
+        ArrayList<String> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getString(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+
+    }
 }

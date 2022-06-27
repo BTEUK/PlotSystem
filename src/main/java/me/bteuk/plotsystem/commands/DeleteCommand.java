@@ -1,16 +1,18 @@
 package me.bteuk.plotsystem.commands;
 
-import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
+import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
 
 public class DeleteCommand {
 
@@ -132,12 +134,12 @@ public class DeleteCommand {
 
             //Set plot to deleted in database.
             plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
-            sender.sendMessage(Utils.chat("&aPlot " + plotID + " deleted."));
+            sender.sendMessage(Utils.chat("&aPlot &3" + plotID + "&a deleted."));
 
         } else {
 
             sender.sendMessage(Utils.chat("&aAn error occured while deleting the plot."));
-            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
+            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot &3" + plotID + "&a from WorldGuard.");
 
         }
     }
@@ -149,11 +151,69 @@ public class DeleteCommand {
 
             if (!(p.hasPermission("uknet.plots.delete.location"))) {
                 p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+                return;
             }
 
         }
 
+        //Check arg count.
+        if (args.length < 3) {
 
+            sender.sendMessage(Utils.chat("&c/plotsystem delete location [name]"));
+            return;
 
+        }
+
+        //Check if location exists.
+        if (!(plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';"))) {
+
+            sender.sendMessage(Utils.chat("&cThe location " + args[2] + " does not exist."));
+            return;
+
+        }
+
+        //Check if the location is on this server.
+        if (!(plotSQL.getString("SELECT server FROM location_data WHERE name='" + args[2] + "';").equals(PlotSystem.SERVER_NAME))) {
+
+            sender.sendMessage(Utils.chat("&cThis location is not on this server."));
+            return;
+
+        }
+
+        //If location has plots, cancel.
+        if (plotSQL.hasRow("SELECT id FROM plot_data WHERE location='" + args[2] + "' AND status<>'completed' AND status<>'deleted';")) {
+
+            sender.sendMessage(Utils.chat("This location has plots, all plots must be deleted or completed to delete the location."));
+            return;
+
+        }
+
+        //Delete location.
+        if (Multiverse.deleteWorld(args[2])) {
+
+            //Delete location from database.
+            plotSQL.update("DELETE FROM location_data WHERE name='" + args[2] + "';");
+            sender.sendMessage(Utils.chat("&aDeleted location &3" + args[2] + "&a."));
+            PlotSystem.getInstance().getLogger().info("Delete location " + args[2] + ".");
+
+            //Get regions from database.
+            ArrayList<String> regions = plotSQL.getStringList("SELECT region FROM regions WHERE location='" + args[2] + "';");
+
+            //Delete regions from database.
+            plotSQL.update("DELETE FROM regions WHERE location='" + args[2] + "';");
+
+            //Iterate through regions to unlock them on Earth.
+            for (String region : regions) {
+                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(NULL,'network','"
+                        + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
+                        "'region set default " + region + "');");
+            }
+
+        } else {
+
+            sender.sendMessage(Utils.chat("&cAn error occurred while deleting the world."));
+            PlotSystem.getInstance().getLogger().warning("An error occurred while deleting world " + args[2] + ".");
+
+        }
     }
 }
