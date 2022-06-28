@@ -134,8 +134,8 @@ public class ClaimEnter implements Listener {
                                 u.plotOwner = false;
                                 u.plotMember = false;
                                 u.player.sendActionBar(Component.text("You have entered " +
-                                        globalSQL.getString("SELECT name FROM player_data WHERE uuid = " + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + "AND is_owner=1;") + ";")
-                                        + "'s plot."));
+                                        globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';")
+                                        + "'s plot.", NamedTextColor.GREEN));
 
                             }
                         }

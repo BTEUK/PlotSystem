@@ -84,7 +84,28 @@ public class ClaimCommand implements CommandExecutor {
         //Check if you do not already have the maximum number of plots.
         if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + u.uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
-            u.player.sendMessage(Utils.chat("&aYou have reached the maximum number of plots."));
+            u.player.sendMessage(Utils.chat("&cYou have reached the maximum number of plots."));
+            return false;
+
+        }
+
+        //Check if the player is allowed to claim this plot.
+        int difficulty = u.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";");
+
+        //Check by difficulty, with the required role.
+        if (difficulty == 3 && !(u.player.hasPermission("group.jrbuilder"))) {
+
+            u.player.sendMessage(Utils.chat("&cYou must be at least Jr.Builder or higher to claim a 'hard' plot."));
+            return false;
+
+        } else if (difficulty == 2 && !(u.player.hasPermission("group.apprentice"))) {
+
+            u.player.sendMessage(Utils.chat("&cYou must be at least Apprentice or higher to claim a 'medium' plot."));
+            return false;
+
+        } else if (difficulty == 1 && !(u.player.hasPermission("group.applicant"))) {
+
+            u.player.sendMessage(Utils.chat("&cYou must complete the tutorial to claim a plot."));
             return false;
 
         }
