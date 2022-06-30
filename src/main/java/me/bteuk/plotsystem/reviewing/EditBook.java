@@ -42,6 +42,7 @@ public class EditBook implements Listener {
 
 			//Save editing of book.
 			review.bookMeta = e.getNewBookMeta();
+			review.book.setItemMeta(review.bookMeta);
 
 			//Set isEdited to true to indicate the book has been edited.
 			isEdited = true;

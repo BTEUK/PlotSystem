@@ -29,7 +29,9 @@ public class ReviewGui extends Gui {
     private final String plotOwner;
     private final World world;
 
-    public ReviewGui(User user) {
+    private final int plotID;
+
+    public ReviewGui(User user, int plotID) {
 
         super(27, Component.text("Review Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -38,11 +40,13 @@ public class ReviewGui extends Gui {
         globalSQL = PlotSystem.getInstance().globalSQL;
         plotSQL = PlotSystem.getInstance().plotSQL;
 
+        this.plotID = plotID;
+
         //Get plot owner.
-        plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
+        plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
 
         //Get world of plot.
-        world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
+        world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";"));
 
         createGui();
 
@@ -52,8 +56,8 @@ public class ReviewGui extends Gui {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lPlot Info"),
-                Utils.chat("&fPlot ID: " + user.review.plot),
-                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + " ;"))));
+                Utils.chat("&fPlot ID: " + plotID),
+                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';"))));
 
         setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
                         Utils.chat("&b&lBefore View"),
@@ -204,13 +208,13 @@ public class ReviewGui extends Gui {
                     //Set the plot back to submitted.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");
 
+                    //Send feedback.
+                    u.player.sendMessage(Utils.chat("&cCancelled reviewing of plot " + user.review.plot));
+
                     //Close review.
                     u.player.closeInventory();
                     user.review.closeReview();
                     user.review = null;
-
-                    //Send feedback.
-                    u.player.sendMessage(Utils.chat("&cCancelled reviewing of plot " + user.review.plot));
 
                 });
     }

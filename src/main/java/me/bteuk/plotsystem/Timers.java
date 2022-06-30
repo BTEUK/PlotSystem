@@ -69,6 +69,9 @@ public class Timers {
             }
         }, 0L, 1L);
 
+        //1 second timer.
+        //TODO: update outlines.
+
         //1 hour timer.
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 

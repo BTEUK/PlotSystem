@@ -95,12 +95,12 @@ public class ClaimCommand implements CommandExecutor {
         //Check by difficulty, with the required role.
         if (difficulty == 3 && !(u.player.hasPermission("group.jrbuilder"))) {
 
-            u.player.sendMessage(Utils.chat("&cYou must be at least Jr.Builder or higher to claim a 'hard' plot."));
+            u.player.sendMessage(Utils.chat("&cYou must be at least Jr.Builder or higher to claim a 'hard difficulty' plot."));
             return false;
 
         } else if (difficulty == 2 && !(u.player.hasPermission("group.apprentice"))) {
 
-            u.player.sendMessage(Utils.chat("&cYou must be at least Apprentice or higher to claim a 'medium' plot."));
+            u.player.sendMessage(Utils.chat("&cYou must be at least Apprentice or higher to claim a 'medium difficulty' plot."));
             return false;
 
         } else if (difficulty == 1 && !(u.player.hasPermission("group.applicant"))) {

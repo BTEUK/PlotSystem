@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -114,6 +115,11 @@ public class DeleteCommand {
             return;
         }
 
+        //Check if plot exists.
+        if (!plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
+            sender.sendMessage(Utils.chat("&cThis plot does not exist."));
+        }
+
         //Check if plot is unclaimed
         if (!(plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='unclaimed'"))) {
             sender.sendMessage(Utils.chat("&cThis plot is claimed, you can only delete unclaimed plots."));
@@ -121,11 +127,11 @@ public class DeleteCommand {
         }
 
         //Get world of plot.
-        World world = Bukkit.getWorld("SELECT location FROM plot_data WHERE id=" + plotID + ";");
+        World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";"));
 
         //If world is null then the plot is not on this server.
         if (world == null) {
-            sender.sendMessage(Utils.chat("&cThis plot is not on this server."));
+            sender.sendMessage(Utils.chat("&cThe plot is not on this server."));
             return;
         }
 
@@ -183,7 +189,7 @@ public class DeleteCommand {
         //If location has plots, cancel.
         if (plotSQL.hasRow("SELECT id FROM plot_data WHERE location='" + args[2] + "' AND status<>'completed' AND status<>'deleted';")) {
 
-            sender.sendMessage(Utils.chat("This location has plots, all plots must be deleted or completed to delete the location."));
+            sender.sendMessage(Utils.chat("&cThis location active has plots, all plots must be deleted or completed to remove the location."));
             return;
 
         }

@@ -77,7 +77,7 @@ public class Multiverse {
         }
 
         //Create global region and add all necessary flags.
-        GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("global");
+        GlobalProtectedRegion globalRegion = new GlobalProtectedRegion("__global__");
 
         Map<Flag<?>, Object> flags = new HashMap<>();
         flags.put(Flags.OTHER_EXPLOSION, StateFlag.State.DENY);

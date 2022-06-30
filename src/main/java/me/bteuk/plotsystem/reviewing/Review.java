@@ -41,7 +41,7 @@ public class Review {
 		u.player.getInventory().clear();
 
 		//Set review gui.
-		reviewGui = new ReviewGui(u);
+		reviewGui = new ReviewGui(u, plot);
 
 		//Create listener for review gui button in slot 1 of hotbar.
 		hotbarListener = new ReviewHotbar(PlotSystem.getInstance(), u);
@@ -51,6 +51,7 @@ public class Review {
 		bookMeta = (BookMeta) book.getItemMeta();
 		//noinspection deprecation
 		bookMeta.setDisplayName(ChatColor.GREEN + "Feedback");
+		book.setItemMeta(bookMeta);
 		editBook = new EditBook(PlotSystem.getInstance(), this);
 		
 	}

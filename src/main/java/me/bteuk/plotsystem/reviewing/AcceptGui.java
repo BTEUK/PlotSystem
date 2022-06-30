@@ -59,7 +59,7 @@ public class AcceptGui extends Gui {
                     //Create accuracy buttons.
                     if (accuracy < i) {
 
-                        setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
+                        setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
                                         Utils.chat("&b&lAccuracy: " + i)),
 
                                 u -> {
@@ -75,7 +75,7 @@ public class AcceptGui extends Gui {
                         );
                     } else {
 
-                        setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
+                        setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
                                         Utils.chat("&b&lAccuracy: " + i)),
 
                                 u -> {
@@ -99,7 +99,7 @@ public class AcceptGui extends Gui {
                     //Create quality buttons.
                     if (quality < i) {
 
-                        setItem((j * 9) + i + 1, Utils.createItem(Material.RED_CONCRETE, 1,
+                        setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
                                         Utils.chat("&b&lQuality: " + i)),
 
                                 u -> {
@@ -116,7 +116,7 @@ public class AcceptGui extends Gui {
 
                     } else {
 
-                        setItem((j * 9) + i + 1, Utils.createItem(Material.GREEN_CONCRETE, 1,
+                        setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
                                         Utils.chat("&b&lQuality: " + i)),
 
                                 u -> {

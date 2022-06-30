@@ -64,7 +64,7 @@ public class WorldGuardFunctions {
 
         //Get worldguard region data
         RegionContainer container = wg.getPlatform().getRegionContainer();
-        RegionManager buildRegions = container.get(BukkitAdapter.adapt(saveWorld));
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
 
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
 
@@ -73,8 +73,8 @@ public class WorldGuardFunctions {
         //To get the actual location we need to take the negative coordinate transform of the plot.
         PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
-        int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + buildWorld + ";");
-        int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + buildWorld + ";");
+        int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + buildWorld.getName() + "';");
+        int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + buildWorld.getName() + "';");
 
         BlockVector2 bv2 = BlockVector2.at(bv.getX() + xTransform, bv.getZ() + zTransform);
 
