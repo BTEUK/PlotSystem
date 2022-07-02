@@ -1,7 +1,8 @@
 package me.bteuk.plotsystem.utils;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
-import me.bteuk.plotsystem.PlotSystem;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,8 +16,6 @@ import static java.lang.Math.*;
 
 public class PlotOutline {
 
-    int index;
-    BlockVector2 p2;
     double[] pos;
     int[] intPos;
     World world;
@@ -25,6 +24,13 @@ public class PlotOutline {
     int lengthX;
     int lengthZ;
     int length;
+
+    boolean contains;
+
+    int minX;
+    int minZ;
+    int maxX;
+    int maxZ;
 
     HashMap<Location, BlockData> previousBlocks;
 
@@ -44,48 +50,41 @@ public class PlotOutline {
             previousBlocks.clear();
         }
 
-        //Iterate through the corners.
-        for (BlockVector2 p1 : corners) {
+        //Create polygonal2dregion.
+        Polygonal2DRegion region = new Polygonal2DRegion(BukkitAdapter.adapt(world), corners, 1, 1);
 
-            //Get the index of the corner in the list.
-            index = corners.indexOf(p1);
+        minX = region.getMinimumPoint().getX();
+        minZ = region.getMinimumPoint().getZ();
 
-            //If the index is the last corner then select the first as p2, else select the next corner as p2.
-            if ((index + 1) == corners.size()) {
-                p2 = corners.get(0);
-            } else {
-                p2 = corners.get((index + 1));
-            }
+        maxX = region.getMaximumPoint().getX();
+        maxZ = region.getMaximumPoint().getZ();
 
-            //Get starting position.
-            pos[0] = p1.getX();
-            pos[1] = p1.getZ();
+        //Iterate in the bounding box.
+        for (int i = minX; i <= maxX; i++) {
+            for (int j = minZ; j <= maxZ; j++) {
 
-            //Get length in x and z direction.
-            lengthX = p2.getX()-p1.getX();
-            lengthZ = p2.getZ()-p1.getZ();
+                //Check if the point is contained in the region.
+                //If the previous point was not contained, set the block to be an outline.
+                if (region.contains(i, j)) {
 
-            length = max(abs(lengthX), abs(lengthZ));
+                    //Check if any of the surrounding blocks are not contained,
+                    //if true then this block is an outline.
+                    if (!(region.contains(i-1,j) && region.contains(i+1,j) && region.contains(i,j-1) && region.contains(i,j+1))) {
 
-            //Iterate over the largest length of the two.
-            for (int i = 0; i < length; i++) {
+                        //Get location.
+                        l = new Location(world, i,
+                                world.getHighestBlockYAt(i, j), j);
 
-                //Set int position.
-                intPos[0] = (int) (round(pos[0] + ((i*lengthX)/(double)length)));
-                intPos[1] = (int) (round(pos[1] + ((i*lengthZ)/(double)length)));
+                        //Add previous block to list.
+                        if (saveBlocks) {
+                            previousBlocks.put(l, l.getBlock().getBlockData());
+                        }
 
-                //Get location.
-                l = new Location(world, intPos[0],
-                        world.getHighestBlockYAt(intPos[0], intPos[1]), intPos[1]);
+                        //Set fake block.
+                        p.sendBlockChange(l, blockType);
 
-                //Add previous block to list.
-                if (saveBlocks) {
-                    previousBlocks.put(l, l.getBlock().getBlockData());
+                    }
                 }
-
-                //Set fake block.
-                p.sendBlockChange(l, blockType);
-
             }
         }
     }
@@ -133,8 +132,8 @@ public class PlotOutline {
         pos[1] = p1.getZ();
 
         //Get length in x and z direction.
-        lengthX = p2.getX()-p1.getX();
-        lengthZ = p2.getZ()-p1.getZ();
+        lengthX = p2.getX() - p1.getX();
+        lengthZ = p2.getZ() - p1.getZ();
 
         length = max(abs(lengthX), abs(lengthZ));
 
@@ -142,8 +141,8 @@ public class PlotOutline {
         for (int i = 0; i <= length; i++) {
 
             //Set int position.
-            intPos[0] = (int) (round(pos[0] + ((i*lengthX)/(double)length)));
-            intPos[1] = (int) (round(pos[1] + ((i*lengthZ)/(double)length)));
+            intPos[0] = (int) (round(pos[0] + ((i * lengthX) / (double) length)));
+            intPos[1] = (int) (round(pos[1] + ((i * lengthZ) / (double) length)));
 
             //Get location.
             l = new Location(world, intPos[0],

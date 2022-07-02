@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
+import com.fasterxml.jackson.databind.util.Named;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -181,14 +182,14 @@ public class ClaimEnter implements Listener {
                     u.plotMember = false;
                     u.player.sendActionBar(Component.text("You have left " +
                             globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
-                            + "'s plot."));
+                            + "'s plot.", NamedTextColor.GREEN));
 
                 } else {
 
                     //If you are not an owner or member send the relevant message.
                     u.player.sendActionBar(Component.text("You have left " +
                             globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
-                            + "'s plot."));
+                            + "'s plot.", NamedTextColor.GREEN));
 
                 }
             }
