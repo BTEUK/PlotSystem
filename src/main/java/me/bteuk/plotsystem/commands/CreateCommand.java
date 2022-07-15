@@ -231,7 +231,7 @@ public class CreateCommand {
                         //If it already exists remove members.
                         globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(NULL,'network','"
                                 + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
-                                "'region set plotsystem " + i + " " + j + "');");
+                                "'region set plotsystem " + i + "," + j + "');");
 
                         //Add region to database.
                         String region = i + "," + j;

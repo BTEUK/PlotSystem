@@ -11,5 +11,6 @@ commands:
     usage: /<command>
     description: Deals will all plotsystem related commands.
   claim:
+    aliases: [claim]
     usage: /<command>
     description: Used to claim the plot you're standing in.
