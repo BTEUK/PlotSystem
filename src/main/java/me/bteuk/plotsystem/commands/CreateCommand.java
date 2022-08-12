@@ -227,14 +227,15 @@ public class CreateCommand {
 
                     for (int j = regionZMin; j <= regionZMax; j++) {
 
+                        String region = i + "," + j;
+
                         //Change region status in region database.
                         //If it already exists remove members.
                         globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(NULL,'network','"
-                                + globalSQL.getString("SELECT name FROM server_data WHERE type='earth';") + "'," +
-                                "'region set plotsystem " + i + "," + j + "');");
+                                + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'," +
+                                "'region set plotsystem " + region + "');");
 
                         //Add region to database.
-                        String region = i + "," + j;
                         plotSQL.update("INSERT INTO regions(region,server,location) VALUES('" + region + "','" + PlotSystem.SERVER_NAME + "','" + args[2] + "');");
 
                     }
@@ -246,6 +247,8 @@ public class CreateCommand {
                 Bukkit.getLogger().warning("An error occured while adding new location!");
 
             }
+
+            //TODO: teleport player once regions are added.
         });
     }
 }
