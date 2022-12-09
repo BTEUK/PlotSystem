@@ -1,5 +1,7 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.Utils;
@@ -81,6 +83,15 @@ public class SubmitEvent {
 
             }
 
+            //Get number of submitted plots.
+            int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+
+            //Send message to reviewers that a plot has been submitted.
+            if (plot_count == 1) {
+                Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there is 1 submitted plot.", "uknet:reviewer");
+            } else {
+                Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there are " + plot_count + " submitted plots.", "uknet:reviewer");
+            }
         }
     }
 }

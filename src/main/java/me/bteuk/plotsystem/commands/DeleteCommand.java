@@ -54,7 +54,7 @@ public class DeleteCommand {
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone]"));
+                sender.sendMessage(Utils.chat("&c/plotsystem delete [plot, location, zone]"));
 
         }
 

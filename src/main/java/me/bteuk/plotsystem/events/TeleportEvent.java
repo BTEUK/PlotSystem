@@ -3,6 +3,8 @@ package me.bteuk.plotsystem.events;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
@@ -55,15 +57,10 @@ public class TeleportEvent {
             } else {
 
                 //Set the server join event.
-                u.globalSQL.update("INSERT INTO join_events(uuid,event) VALUES('"
-                        + u.player.getUniqueId()
-                        + "','teleport plot " + id + "');");
+                EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport plot" + id);
 
                 //Teleport them to another server.
-                u.player.closeInventory();
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("Connect");
-                out.writeUTF(server);
+                SwitchServer.switchServer(u.player, server);
 
             }
         }

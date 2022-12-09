@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.Network;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
@@ -46,6 +47,16 @@ public class RetractEvent {
                 //Send a cross-server message.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
 
+            }
+
+            //Get number of submitted plots.
+            int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+
+            //Send message to reviewers that a plot submission has been retracted.
+            if (plot_count == 1) {
+                Network.getInstance().chat.broadcastMessage("&aA submitted plot has been retracted, there is 1 submitted plot.", "uknet:reviewer");
+            } else {
+                Network.getInstance().chat.broadcastMessage("&aA submitted plot has been retracted, there are " + plot_count + " submitted plots.", "uknet:reviewer");
             }
         }
     }

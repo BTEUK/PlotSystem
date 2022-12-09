@@ -3,6 +3,7 @@ package me.bteuk.plotsystem.reviewing;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Points;
 import me.bteuk.network.utils.enums.PointsType;
@@ -235,34 +236,14 @@ public class AcceptGui extends Gui {
                     //Send feedback in chat and console.
                     u.player.sendMessage(Utils.chat("&aPlot " + user.review.plot + " accepted."));
 
-                    //If another plot is submitted tell the reviewer.
-                    int submittedPlots = 0;
-                    if (plotSQL.hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
+                    //Get number of submitted plots.
+                    int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                        //Get arraylist of submitted plots.
-                        ArrayList<Integer> nPlots = plotSQL.getIntList("SELECT id FROM plot_data WHERE status='submitted';");
-
-                        //Iterate through all plots.
-                        for (int nPlot : nPlots) {
-
-                            //If you are not owner or member of the plot select it for the next review.
-                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
-
-                                submittedPlots++;
-
-                            }
-                        }
-
-                        if (submittedPlots == 1) {
-                            u.player.sendMessage(Utils.chat("&aThere is 1 plot available for review."));
-                        } else {
-                            u.player.sendMessage(Utils.chat("&aThere are " + submittedPlots + " plots available for review."));
-                        }
-
+                    //Send message to reviewers that a plot has been submitted.
+                    if (plot_count == 1) {
+                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is 1 submitted plot.", "uknet:reviewer");
                     } else {
-
-                        u.player.sendMessage(Utils.chat("&aAll plots have been reviewed."));
-
+                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are " + plot_count + " submitted plots.", "uknet:reviewer");
                     }
 
                     //Close gui and clear review.
