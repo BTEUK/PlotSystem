@@ -22,6 +22,9 @@ public class Review {
 	//Accept Gui and accept data.
 	public AcceptGui acceptGui;
 
+	//Previous feedback Gui.
+	public PreviousFeedbackGui previousFeedbackGui;
+
 	//Plot id.
 	public final int plot;
 	
@@ -68,6 +71,9 @@ public class Review {
 		}
 		if (acceptGui != null) {
 			acceptGui.delete();
+		}
+		if (previousFeedbackGui != null) {
+			previousFeedbackGui.delete();
 		}
 
 		//Convert inventory back to how it was pre-review.

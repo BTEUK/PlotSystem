@@ -259,7 +259,7 @@ public class AcceptGui extends Gui {
 
                 u -> {
 
-                    //Go back to the review gui and delete the accept gui.
+                    //Go back to the review gui.
                     u.player.closeInventory();
                     user.review.reviewGui.open(u);
 

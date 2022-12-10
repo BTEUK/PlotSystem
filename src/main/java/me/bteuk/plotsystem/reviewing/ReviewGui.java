@@ -17,7 +17,6 @@ import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewGui extends Gui {
@@ -177,8 +176,29 @@ public class ReviewGui extends Gui {
                     }
                 });
 
+        //View previous feedback, if it exists.
+        if (plotSQL.hasRow("SELECT id FROM deny_data WHERE uuid='" + plotOwner + "' AND id=" + plotID + ";")) {
+
+            setItem(18, Utils.createItem(Material.LECTERN, 1,
+                            Utils.chat("&b&lPrevious Feedback"),
+                            Utils.chat("&fClick to review previous"),
+                            Utils.chat("feedback this player received"),
+                            Utils.chat("while building this plot.")),
+                    u -> {
+
+                        //Open the previous feedback menu.
+                        if (user.review.previousFeedbackGui == null) {
+                            user.review.previousFeedbackGui = new PreviousFeedbackGui(plotID, user);
+                        }
+
+                        u.player.closeInventory();
+                        user.review.previousFeedbackGui.open(u);
+
+                    });
+        }
+
         //Cancel review.
-        setItem(22, Utils.createItem(Material.BARRIER, 1,
+        setItem(26, Utils.createItem(Material.BARRIER, 1,
                         Utils.chat("&b&lCancel Review"),
                         Utils.chat("&fStop reviewing this plot.")),
                 u -> {
