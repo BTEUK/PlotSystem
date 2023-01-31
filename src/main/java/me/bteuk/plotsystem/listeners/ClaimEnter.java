@@ -1,26 +1,20 @@
 package me.bteuk.plotsystem.listeners;
 
-import com.fasterxml.jackson.databind.util.Named;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.PlotOutline;
 import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,27 +26,12 @@ public class ClaimEnter implements Listener {
     PlotSQL plotSQL;
     GlobalSQL globalSQL;
 
-    PlotOutline plotOutline;
-    int plotID;
-    int difficulty;
-    ProtectedRegion region;
-    RegionManager regions;
-    WorldGuard wg;
-
-    //Block data
-    BlockData redConc = Material.RED_CONCRETE.createBlockData();
-    BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
-    BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
-
     public ClaimEnter(PlotSystem plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
         this.plotSQL = plotSQL;
         this.globalSQL = globalSQl;
 
-        plotOutline = new PlotOutline();
-
-        wg = WorldGuard.getInstance();
     }
 
     @EventHandler
@@ -61,7 +40,6 @@ public class ClaimEnter implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(), () -> {
             User u = PlotSystem.getInstance().getUser(e.getPlayer());
             checkRegion(u);
-            checkLocation(u);
         },20L);
     }
 
@@ -69,14 +47,12 @@ public class ClaimEnter implements Listener {
     public void moveEvent(PlayerMoveEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
-        checkLocation(u);
     }
 
     @EventHandler
     public void teleportEvent(PlayerTeleportEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
         checkRegion(u);
-        checkLocation(u);
     }
 
     public void checkRegion(User u) {
@@ -206,71 +182,5 @@ public class ClaimEnter implements Listener {
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-    public void checkLocation(User u) {
-
-        if (u.last_outline_check == null) {
-
-            updateOutlines(u);
-            return;
-
-        } else if (u.last_outline_check.getWorld() == null) {
-
-            updateOutlines(u);
-            return;
-
-        }
-
-        if (u.last_outline_check.getWorld().equals(u.player.getWorld())) {
-
-            //If the player is over 100 blocks from the previous check update outlines.
-            if (u.last_outline_check.distance(u.player.getLocation()) > 50) {
-                updateOutlines(u);
-            }
-
-        } else {
-            updateOutlines(u);
-        }
-    }
-
-    public void updateOutlines(User u) {
-
-        //Update last outline check and create outlines for all plots in 100 block area around the player.
-        u.last_outline_check = u.player.getLocation();
-
-        //Get regions.
-        regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.last_outline_check.getWorld()));
-
-        if (regions == null) {return;}
-
-        region = new ProtectedCuboidRegion("test",
-                BlockVector3.at(u.last_outline_check.getX() - 100, -60, u.last_outline_check.getZ() - 100),
-                BlockVector3.at(u.last_outline_check.getX() + 100, 320, u.last_outline_check.getZ() + 100));
-        ApplicableRegionSet set = regions.getApplicableRegions(region);
-
-        PlotSystem.getInstance().getLogger().info("Regions: " + set.size());
-
-        for (ProtectedRegion protectedRegion : set) {
-
-            plotID = tryParse(protectedRegion.getId());
-
-            //Get plot difficulty.
-            difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
-
-            plotOutline.createOutline(u.player, protectedRegion.getPoints(), difficultyMaterial(difficulty), false);
-
-        }
-    }
-
-    //Returns the plot difficulty material.
-    public BlockData difficultyMaterial(int difficulty) {
-
-        return switch (difficulty) {
-            case 1 -> limeConc;
-            case 2 -> yellowConc;
-            case 3 -> redConc;
-            default -> null;
-        };
     }
 }
