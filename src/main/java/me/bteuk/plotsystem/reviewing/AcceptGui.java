@@ -2,10 +2,12 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Points;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.enums.PointsType;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
@@ -184,9 +186,10 @@ public class AcceptGui extends Gui {
                     }
 
                     //Calculate points.
-                    int points = (int) Math.round((PlotValues.sizeValue(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.review.plot + ";")) +
-                            PlotValues.difficultyValue(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";"))) *
-                            ((accuracyMultiplier()+qualityMultiplier())/2));
+                    //TODO Enable this when points are added.
+                    //int points = (int) Math.round((PlotValues.sizeValue(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.review.plot + ";")) +
+                    //        PlotValues.difficultyValue(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";"))) *
+                    //        ((accuracyMultiplier()+qualityMultiplier())/2));
 
                     //Add to accept data.
                     if (!plotSQL.update("INSERT INTO accept_data(id,uuid,reviewer,book_id,accuracy,quality,accept_time) VALUES(" +
@@ -209,7 +212,8 @@ public class AcceptGui extends Gui {
 
                     //Add points to player.
                     //By referencing network plugin.
-                    Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
+                    //TODO Enable this when points are added.
+                    //Points.addPoints(plotOwner, points, PointsType.BUILDING_POINTS);
 
                     //Get negative coordinate transform.
                     int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world.getName() + "';");
@@ -244,6 +248,31 @@ public class AcceptGui extends Gui {
                         Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is 1 submitted plot.", "uknet:reviewer");
                     } else {
                         Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are " + plot_count + " submitted plots.", "uknet:reviewer");
+                    }
+
+                    //Promote plot owner if they should be.
+                    int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
+
+                    String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
+
+                    if (difficulty == 1 && role.equals("guest")) {
+                        //Promote player to apprentice.
+                        Roles.promoteBuilder(plotOwner, "guest", "apprentice");
+                    } else if (difficulty == 2) {
+                        if (role.equals("guest")) {
+                            //Promote player to jrbuilder.
+                            Roles.promoteBuilder(plotOwner, "guest", "jrbuilder");
+                        } else if (role.equals("apprentice")) {
+                            Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                        }
+                    } else if (difficulty == 3) {
+                        if (role.equals("guest")) {
+                            Roles.promoteBuilder(plotOwner, "guest", "builder");
+                        } else if (role.equals("apprentice")) {
+                            Roles.promoteBuilder(plotOwner, "apprentice", "builder");
+                        } else if (role.equals("jrbuilder")) {
+                            Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
+                        }
                     }
 
                     //Close gui and clear review.
