@@ -89,27 +89,6 @@ public class ClaimCommand implements CommandExecutor {
 
         }
 
-        //Check if the player is allowed to claim this plot.
-        int difficulty = u.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";");
-
-        //Check by difficulty, with the required role.
-        if (difficulty == 3 && !(u.player.hasPermission("group.jrbuilder"))) {
-
-            u.player.sendMessage(Utils.chat("&cYou must be at least Jr.Builder or higher to claim a 'hard difficulty' plot."));
-            return false;
-
-        } else if (difficulty == 2 && !(u.player.hasPermission("group.apprentice"))) {
-
-            u.player.sendMessage(Utils.chat("&cYou must be at least Apprentice or higher to claim a 'medium difficulty' plot."));
-            return false;
-
-        } else if (difficulty == 1 && !(u.player.hasPermission("group.applicant"))) {
-
-            u.player.sendMessage(Utils.chat("&cYou must complete the tutorial to claim a plot."));
-            return false;
-
-        }
-
         //Checks passed, return true.
         return true;
     }
