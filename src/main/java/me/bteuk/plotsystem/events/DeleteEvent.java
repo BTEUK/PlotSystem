@@ -63,20 +63,6 @@ public class DeleteEvent {
             //Revert plot to original state.
             WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(), () -> {
-
-                for (User u : PlotSystem.getInstance().getUsers()) {
-
-                    //Update outlines for all users in this world.
-                    if (pasteWorld.equals(u.player.getWorld())) {
-                        PlotSystem.getInstance().getLogger().info("Updating outlines for " + u.player.getName());
-                        PlotSystem.getInstance().claimEnter.updateOutlines(u);
-                    }
-
-                }
-
-            }, 20L);
-
             //Remove all members from the worldguard plot.
             WorldGuardFunctions.clearMembers(id, pasteWorld);
 

@@ -52,6 +52,8 @@ public class Timers {
     int difficulty;
     PlotOutline plotOutline;
 
+    WorldGuard wg;
+
     public Timers(PlotSystem instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.instance = instance;
@@ -65,6 +67,8 @@ public class Timers {
         events = new HashMap<>();
 
         plotOutline = new PlotOutline();
+
+        wg = WorldGuard.getInstance();
 
     }
 
@@ -96,13 +100,12 @@ public class Timers {
 
         //1 second timer.
         //Update plot outlines.
-        WorldGuard wg = WorldGuard.getInstance();
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             for (User u : instance.getUsers()) {
 
                 //Get regions.
-                regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.last_outline_check.getWorld()));
+                regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.player.getWorld()));
 
                 if (regions == null) {return;}
 

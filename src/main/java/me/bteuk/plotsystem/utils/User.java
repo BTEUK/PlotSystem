@@ -32,9 +32,6 @@ public class User {
     public ClaimGui claimGui;
     public CreatePlotGui createGui;
 
-    //Last plot outline update.
-    public Location last_outline_check;
-
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         //Set sql

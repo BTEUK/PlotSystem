@@ -34,7 +34,8 @@ public class JoinServer implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    //Must run last.
+    @EventHandler(priority = EventPriority.HIGH)
     public void joinEvent(PlayerJoinEvent e) {
 
         //Create instance of User and add it to list.
