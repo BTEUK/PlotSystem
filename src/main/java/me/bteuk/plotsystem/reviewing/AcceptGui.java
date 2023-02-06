@@ -177,7 +177,7 @@ public class AcceptGui extends Gui {
                         int i = 1;
 
                         for (String text : book) {
-                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text + "');"))) {
+                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
                                 u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                                 return;
                             }

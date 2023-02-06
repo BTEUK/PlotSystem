@@ -125,7 +125,8 @@ public class ReviewGui extends Gui {
                     int i = 1;
 
                     for (String text : book) {
-                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text + "');"))) {
+                        //Add escape characters to '
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
                             u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
                             return;
                         }
@@ -182,8 +183,8 @@ public class ReviewGui extends Gui {
             setItem(18, Utils.createItem(Material.LECTERN, 1,
                             Utils.chat("&b&lPrevious Feedback"),
                             Utils.chat("&fClick to review previous"),
-                            Utils.chat("feedback this player received"),
-                            Utils.chat("while building this plot.")),
+                            Utils.chat("&ffeedback this player received"),
+                            Utils.chat("&fwhile building this plot.")),
                     u -> {
 
                         //Open the previous feedback menu.

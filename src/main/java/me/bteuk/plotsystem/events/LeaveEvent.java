@@ -49,7 +49,7 @@ public class LeaveEvent {
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &4" + id + "');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &3" + id + "');");
 
             }
         }

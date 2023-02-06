@@ -24,7 +24,7 @@ public class SubmitEvent {
             int id = Integer.parseInt(event[2]);
 
             //Check if the player can submit a plot at this point in time.
-            long lCoolDown = (long) PlotSystem.getInstance().getConfig().getInt("submit_cooldown") * 60 * 1000;
+            long lCoolDown = PlotSystem.getInstance().getConfig().getInt("submit_cooldown") * 60L * 1000L;
             long lSubmit = PlotSystem.getInstance().globalSQL.getLong("SELECT last_submit FROM player_data WHERE uuid='" + uuid + "';");
 
             String message;

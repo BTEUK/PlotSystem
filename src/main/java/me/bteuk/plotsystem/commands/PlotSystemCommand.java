@@ -127,7 +127,7 @@ public class PlotSystemCommand implements CommandExecutor {
 
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location + "';")) {
 
-            plotSQL.update("UPDATE location_data SET alias='" + alias + "' WHERE name='" + location+ "';");
+            plotSQL.update("UPDATE location_data SET alias='" + alias.replace("'", "\\'") + "' WHERE name='" + location+ "';");
             sender.sendMessage(Utils.chat("&aSet alias of location &3" + location + "&a to &3" + alias + "&a."));
 
         } else {
