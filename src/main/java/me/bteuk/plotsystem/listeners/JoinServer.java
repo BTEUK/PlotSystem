@@ -43,21 +43,24 @@ public class JoinServer implements Listener {
         instance.addUser(u);
 
         //If the player has a join event, execute it.
-        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';")) {
+        //Delay by 1 second for all plugins to run their join events.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';")) {
 
-            //Get the event from the database.
-            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem'");
+                //Get the event from the database.
+                String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem'");
 
-            //Split the event by word.
-            String[] aEvent = event.split(" ");
+                //Split the event by word.
+                String[] aEvent = event.split(" ");
 
-            //Send the event to the event handler.
-            EventManager.event(u.uuid, aEvent);
+                //Send the event to the event handler.
+                EventManager.event(u.uuid, aEvent);
 
-            //Clear the events.
-            globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';");
+                //Clear the events.
+                globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='plotsystem';");
 
-        }
+            }
+        }, 20L);
 
 
     }

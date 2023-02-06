@@ -34,6 +34,7 @@ public class ClaimEnter implements Listener {
 
     }
 
+
     @EventHandler
     public void joinEvent(PlayerJoinEvent e) {
 
