@@ -81,6 +81,13 @@ public class PlotSystemCommand implements CommandExecutor {
 
     private void help(CommandSender sender) {
 
+        sender.sendMessage(Utils.chat("&7/plotsystem setalias [location] [alias]"));
+        sender.sendMessage(Utils.chat("&7/plotsystem selectiontool &f- Get the selection tool to create plots."));
+        sender.sendMessage(Utils.chat("&7/plotsystem create plot &f- Create a plot for your current selection."));
+        sender.sendMessage(Utils.chat("&7/plotsystem delete plot <plotID> &f- Delete an unclaimed plot."));
+        sender.sendMessage(Utils.chat("&7/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+        sender.sendMessage(Utils.chat("&7/plotsystem delete location [name]"));
+
     }
 
     private void selectionTool(CommandSender sender) {
