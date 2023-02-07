@@ -51,7 +51,7 @@ public class ClaimGui extends Gui {
                     TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
                     message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "insert link here"));
 
-                    u.player.sendMessage(message);
+                    u.player.spigot().sendMessage(message);
 
                 });
 

@@ -6,6 +6,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import me.bteuk.network.commands.Plot;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -53,7 +54,8 @@ public class ClaimEnter implements Listener {
     @EventHandler
     public void teleportEvent(PlayerTeleportEvent e) {
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
-        checkRegion(u);
+        //Delay this so the teleport has taken place.
+        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> checkRegion(u));
     }
 
     public void checkRegion(User u) {
@@ -82,8 +84,7 @@ public class ClaimEnter implements Listener {
                             u.isClaimed = false;
                             u.plotOwner = false;
                             u.plotMember = false;
-                            u.player.sendActionBar(Component.text("You have entered plot " + plot + ", it is currently unclaimed.", NamedTextColor.GREEN));
-                            u.player.sendActionBar(Component.text("Open the building menu and click on the emerald to claim the plot.", NamedTextColor.GREEN));
+                            u.player.sendActionBar(Component.text("You have entered plot " + plot + ", it is unclaimed.", NamedTextColor.GREEN));
 
                         } else {
 

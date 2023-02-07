@@ -28,6 +28,7 @@ public class SubmitEvent {
             long lSubmit = PlotSystem.getInstance().globalSQL.getLong("SELECT last_submit FROM player_data WHERE uuid='" + uuid + "';");
 
             String message;
+            boolean success = true;
 
             if (Time.currentTime() - lSubmit <= lCoolDown) {
 
@@ -49,6 +50,7 @@ public class SubmitEvent {
                 }
 
                 message = Utils.chat("&cYou have a &4" + time + " &ccooldown before you can submit another plot.");
+                success = false;
 
             } else {
 
@@ -83,14 +85,16 @@ public class SubmitEvent {
 
             }
 
-            //Get number of submitted plots.
-            int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+            if (success) {
+                //Get number of submitted plots.
+                int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-            //Send message to reviewers that a plot has been submitted.
-            if (plot_count == 1) {
-                Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there is 1 submitted plot.", "uknet:reviewer");
-            } else {
-                Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there are " + plot_count + " submitted plots.", "uknet:reviewer");
+                //Send message to reviewers that a plot has been submitted.
+                if (plot_count == 1) {
+                    Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there is 1 submitted plot.", "uknet:reviewer");
+                } else {
+                    Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there are " + plot_count + " submitted plots.", "uknet:reviewer");
+                }
             }
         }
     }
