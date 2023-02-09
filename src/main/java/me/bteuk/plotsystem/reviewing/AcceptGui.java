@@ -255,19 +255,19 @@ public class AcceptGui extends Gui {
 
                     String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
 
-                    if (difficulty == 1 && role.equals("guest")) {
+                    if (difficulty == 1 && role.equals("default")) {
                         //Promote player to apprentice.
-                        Roles.promoteBuilder(plotOwner, "guest", "apprentice");
+                        Roles.promoteBuilder(plotOwner, "default", "apprentice");
                     } else if (difficulty == 2) {
-                        if (role.equals("guest")) {
+                        if (role.equals("default")) {
                             //Promote player to jrbuilder.
-                            Roles.promoteBuilder(plotOwner, "guest", "jrbuilder");
+                            Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
                         } else if (role.equals("apprentice")) {
                             Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
                         }
                     } else if (difficulty == 3) {
-                        if (role.equals("guest")) {
-                            Roles.promoteBuilder(plotOwner, "guest", "builder");
+                        if (role.equals("default")) {
+                            Roles.promoteBuilder(plotOwner, "default", "builder");
                         } else if (role.equals("apprentice")) {
                             Roles.promoteBuilder(plotOwner, "apprentice", "builder");
                         } else if (role.equals("jrbuilder")) {

@@ -178,17 +178,23 @@ public class SelectionTool extends WGCreatePlot {
             area = 0;
         }
 
-        int sumX = 0;
-        int sumZ = 0;
+        int sum = 0;
 
-        for (int i = 0; i < size() - 1; i++) {
+        for (int i = 0; i < size(); i++) {
 
-            sumX += vector.get(i).getX() * vector.get(i + 1).getZ();
-            sumZ += vector.get(i + 1).getX() * vector.get(i).getZ();
+            if (i == (size() - 1)) {
 
+                sum += (((vector.get(i).getZ() + vector.get(0).getZ())/2) * (vector.get(0).getX() - vector.get(i).getX()));
+
+            } else {
+
+                sum += (((vector.get(i).getZ() + vector.get(i+1).getZ())/2) * (vector.get(i+1).getX() - vector.get(i).getX()));
+
+            }
         }
 
-        area = Math.abs((sumX - sumZ) / 2);
+        area = Math.abs(sum);
+        PlotSystem.getInstance().getLogger().info("Area: " + area);
 
     }
 
