@@ -1,11 +1,9 @@
 package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import me.bteuk.network.commands.Plot;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -41,8 +39,8 @@ public class DeleteEvent {
             if (copyWorld == null || pasteWorld == null) {
 
                 //Send error to console.
-                Bukkit.getLogger().severe(Utils.chat("&cPlot delete event failed!"));
-                Bukkit.getLogger().severe(Utils.chat("&cEvent details:" + Arrays.toString(event)));
+                Bukkit.getLogger().severe("Plot delete event failed!");
+                Bukkit.getLogger().severe("Event details:" + Arrays.toString(event));
                 return;
 
             }
@@ -78,7 +76,7 @@ public class DeleteEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.chat("&cPlot &4" + id + " &cdeleted"));
+                p.sendMessage(Utils.success("Plot &3" + id + " &adeleted"));
 
             } else {
 

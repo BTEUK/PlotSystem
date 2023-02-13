@@ -2,9 +2,9 @@ package me.bteuk.plotsystem.reviewing;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ public class ReviewHotbar implements Listener {
         this.u = u;
 
         //Create review gui item.
-        reviewGuiItem = Utils.createItem(Material.EMERALD,1, Utils.chat("&b&lReview Menu"), Utils.chat("&fClick to open review menu."));
+        reviewGuiItem = Utils.createItem(Material.EMERALD,1, Utils.title("Review Menu"), Utils.line("Click to open review menu."));
 
         //Register listeners.
         Bukkit.getServer().getPluginManager().registerEvents(this, plotSystem);
@@ -195,7 +195,7 @@ public class ReviewHotbar implements Listener {
     }
 
     @EventHandler
-    public void moveItem(InventoryDragEvent e) {
+    public void dragItem(InventoryDragEvent e) {
         if (e.getOldCursor().equals(reviewGuiItem)) {
             e.setCancelled(true);
         } else if (e.getOldCursor().equals(u.review.book)) {

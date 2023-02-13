@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -11,7 +12,6 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 public class PlayerInteract implements Listener {
@@ -45,7 +45,7 @@ public class PlayerInteract implements Listener {
             if (!u.player.hasPermission("uknet.plots.select")) {
 
                 e.setCancelled(true);
-                u.player.sendMessage(Utils.chat("&cYou do not have permission to use this tool!"));
+                u.player.sendMessage(Utils.error("You do not have permission to use this tool!"));
                 return;
 
             }
@@ -58,7 +58,7 @@ public class PlayerInteract implements Listener {
                 //Check if they are in a world where plots are allowed to be created.
                 if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getClickedBlock().getWorld().getName() + "';")) {
 
-                    u.player.sendMessage(Utils.chat("&cYou can't create plots in this world!"));
+                    u.player.sendMessage(Utils.error("You can't create plots in this world!"));
                     return;
 
                 }
@@ -66,14 +66,14 @@ public class PlayerInteract implements Listener {
                 //If the selected point is in an existing plot cancel.
                 if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                    u.player.sendMessage(Utils.chat("&cThis point is in another plot!"));
+                    u.player.sendMessage(Utils.error("This point is in another plot!"));
                     return;
 
                 }
 
                 //Passed the checks, start a new selection at the clicked block.
                 u.selectionTool.startSelection(e.getClickedBlock(), e.getClickedBlock().getWorld().getName());
-                u.player.sendMessage(Utils.chat("&aStarted a new selection at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
+                u.player.sendMessage(Utils.success("Started a new selection at &3" + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
                 //If the player right clicks then add a point to the existing selection.
             } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getHand().equals(EquipmentSlot.HAND)) {
@@ -83,7 +83,7 @@ public class PlayerInteract implements Listener {
                 //If the player hasn't selected their first point cancel.
                 if (u.selectionTool.size() == 0) {
 
-                    u.player.sendMessage(Utils.chat("&cYou must first start your selection by left-clicking."));
+                    u.player.sendMessage(Utils.error("You must first start your selection by left-clicking."));
                     return;
 
                 }
@@ -91,7 +91,7 @@ public class PlayerInteract implements Listener {
                 //Check if they are making their plot in the same world as their first point.
                 if (!e.getClickedBlock().getWorld().equals(u.selectionTool.world())) {
 
-                    u.player.sendMessage(Utils.chat("&cYou already started a selection in a different world, please create a new selection first."));
+                    u.player.sendMessage(Utils.error("You already started a selection in a different world, please create a new selection first."));
                     return;
 
                 }
@@ -99,7 +99,7 @@ public class PlayerInteract implements Listener {
                 //If the selected point is in an existing plot cancel.
                 if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                    u.player.sendMessage(Utils.chat("&cThis point is in another plot!"));
+                    u.player.sendMessage(Utils.error("This point is in another plot!"));
                     return;
 
                 }
@@ -110,12 +110,9 @@ public class PlayerInteract implements Listener {
 
                 }
 
-                u.player.sendMessage(Utils.chat("&aAdded point at " + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
+                u.player.sendMessage(Utils.success("Added point at &3" + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
             }
-
-
         }
-
     }
 }

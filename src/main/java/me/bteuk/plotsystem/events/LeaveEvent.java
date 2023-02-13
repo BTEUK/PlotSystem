@@ -1,7 +1,7 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -26,8 +26,8 @@ public class LeaveEvent {
             if (world == null) {
 
                 //Send error to console.
-                Bukkit.getLogger().severe(Utils.chat("&cPlot leave event failed!"));
-                Bukkit.getLogger().severe(Utils.chat("&cEvent details:" + Arrays.toString(event)));
+                Bukkit.getLogger().severe("Plot leave event failed!");
+                Bukkit.getLogger().severe("Event details:" + Arrays.toString(event));
                 return;
 
             }
@@ -44,12 +44,12 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.chat("&cYou have left plot &3" + id));
+                p.sendMessage(Utils.success("You have left plot &3" + id));
 
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &3" + id + "');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &4" + id + "');");
 
             }
         }

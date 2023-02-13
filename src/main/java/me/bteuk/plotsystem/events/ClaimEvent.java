@@ -2,10 +2,10 @@ package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -23,7 +23,7 @@ public class ClaimEvent {
 
             if (p == null) {
 
-                Bukkit.getLogger().warning(Utils.chat("Player " + uuid + " is not on the server the event was sent to!"));
+                Bukkit.getLogger().warning("Player " + uuid + " is not on the server the event was sent to!");
                 return;
 
             }
@@ -33,7 +33,7 @@ public class ClaimEvent {
             //If the player is not in a plot tell them.
             if (u.inPlot == 0) {
 
-                p.sendMessage(Utils.chat("&cYou are not in a plot!"));
+                p.sendMessage(Utils.error("You are not in a plot!"));
                 return;
 
             }
@@ -42,17 +42,17 @@ public class ClaimEvent {
             //If they are the owner or a member tell them.
             if (u.plotOwner) {
 
-                p.sendMessage(Utils.chat("&cYou are already the owner of this plot!"));
+                p.sendMessage(Utils.error("You are already the owner of this plot!"));
                 return;
 
             } else if (u.plotMember) {
 
-                p.sendMessage(Utils.chat("&cYou are already a member of this plot!"));
+                p.sendMessage(Utils.error("You are already a member of this plot!"));
                 return;
 
             } else if (u.isClaimed) {
 
-                p.sendMessage(Utils.chat("&cThis plot is already claimed!"));
+                p.sendMessage(Utils.error("This plot is already claimed!"));
                 return;
 
             }
@@ -60,7 +60,7 @@ public class ClaimEvent {
             //Check if you do not already have the maximum number of plots.
             if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
-                p.sendMessage(Utils.chat("&aYou have reached the maximum number of plots."));
+                p.sendMessage(Utils.error("You have reached the maximum number of plots."));
                 return;
 
             }

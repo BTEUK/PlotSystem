@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem;
 
-import java.nio.channels.ClosedChannelException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
 import me.bteuk.plotsystem.listeners.*;
@@ -15,15 +15,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
-import org.jetbrains.annotations.NotNull;
 
 public class PlotSystem extends JavaPlugin {
 
@@ -148,7 +145,7 @@ public class PlotSystem extends JavaPlugin {
         //Create selection tool item
         selectionTool = new ItemStack(Material.BLAZE_ROD);
         ItemMeta meta = selectionTool.getItemMeta();
-        meta.setLocalizedName(Utils.chat("&aSelection Tool"));
+        meta.setLocalizedName(Utils.success("Selection Tool"));
         selectionTool.setItemMeta(meta);
 
         //Listeners

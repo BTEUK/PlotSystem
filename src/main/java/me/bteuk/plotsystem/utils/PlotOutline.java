@@ -25,8 +25,6 @@ public class PlotOutline {
     int lengthZ;
     int length;
 
-    boolean contains;
-
     int minX;
     int minZ;
     int maxX;

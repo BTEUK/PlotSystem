@@ -2,8 +2,8 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -48,7 +48,7 @@ public class WGCreatePlot {
         ApplicableRegionSet set = regions.getApplicableRegions(region);
         if (set.size() > 0) {
 
-            p.sendMessage(Utils.chat("&cYour selection overlaps with an existing plot."));
+            p.sendMessage(Utils.error("Your selection overlaps with an existing plot."));
             return false;
 
         }

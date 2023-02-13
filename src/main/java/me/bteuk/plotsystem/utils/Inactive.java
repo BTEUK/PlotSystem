@@ -3,6 +3,7 @@ package me.bteuk.plotsystem.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.bteuk.network.utils.Time;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -83,7 +84,7 @@ public class Inactive {
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot " + plot + "removed due to inactivity!');");
 
                 //Log plot removal to console.
-                PlotSystem.getInstance().getLogger().info(Utils.chat("&cPlot " + plot + " removed due to inactivity!"));
+                PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
 
             }
         }

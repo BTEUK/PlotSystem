@@ -2,9 +2,10 @@ package me.bteuk.plotsystem.reviewing;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -14,7 +15,6 @@ import org.bukkit.World;
 
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 import java.util.List;
@@ -55,13 +55,13 @@ public class ReviewGui extends Gui {
     private void createGui() {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lPlot Info"),
-                Utils.chat("&fPlot ID: " + plotID),
-                Utils.chat("&fPlot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';"))));
+                Utils.title("Plot Info"),
+                Utils.line("Plot ID: " + plotID),
+                Utils.line("Plot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';"))));
 
         setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
-                        Utils.chat("&b&lBefore View"),
-                        Utils.chat("&fTeleport to the plot before it was claimed.")),
+                        Utils.title("Before View"),
+                        Utils.line("Teleport to the plot before it was claimed.")),
                 u -> {
 
                     //Teleport to plot in original state.
@@ -71,8 +71,8 @@ public class ReviewGui extends Gui {
                 });
 
         setItem(14, Utils.createItem(Material.STONE_BRICKS, 1,
-                        Utils.chat("&b&lCurrent View"),
-                        Utils.chat("&fTeleport to the current view of the plot.")),
+                        Utils.title("Current View"),
+                        Utils.line("Teleport to the current view of the plot.")),
                 u -> {
 
                     //Teleport to plot in current state.
@@ -82,8 +82,8 @@ public class ReviewGui extends Gui {
                 });
 
         setItem(10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                        Utils.chat("&b&lAccept Plot"),
-                        Utils.chat("&fOpens the accept gui.")),
+                        Utils.title("Accept Plot"),
+                        Utils.line("Opens the accept gui.")),
                 u -> {
 
                     //Open accept gui, create a new one if it is null.
@@ -100,8 +100,8 @@ public class ReviewGui extends Gui {
                 });
 
         setItem(16, Utils.createItem(Material.RED_CONCRETE, 1,
-                        Utils.chat("&b&lDeny Plot"),
-                        Utils.chat("&fDeny the plot and return it to the plot owner.")),
+                        Utils.title("Deny Plot"),
+                        Utils.line("Deny the plot and return it to the plot owner.")),
                 u -> {
 
                     //Close inventory.
@@ -110,7 +110,7 @@ public class ReviewGui extends Gui {
                     //Check if the feedback book has been edited.
                     if (!user.review.editBook.isEdited) {
 
-                        u.player.sendMessage(Utils.chat("&cYou must provide feedback to deny the plot."));
+                        u.player.sendMessage(Utils.error("You must provide feedback to deny the plot."));
                         return;
 
                     }
@@ -127,7 +127,7 @@ public class ReviewGui extends Gui {
                     for (String text : book) {
                         //Add escape characters to '
                         if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
-                            u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
+                            u.player.sendMessage(Utils.error("An error occured, please notify an admin."));
                             return;
                         }
                         i++;
@@ -153,7 +153,7 @@ public class ReviewGui extends Gui {
                         WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);
 
                         //Send feedback.
-                        u.player.sendMessage(Utils.chat("&aPlot " + user.review.plot + " has been denied."));
+                        u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &ahas been denied."));
 
                         //Get number of submitted plots.
                         int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
@@ -172,7 +172,7 @@ public class ReviewGui extends Gui {
 
                     } else {
 
-                        u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
+                        u.player.sendMessage(Utils.error("An error occured, please notify an admin."));
 
                     }
                 });
@@ -181,10 +181,10 @@ public class ReviewGui extends Gui {
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE uuid='" + plotOwner + "' AND id=" + plotID + ";")) {
 
             setItem(18, Utils.createItem(Material.LECTERN, 1,
-                            Utils.chat("&b&lPrevious Feedback"),
-                            Utils.chat("&fClick to review previous"),
-                            Utils.chat("&ffeedback this player received"),
-                            Utils.chat("&fwhile building this plot.")),
+                            Utils.title("Previous Feedback"),
+                            Utils.line("Click to review previous"),
+                            Utils.line("feedback this player received"),
+                            Utils.line("while building this plot.")),
                     u -> {
 
                         //Open the previous feedback menu.
@@ -200,8 +200,8 @@ public class ReviewGui extends Gui {
 
         //Cancel review.
         setItem(26, Utils.createItem(Material.BARRIER, 1,
-                        Utils.chat("&b&lCancel Review"),
-                        Utils.chat("&fStop reviewing this plot.")),
+                        Utils.title("Cancel Review"),
+                        Utils.line("Stop reviewing this plot.")),
                 u -> {
 
                     //Remove the reviewer from the plot.
@@ -211,7 +211,7 @@ public class ReviewGui extends Gui {
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");
 
                     //Send feedback.
-                    u.player.sendMessage(Utils.chat("&cCancelled reviewing of plot " + user.review.plot));
+                    u.player.sendMessage(Utils.success("Cancelled reviewing of plot &3" + user.review.plot));
 
                     //Close review.
                     u.player.closeInventory();

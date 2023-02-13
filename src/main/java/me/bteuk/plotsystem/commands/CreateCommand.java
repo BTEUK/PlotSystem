@@ -1,15 +1,15 @@
 package me.bteuk.plotsystem.commands;
 
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import org.bukkit.Bukkit;
@@ -34,7 +34,7 @@ public class CreateCommand {
 
         if (args.length < 2) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone]"));
+            sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
             return;
 
         }
@@ -57,7 +57,7 @@ public class CreateCommand {
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem create [plot, location, zone]"));
+                sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
 
         }
 
@@ -69,7 +69,7 @@ public class CreateCommand {
         //Check if the sender is a player
         if (!(sender instanceof Player)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be used by players!"));
+            sender.sendMessage(Utils.error("This command can only be used by players!"));
             return;
 
         }
@@ -80,7 +80,7 @@ public class CreateCommand {
         //Check if the user has permission to use this command
         if (!u.player.hasPermission("uknet.plots.create.plot")) {
 
-            u.player.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
+            u.player.sendMessage(Utils.error("You do not have permission to use this command!"));
             return;
 
         }
@@ -88,7 +88,7 @@ public class CreateCommand {
         //Check if the plot is valid, meaning that at least 3 points are selected with the selection tool.
         if (u.selectionTool.size() < 3) {
 
-            u.player.sendMessage(Utils.chat("&cYou must select at least 3 points for a valid plot!"));
+            u.player.sendMessage(Utils.error("You must select at least 3 points for a valid plot!"));
             return;
 
         }
@@ -114,7 +114,7 @@ public class CreateCommand {
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.plots.create.location")) {
 
-                p.sendMessage(Utils.chat("&cYou do not have permission to use this command!"));
+                p.sendMessage(Utils.error("You do not have permission to use this command!"));
                 return;
 
             }
@@ -123,7 +123,7 @@ public class CreateCommand {
         //Check if they have enough args.
         if (args.length < 7) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
             return;
 
         }
@@ -145,7 +145,7 @@ public class CreateCommand {
 
         } catch (NumberFormatException e) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
             return;
 
         }
@@ -153,7 +153,7 @@ public class CreateCommand {
         //Check if the location name is unique.
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';")) {
 
-            sender.sendMessage(Utils.chat("&cThe location " + args[2] + " already exists."));
+            sender.sendMessage(Utils.error("The location &4" + args[2] + " &calready exists."));
             return;
 
         }
@@ -175,7 +175,7 @@ public class CreateCommand {
         String saveWorld = PlotSystem.getInstance().getConfig().getString("save_world");
 
         if (saveWorld == null) {
-            sender.sendMessage(Utils.chat("&cThe save world is not set in config."));
+            sender.sendMessage(Utils.error("The save world is not set in config."));
             return;
         }
 
@@ -186,7 +186,7 @@ public class CreateCommand {
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
-        sender.sendMessage(Utils.chat("&aTransferring terrain, this may take a while."));
+        sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
 
             for (int i = regionXMin; i <= regionXMax; i++) {
@@ -197,16 +197,16 @@ public class CreateCommand {
                             BlockVector3.at(i * 512 + xTransform, -60, j * 512 + zTransform),
                             BlockVector3.at(i * 512 + 511 + xTransform, 319, j * 512 + 511 + zTransform)
                             , copy, paste)) {
-                        sender.sendMessage(Utils.chat("&cAn error occured while transferring the terrain."));
+                        sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
                         return;
                     } else {
-                        sender.sendMessage(Utils.chat("&aCopied region " + i + "," + j + " to " + args[2] + "."));
+                        sender.sendMessage(Utils.success("&aCopied region &3" + i + "," + j + " &ato &3" + args[2] + "&a."));
                     }
 
                 }
             }
 
-            sender.sendMessage(Utils.chat("&aTerrain transfer has been completed."));
+            sender.sendMessage(Utils.success("Terrain transfer has been completed."));
 
             int coordMin = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
@@ -220,7 +220,7 @@ public class CreateCommand {
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
                     + args[2] + "','" + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
 
-                sender.sendMessage(Utils.chat("&aCreated new location " + args[2]));
+                sender.sendMessage(Utils.success("Created new location " + args[2]));
 
                 //Set the status of all effected regions in the region database.
                 for (int i = regionXMin; i <= regionXMax; i++) {
@@ -243,12 +243,32 @@ public class CreateCommand {
 
             } else {
 
-                sender.sendMessage(Utils.chat("&cAn error occurred, please check the console for more info."));
+                sender.sendMessage(Utils.error("An error occurred, please check the console for more info."));
                 Bukkit.getLogger().warning("An error occured while adding new location!");
 
             }
 
-            //TODO: teleport player once regions are added.
+            //If sender is a player teleport them to the location.
+            if (sender instanceof Player p) {
+
+                //Get middle.
+                double x = ((globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordMax + ";") +
+                        globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordMin + ";"))/2) +
+                        plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + args[2] + "';");
+
+                double z = ((globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordMax + ";") +
+                        globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordMin + ";"))/2) +
+                        plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + args[2] + "';");
+
+                //Teleport to the location.
+                World world = Bukkit.getWorld(args[2]);
+                double y = world.getHighestBlockYAt((int) x, (int) z);
+                y++;
+
+                EventManager.createTeleportEvent(false, p.getUniqueId().toString(), "network", "teleport " + args[2] + " " + x + " " + y + " " + z + " "
+                                + p.getLocation().getYaw() + " " + p.getLocation().getPitch(),
+                        "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + args[2] + "';"), p.getLocation());
+            }
         });
     }
 }

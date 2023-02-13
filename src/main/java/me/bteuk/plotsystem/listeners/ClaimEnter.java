@@ -6,14 +6,14 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import me.bteuk.network.commands.Plot;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.User;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -84,7 +84,8 @@ public class ClaimEnter implements Listener {
                             u.isClaimed = false;
                             u.plotOwner = false;
                             u.plotMember = false;
-                            u.player.sendActionBar(Component.text("You have entered plot " + plot + ", it is unclaimed.", NamedTextColor.GREEN));
+                            u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                    TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, it is unclaimed.")));
 
                         } else {
 
@@ -97,7 +98,8 @@ public class ClaimEnter implements Listener {
                                 u.plotOwner = true;
                                 u.plotMember = false;
                                 plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
-                                u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are the owner of this plot.", NamedTextColor.GREEN));
+                                u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                        TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are the owner of this plot.")));
 
                                 //If you are a member of the plot send the relevant message.
                             } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
@@ -105,16 +107,17 @@ public class ClaimEnter implements Listener {
                                 u.plotOwner = false;
                                 u.plotMember = true;
                                 plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
-                                u.player.sendActionBar(Component.text("You have entered plot " + plot + ", you are a member of this plot.", NamedTextColor.GREEN));
+                                u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                        TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are a member of this plot.")));
 
                             } else {
 
                                 //If you are not an owner or member send the relevant message.
                                 u.plotOwner = false;
                                 u.plotMember = false;
-                                u.player.sendActionBar(Component.text("You have entered " +
-                                        globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';")
-                                        + "'s plot.", NamedTextColor.GREEN));
+                                u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                        TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
+                                                plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';") + "'s &aplot.")));
 
                             }
                         }
@@ -144,7 +147,8 @@ public class ClaimEnter implements Listener {
             //If the plot is claimed, send the relevant message.
             if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
 
-                u.player.sendActionBar(Component.text("You have left plot " + u.inPlot, NamedTextColor.GREEN));
+                u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        TextComponent.fromLegacyText(Utils.success("You have left plot &3" + u.inPlot)));
 
             } else {
 
@@ -152,22 +156,23 @@ public class ClaimEnter implements Listener {
                 if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
                     u.plotOwner = false;
-                    u.player.sendActionBar(Component.text("You have left your plot", NamedTextColor.GREEN));
+                    u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                            TextComponent.fromLegacyText(Utils.success("You have left your plot")));
 
                     //If you are a member of the plot send the relevant message.
                 } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
 
                     u.plotMember = false;
-                    u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
-                            + "'s plot.", NamedTextColor.GREEN));
+                    u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                            TextComponent.fromLegacyText(Utils.success("You have left plot &3" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
+                                    + "'s &aplot."));
 
                 } else {
 
                     //If you are not an owner or member send the relevant message.
-                    u.player.sendActionBar(Component.text("You have left " +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
-                            + "'s plot.", NamedTextColor.GREEN));
+                    u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                            TextComponent.fromLegacyText(Utils.success("You have left plot &3" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';")
+                                    + "'s &aplot."));
 
                 }
             }

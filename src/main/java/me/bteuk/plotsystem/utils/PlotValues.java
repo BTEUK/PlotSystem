@@ -71,7 +71,7 @@ public class PlotValues {
 
         }
 
-        Bukkit.getLogger().warning(Utils.chat("&cPlot size was not in the range of possible values!"));
+        Bukkit.getLogger().warning("Plot size was not in the range of possible values!");
         return 0;
 
     }
@@ -96,7 +96,7 @@ public class PlotValues {
 
         }
 
-        Bukkit.getLogger().warning(Utils.chat("&cPlot difficulty was not in the range of possible values!"));
+        Bukkit.getLogger().warning("Plot difficulty was not in the range of possible values!");
         return 0;
 
     }

@@ -1,11 +1,10 @@
 package me.bteuk.plotsystem.commands;
 
-import me.bteuk.network.commands.Plot;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -31,7 +30,7 @@ public class DeleteCommand {
 
         if (args.length < 2) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem delete [plot, location, zone]"));
+            sender.sendMessage(Utils.error("/plotsystem delete [plot, location, zone]"));
             return;
 
         }
@@ -54,7 +53,7 @@ public class DeleteCommand {
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem delete [plot, location, zone]"));
+                sender.sendMessage(Utils.error("/plotsystem delete [plot, location, zone]"));
 
         }
 
@@ -67,13 +66,13 @@ public class DeleteCommand {
         if (sender instanceof Player p) {
 
             if (!(p.hasPermission("uknet.plots.delete.plot"))) {
-                p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+                p.sendMessage(Utils.error("&cYou do not have permission to use this command."));
                 return;
             }
 
         } else if (args.length < 3) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem delete plot <plotID>"));
+            sender.sendMessage(Utils.error("/plotsystem delete plot <plotID>"));
             return;
 
         }
@@ -88,7 +87,7 @@ public class DeleteCommand {
 
             } catch (NumberFormatException e) {
 
-                sender.sendMessage("&c/plotsystem delete plot <plotID>");
+                sender.sendMessage(Utils.error("/plotsystem delete plot <plotID>"));
                 return;
 
             }
@@ -102,7 +101,7 @@ public class DeleteCommand {
 
             if (u.inPlot == 0) {
 
-                p.sendMessage(Utils.chat("&cYou are not standing in a plot."));
+                p.sendMessage(Utils.error("You are not standing in a plot."));
                 return;
 
             }
@@ -117,12 +116,12 @@ public class DeleteCommand {
 
         //Check if plot exists.
         if (!plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
-            sender.sendMessage(Utils.chat("&cThis plot does not exist."));
+            sender.sendMessage(Utils.error("This plot does not exist."));
         }
 
         //Check if plot is unclaimed
         if (!(plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='unclaimed'"))) {
-            sender.sendMessage(Utils.chat("&cThis plot is claimed, you can only delete unclaimed plots."));
+            sender.sendMessage(Utils.error("This plot is claimed, you can only delete unclaimed plots."));
             return;
         }
 
@@ -131,7 +130,7 @@ public class DeleteCommand {
 
         //If world is null then the plot is not on this server.
         if (world == null) {
-            sender.sendMessage(Utils.chat("&cThe plot is not on this server."));
+            sender.sendMessage(Utils.error("The plot is not on this server."));
             return;
         }
 
@@ -140,11 +139,11 @@ public class DeleteCommand {
 
             //Set plot to deleted in database.
             plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
-            sender.sendMessage(Utils.chat("&aPlot &3" + plotID + "&a deleted."));
+            sender.sendMessage(Utils.success("Plot &3" + plotID + "&a deleted."));
 
         } else {
 
-            sender.sendMessage(Utils.chat("&aAn error occured while deleting the plot."));
+            sender.sendMessage(Utils.error("An error occured while deleting the plot."));
             PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot &3" + plotID + "&a from WorldGuard.");
 
         }
@@ -156,7 +155,7 @@ public class DeleteCommand {
         if (sender instanceof Player p) {
 
             if (!(p.hasPermission("uknet.plots.delete.location"))) {
-                p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
                 return;
             }
 
@@ -165,7 +164,7 @@ public class DeleteCommand {
         //Check arg count.
         if (args.length < 3) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem delete location [name]"));
+            sender.sendMessage(Utils.error("/plotsystem delete location [name]"));
             return;
 
         }
@@ -173,7 +172,7 @@ public class DeleteCommand {
         //Check if location exists.
         if (!(plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';"))) {
 
-            sender.sendMessage(Utils.chat("&cThe location " + args[2] + " does not exist."));
+            sender.sendMessage(Utils.error("The location &4" + args[2] + " &cdoes not exist."));
             return;
 
         }
@@ -181,7 +180,7 @@ public class DeleteCommand {
         //Check if the location is on this server.
         if (!(plotSQL.getString("SELECT server FROM location_data WHERE name='" + args[2] + "';").equals(PlotSystem.SERVER_NAME))) {
 
-            sender.sendMessage(Utils.chat("&cThis location is not on this server."));
+            sender.sendMessage(Utils.error("This location is not on this server."));
             return;
 
         }
@@ -189,7 +188,7 @@ public class DeleteCommand {
         //If location has plots, cancel.
         if (plotSQL.hasRow("SELECT id FROM plot_data WHERE location='" + args[2] + "' AND status<>'completed' AND status<>'deleted';")) {
 
-            sender.sendMessage(Utils.chat("&cThis location active has plots, all plots must be deleted or completed to remove the location."));
+            sender.sendMessage(Utils.error("This location active has plots, all plots must be deleted or completed to remove the location."));
             return;
 
         }
@@ -199,8 +198,8 @@ public class DeleteCommand {
 
             //Delete location from database.
             plotSQL.update("DELETE FROM location_data WHERE name='" + args[2] + "';");
-            sender.sendMessage(Utils.chat("&aDeleted location &3" + args[2] + "&a."));
-            PlotSystem.getInstance().getLogger().info("Delete location " + args[2] + ".");
+            sender.sendMessage(Utils.success("Deleted location &3" + args[2] + "&a."));
+            PlotSystem.getInstance().getLogger().info("Deleted location " + args[2] + ".");
 
             //Get regions from database.
             ArrayList<String> regions = plotSQL.getStringList("SELECT region FROM regions WHERE location='" + args[2] + "';");
@@ -217,7 +216,7 @@ public class DeleteCommand {
 
         } else {
 
-            sender.sendMessage(Utils.chat("&cAn error occurred while deleting the world."));
+            sender.sendMessage(Utils.error("An error occurred while deleting the world."));
             PlotSystem.getInstance().getLogger().warning("An error occurred while deleting world " + args[2] + ".");
 
         }

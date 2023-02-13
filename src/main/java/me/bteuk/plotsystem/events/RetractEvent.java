@@ -1,8 +1,8 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -29,7 +29,7 @@ public class RetractEvent {
                 //Set plot status to submitted.
                 PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + id + ";");
 
-                message = Utils.chat("&aRetracted submission for plot &3" + id);
+                message = "&aRetracted submission for plot &3" + id;
 
             } else {
 

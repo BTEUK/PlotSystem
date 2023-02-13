@@ -66,9 +66,9 @@ public class PreviousFeedbackGui extends Gui {
             //Add player to gui.
             int finalI = i;
             setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
-                            Utils.chat("&b&lFeedback for submission " + i),
-                            Utils.chat("&fClick to view feedback for this submission."),
-                            Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                            Utils.title("Feedback for submission " + i),
+                            Utils.line("Click to view feedback for this submission."),
+                            Utils.line("Reviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                     + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"))),
 
                     u ->
@@ -81,7 +81,7 @@ public class PreviousFeedbackGui extends Gui {
                         //Create book.
                         ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
                         BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-                        bookMeta.setTitle(Utils.chat("&b&lPlot " + plotID + " Attempt " + finalI));
+                        bookMeta.setTitle(Utils.title("Plot " + plotID + " Attempt " + finalI));
 
                         //Get book author, aka the reviewer.
                         String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
@@ -114,8 +114,8 @@ public class PreviousFeedbackGui extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        me.bteuk.plotsystem.utils.Utils.chat("&b&lReturn"),
-                        me.bteuk.plotsystem.utils.Utils.chat("&fGo back to the review menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Go back to the review menu.")),
 
                 u -> {
 

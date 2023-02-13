@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.reviewing.Review;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -24,7 +24,7 @@ public class ReviewEvent {
 
             if (p == null) {
 
-                Bukkit.getLogger().warning(Utils.chat("&cPlayer " + uuid + " is not on the server the event was sent to!"));
+                Bukkit.getLogger().warning("Player " + uuid + " is not on the server the event was sent to!");
                 return;
 
             }
@@ -57,7 +57,7 @@ public class ReviewEvent {
 
             } else {
 
-                p.sendMessage(Utils.chat("&cThe plot is not submitted."));
+                p.sendMessage(Utils.error("The plot is not submitted."));
 
             }
         }

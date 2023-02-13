@@ -11,7 +11,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.*;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
@@ -26,7 +25,7 @@ public class Multiverse {
         MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         if (core == null) {
-            PlotSystem.getInstance().getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            PlotSystem.getInstance().getLogger().severe("Multiverse is a dependency of PlotSystem!");
             return false;
         }
 
@@ -129,7 +128,7 @@ public class Multiverse {
         MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         if (core == null) {
-            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            Bukkit.getLogger().severe("Multiverse is a dependency of PlotSystem!");
             return false;
         }
 
@@ -147,7 +146,7 @@ public class Multiverse {
         MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         if (core == null) {
-            Bukkit.getLogger().severe(Utils.chat("&cMultiverse is a dependency of PlotSystem!"));
+            Bukkit.getLogger().severe("Multiverse is a dependency of PlotSystem!");
             return false;
         }
 

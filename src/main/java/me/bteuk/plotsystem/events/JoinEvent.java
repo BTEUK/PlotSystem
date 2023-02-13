@@ -1,10 +1,9 @@
 package me.bteuk.plotsystem.events;
 
-import me.bteuk.network.Network;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.Time;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,7 +43,7 @@ public class JoinEvent {
                 //Send a message to the plot owner.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
                         plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','" + "&3" +
-                        PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &chas joined your plot &3" + id + "';");
+                        PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &chas joined your plot &3" + id + "');");
 
             }
 

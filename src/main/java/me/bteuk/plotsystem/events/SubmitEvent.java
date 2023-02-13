@@ -1,10 +1,9 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.Plot;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.utils.Time;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,7 +48,7 @@ public class SubmitEvent {
                     }
                 }
 
-                message = Utils.chat("&cYou have a &4" + time + " &ccooldown before you can submit another plot.");
+                message = "&cYou have a &4" + time + " &ccooldown before you can submit another plot.";
                 success = false;
 
             } else {

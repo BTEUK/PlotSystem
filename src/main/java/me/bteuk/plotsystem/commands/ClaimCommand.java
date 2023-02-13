@@ -2,11 +2,11 @@ package me.bteuk.plotsystem.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,7 +29,7 @@ public class ClaimCommand implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be used by a player."));
+            sender.sendMessage(Utils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -57,7 +57,7 @@ public class ClaimCommand implements CommandExecutor {
         //If the player is not in a plot tell them.
         if (u.inPlot == 0) {
 
-            u.player.sendMessage(Utils.chat("&cYou are not in a plot!"));
+            u.player.sendMessage(Utils.error("You are not in a plot!"));
             return false;
 
         }
@@ -66,17 +66,17 @@ public class ClaimCommand implements CommandExecutor {
         //If they are the owner or a member tell them.
         if (u.plotOwner) {
 
-            u.player.sendMessage(Utils.chat("&cYou are already the owner of this plot!"));
+            u.player.sendMessage(Utils.error("You are already the owner of this plot!"));
             return false;
 
         } else if (u.plotMember) {
 
-            u.player.sendMessage(Utils.chat("&cYou are already a member of this plot!"));
+            u.player.sendMessage(Utils.error("You are already a member of this plot!"));
             return false;
 
         } else if (u.isClaimed) {
 
-            u.player.sendMessage(Utils.chat("&cThis plot is already claimed!"));
+            u.player.sendMessage(Utils.error("This plot is already claimed!"));
             return false;
 
         }
@@ -84,7 +84,7 @@ public class ClaimCommand implements CommandExecutor {
         //Check if you do not already have the maximum number of plots.
         if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + u.uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
-            u.player.sendMessage(Utils.chat("&cYou have reached the maximum number of plots."));
+            u.player.sendMessage(Utils.error("You have reached the maximum number of plots."));
             return false;
 
         }

@@ -102,7 +102,7 @@ public class Timers {
         //Update plot outlines.
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
-            for (User u : instance.getUsers()) {
+            for (User u : users) {
 
                 //Get regions.
                 regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.player.getWorld()));

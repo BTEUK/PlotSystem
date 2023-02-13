@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.commands;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,7 +31,7 @@ public class PlotSystemCommand implements CommandExecutor {
         //If there are no arguments return.
         if (args.length == 0) {
 
-            sender.sendMessage(Utils.chat("&c/plotsystem help"));
+            sender.sendMessage(Utils.error("/plotsystem help"));
             return true;
 
         }
@@ -65,13 +65,13 @@ public class PlotSystemCommand implements CommandExecutor {
                 if (args.length == 3) {
                     setAlias(sender, args[1], args[2]);
                 } else {
-                    sender.sendMessage(Utils.chat("&c/plotsystem setalias [location] [alias]"));
+                    sender.sendMessage(Utils.error("/plotsystem setalias [location] [alias]"));
                 }
                 break;
 
             default:
 
-                sender.sendMessage(Utils.chat("&c/plotsystem help"));
+                sender.sendMessage(Utils.error("/plotsystem help"));
 
         }
 
@@ -95,7 +95,7 @@ public class PlotSystemCommand implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player)) {
 
-            sender.sendMessage(Utils.chat("&cYou must be a player to use this command."));
+            sender.sendMessage(Utils.error("You must be a player to use this command."));
             return;
 
         }
@@ -106,7 +106,7 @@ public class PlotSystemCommand implements CommandExecutor {
         //Check if the user has permission.
         if (!u.player.hasPermission("uknet.plots.select")) {
 
-            u.player.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+            u.player.sendMessage(Utils.error("You do not have permission to use this command."));
 
         }
 
@@ -120,7 +120,7 @@ public class PlotSystemCommand implements CommandExecutor {
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("uknet.plots.setalias")) {
-                p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
             }
 
         }
@@ -128,10 +128,10 @@ public class PlotSystemCommand implements CommandExecutor {
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location + "';")) {
 
             plotSQL.update("UPDATE location_data SET alias='" + alias.replace("'", "\\'") + "' WHERE name='" + location+ "';");
-            sender.sendMessage(Utils.chat("&aSet alias of location &3" + location + "&a to &3" + alias + "&a."));
+            sender.sendMessage(Utils.success("Set alias of location &3" + location + "&a to &3" + alias + "&a."));
 
         } else {
-            sender.sendMessage(Utils.chat("&cThe location " + location + " does not exist."));
+            sender.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
         }
     }
 }

@@ -2,18 +2,15 @@ package me.bteuk.plotsystem.reviewing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.Points;
 import me.bteuk.network.utils.Roles;
-import me.bteuk.network.utils.enums.PointsType;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.PlotValues;
-import me.bteuk.plotsystem.utils.Time;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,7 +19,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import com.sk89q.worldedit.math.BlockVector2;
 
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -63,7 +59,7 @@ public class AcceptGui extends Gui {
                     if (accuracy < i) {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
-                                        Utils.chat("&b&lAccuracy: " + i)),
+                                        Utils.title("Accuracy: " + i)),
 
                                 u -> {
 
@@ -79,7 +75,7 @@ public class AcceptGui extends Gui {
                     } else {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                        Utils.chat("&b&lAccuracy: " + i)),
+                                        Utils.title("Accuracy: " + i)),
 
                                 u -> {
 
@@ -103,7 +99,7 @@ public class AcceptGui extends Gui {
                     if (quality < i) {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
-                                        Utils.chat("&b&lQuality: " + i)),
+                                        Utils.title("Quality: " + i)),
 
                                 u -> {
 
@@ -120,7 +116,7 @@ public class AcceptGui extends Gui {
                     } else {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                        Utils.chat("&b&lQuality: " + i)),
+                                        Utils.title("Quality: " + i)),
 
                                 u -> {
 
@@ -140,8 +136,8 @@ public class AcceptGui extends Gui {
         }
 
         setItem(4, Utils.createItem(Material.EMERALD, 1,
-                        Utils.chat("&b&lAccept Plot"),
-                        Utils.chat("&fClick to accept the plot with the current settings.")),
+                        Utils.title("Accept Plot"),
+                        Utils.line("Click to accept the plot with the current settings.")),
 
                 u -> {
 
@@ -232,13 +228,13 @@ public class AcceptGui extends Gui {
                     //Update the world by copying the build world to the save world.
                     WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
 
-                    PlotSystem.getInstance().getLogger().info(Utils.chat("&aPlot " + user.review.plot + " successfully saved."));
+                    PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
 
                     //Remove plot from worldguard.
                     WorldGuardFunctions.deletePlot(user.review.plot, world);
 
                     //Send feedback in chat and console.
-                    u.player.sendMessage(Utils.chat("&aPlot " + user.review.plot + " accepted."));
+                    u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));
 
                     //Get number of submitted plots.
                     int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
@@ -283,8 +279,8 @@ public class AcceptGui extends Gui {
         );
 
         setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fGo back to the review menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Go back to the review menu.")),
 
                 u -> {
 

@@ -1,13 +1,10 @@
 package me.bteuk.plotsystem.events;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
-import me.bteuk.plotsystem.utils.Utils;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,7 +25,7 @@ public class TeleportEvent {
             if (p == null) {
 
                 //Send warning to console if player can't be found.
-                Bukkit.getLogger().warning(Utils.chat("&cAttempting to teleport player with uuid " + uuid + " but they are not on this server."));
+                Bukkit.getLogger().warning(("Attempting to teleport player with uuid " + uuid + " but they are not on this server."));
                 return;
 
             }

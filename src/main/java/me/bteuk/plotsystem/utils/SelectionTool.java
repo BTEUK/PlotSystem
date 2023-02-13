@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
@@ -112,7 +113,7 @@ public class SelectionTool extends WGCreatePlot {
         //Send an error message to the player.
         if (bv2.distance(vector.get(0)) > 500) {
 
-            u.player.sendMessage(Utils.chat("&cThis point is over 500 blocks from the first point, please make the selection smaller."));
+            u.player.sendMessage(Utils.error("This point is over 500 blocks from the first point, please make the selection smaller."));
             return false;
 
         } else {
@@ -234,7 +235,7 @@ public class SelectionTool extends WGCreatePlot {
             }
 
             //Send feedback.
-            u.player.sendMessage(Utils.chat("&aPlot created with ID &3" + plotID +
+            u.player.sendMessage(Utils.success("Plot created with ID &3" + plotID +
                     "&a, difficulty &3" + PlotValues.difficultyName(difficulty) +
                     "&a and size &3" + PlotValues.sizeName(size)));
             PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
