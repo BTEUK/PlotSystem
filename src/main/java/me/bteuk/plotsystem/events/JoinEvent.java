@@ -43,7 +43,7 @@ public class JoinEvent {
                 //Send a message to the plot owner.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
                         plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','" + "&3" +
-                        PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &chas joined your plot &3" + id + "');");
+                        PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined your plot &3" + id + "');");
 
             }
 
@@ -54,7 +54,7 @@ public class JoinEvent {
             } else {
 
                 //Send a cross-server message.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
 
             }
         }

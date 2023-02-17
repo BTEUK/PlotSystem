@@ -44,7 +44,7 @@ public class KickEvent {
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1") + "','" + messageOwner + "';");
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','" + messageOwner + "');");
 
             }
 
@@ -56,7 +56,7 @@ public class KickEvent {
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + messageMember + "';");
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + messageMember + "');");
 
             }
         }

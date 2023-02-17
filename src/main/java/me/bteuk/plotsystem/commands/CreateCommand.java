@@ -200,7 +200,7 @@ public class CreateCommand {
                         sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
                         return;
                     } else {
-                        sender.sendMessage(Utils.success("&aCopied region &3" + i + "," + j + " &ato &3" + args[2] + "&a."));
+                        sender.sendMessage(Utils.success("&aCopied region &3" + i + "," + j + " &ato &3" + args[2]));
                     }
 
                 }
