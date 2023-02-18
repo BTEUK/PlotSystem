@@ -210,11 +210,11 @@ public class CreateCommand {
 
             int coordMin = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    (regionXMin * 512), 0, (regionZMin * 512), 0, 0));
+                    (regionXMin * 512), -60, (regionZMin * 512), 0, 0));
 
             int coordMax = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    ((regionXMax * 512) + 511), 256, ((regionZMax * 512) + 511), 0, 0));
+                    ((regionXMax * 512) + 511), 319, ((regionZMax * 512) + 511), 0, 0));
 
             //Add the location to the database.
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"

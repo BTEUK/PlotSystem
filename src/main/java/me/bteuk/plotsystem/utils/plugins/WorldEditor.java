@@ -53,6 +53,7 @@ public class WorldEditor {
                     // configure here
                     .build();
             Operations.complete(operation);
+            editSession.flushQueue();
         } catch (WorldEditException e) {
             e.printStackTrace();
             return false;
@@ -72,7 +73,7 @@ public class WorldEditor {
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-                .world(copyWorld).fastMode(false).checkMemory(true).limitUnlimited().build()) {
+                .world(copyWorld).fastMode(false).checkMemory(true).limitUnlimited().changeSetNull().build()) {
             ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
                     editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
             );
@@ -102,6 +103,8 @@ public class WorldEditor {
             e.printStackTrace();
             return false;
         }
+
+        clipboard.close();
 
         return true;
 

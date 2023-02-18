@@ -47,6 +47,7 @@ public class Multiverse {
         MVWorld.setDifficulty(Difficulty.PEACEFUL);
         MVWorld.setEnableWeather(false);
         MVWorld.setHunger(false);
+        MVWorld.setKeepSpawnInMemory(false);
 
         //Get world from bukkit.
         World world = Bukkit.getWorld(name);
