@@ -7,6 +7,8 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -48,10 +50,44 @@ public class ClaimGui extends Gui {
 
                     u.player.closeInventory();
 
-                    TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "insert link here"));
+                    //Get corners of the plot.
+                    int[][] corners = user.plotSQL.getPlotCorners(user.inPlot);
 
-                    u.player.spigot().sendMessage(message);
+                    int sumX = 0;
+                    int sumZ = 0;
+
+                    //Find the centre.
+                    for (int[] corner : corners) {
+
+                        sumX += corner[0];
+                        sumZ += corner[1];
+
+                    }
+
+                    double x = sumX / (double) corners.length;
+                    double z = sumZ / (double) corners.length;
+
+                    //Subtract the coordinate transform to make the coordinates in the real location.
+                    x -= user.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" +
+                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.inPlot + ";") + "';");
+                    z -= user.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" +
+                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.inPlot + ";") + "';");
+
+                    //Convert to irl coordinates.
+                    try {
+
+                        final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+                        double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
+
+                        //Generate link to google maps.
+                        TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
+                        message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
+
+                        u.player.spigot().sendMessage(message);
+
+                    } catch (OutOfProjectionBoundsException e) {
+                        e.printStackTrace();
+                    }
 
                 });
 
