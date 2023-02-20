@@ -106,7 +106,8 @@ public class PlotSystemCommand implements CommandExecutor {
         //Check if the user has permission.
         if (!u.player.hasPermission("uknet.plots.select")) {
 
-            u.player.sendMessage(Utils.error("You do not have permission to use this command."));
+            u.player.sendMessage(Utils.error("You do not have permission to do this."));
+            return;
 
         }
 
@@ -121,6 +122,7 @@ public class PlotSystemCommand implements CommandExecutor {
 
             if (!p.hasPermission("uknet.plots.setalias")) {
                 p.sendMessage(Utils.error("You do not have permission to use this command."));
+                return;
             }
 
         }

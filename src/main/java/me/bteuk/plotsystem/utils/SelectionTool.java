@@ -150,10 +150,14 @@ public class SelectionTool extends WGCreatePlot {
             i.setItem(i.first(PlotSystem.selectionTool), i.getItemInMainHand());
             i.setItemInMainHand(PlotSystem.selectionTool);
 
+            u.player.sendMessage(Utils.success("Switched to selection tool from inventory."));
+
         } else {
 
             //If they don't have the selection tool already set it in their main hand.
             i.setItemInMainHand(PlotSystem.selectionTool);
+
+            u.player.sendMessage(Utils.success("Set selection tool to main hand."));
 
         }
     }

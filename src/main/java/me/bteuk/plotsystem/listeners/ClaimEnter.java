@@ -116,7 +116,7 @@ public class ClaimEnter implements Listener {
                                 u.plotOwner = false;
                                 u.plotMember = false;
                                 u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                        TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
+                                        TextComponent.fromLegacyText(Utils.success("You have entered &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
                                                 plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';") + "'s &aplot.")));
 
                             }
@@ -171,7 +171,7 @@ public class ClaimEnter implements Listener {
 
                     //If you are not an owner or member send the relevant message.
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(Utils.success("You have left plot &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
+                            TextComponent.fromLegacyText(Utils.success("You have left &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
                                     plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';") + "'s &aplot.")));
 
                 }
