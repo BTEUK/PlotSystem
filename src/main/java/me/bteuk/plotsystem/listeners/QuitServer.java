@@ -52,8 +52,12 @@ public class QuitServer implements Listener {
             u.claimGui.delete();
         }
 
-        if (u.createGui != null) {
-            u.createGui.delete();
+        if (u.createPlotGui != null) {
+            u.createPlotGui.delete();
+        }
+
+        if (u.createZoneGui != null) {
+            u.createZoneGui.delete();
         }
 
         //Remove user from list

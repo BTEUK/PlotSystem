@@ -143,11 +143,11 @@ public class ReviewGui extends Gui {
                         globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
                                 "','&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
 
-                        //Set status of plot back to claimed.
-                        plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
-
                         //Update last visit time, to prevent inactivity removal of plot.
                         plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + user.review.plot + ";");
+
+                        //Set status of plot back to claimed.
+                        plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
 
                         //Remove the reviewer from the plot.
                         WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);

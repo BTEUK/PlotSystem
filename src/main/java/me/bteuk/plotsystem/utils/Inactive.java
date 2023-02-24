@@ -41,9 +41,9 @@ public class Inactive {
         //Iterate through all inactive plots and cancel them.
         for (int plot : inactivePlots) {
 
-            //Check if the plot is on this server.
+            //Check if the plot is on this server and that it is claimed, rather than submitted.
             if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") +
-                    "' AND server='" + PlotSystem.SERVER_NAME + "';")) {
+                    "' AND server='" + PlotSystem.SERVER_NAME + "';") && plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plot + " AND status='claimed';")) {
 
                 //Get plot location.
                 String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");

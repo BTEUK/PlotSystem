@@ -7,6 +7,7 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
+import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -53,6 +54,7 @@ public class CreateCommand {
 
             case "zone":
 
+                createZone(sender);
                 break;
 
             default:
@@ -102,8 +104,8 @@ public class CreateCommand {
         NetworkUser user = Network.getInstance().getUser(u.player);
 
         //Open the create gui.
-        u.createGui = new CreatePlotGui(u);
-        u.createGui.open(user);
+        u.createPlotGui = new CreatePlotGui(u);
+        u.createPlotGui.open(user);
 
     }
 
@@ -270,5 +272,42 @@ public class CreateCommand {
                         "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + args[2] + "';"), p.getLocation());
             }
         });
+    }
+
+    public void createZone(CommandSender sender) {
+
+        //Check if the sender is a player
+        if (!(sender instanceof Player)) {
+
+            sender.sendMessage(Utils.error("This command can only be used by players!"));
+            return;
+
+        }
+
+        //Get the user
+        User u = PlotSystem.getInstance().getUser((Player) sender);
+
+        //Check if the user has permission to use this command
+        if (!u.player.hasPermission("uknet.plots.create.zone")) {
+
+            u.player.sendMessage(Utils.error("You do not have permission to use this command!"));
+            return;
+
+        }
+
+        //Check if the selection is valid, meaning that at least 3 points are selected with the selection tool.
+        if (u.selectionTool.size() < 3) {
+
+            u.player.sendMessage(Utils.error("You must select at least 3 points for a valid zone!"));
+            return;
+
+        }
+
+        //Get the user from the network plugin, this plugin handles all guis.
+        NetworkUser user = Network.getInstance().getUser(u.player);
+
+        //Open the create zone gui.
+        u.createZoneGui = new CreateZoneGui(u);
+        u.createZoneGui.open(user);
     }
 }

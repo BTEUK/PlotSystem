@@ -30,9 +30,9 @@ public class CloseInventory implements Listener {
             u.claimGui = null;
         }
 
-        if (u.createGui != null) {
-            u.createGui.delete();
-            u.createGui = null;
+        if (u.createPlotGui != null) {
+            u.createPlotGui.delete();
+            u.createPlotGui = null;
         }
 
     }

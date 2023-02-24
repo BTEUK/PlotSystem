@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.utils;
 
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
+import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import org.bukkit.Location;
@@ -30,7 +31,8 @@ public class User {
 
     //Guis
     public ClaimGui claimGui;
-    public CreatePlotGui createGui;
+    public CreatePlotGui createPlotGui;
+    public CreateZoneGui createZoneGui;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
