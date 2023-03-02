@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -49,6 +50,10 @@ public class SelectionTool extends WGCreatePlot {
 
     //PlotOutline
     private final PlotOutline plotOutline;
+
+    //Zones settings.
+    public int hours;
+    public boolean is_public;
 
     //Constructor, sets up the basics of the selection tool, including default values fo size and difficulty.
     public SelectionTool(User u, PlotSQL plotSQL) {
@@ -245,6 +250,41 @@ public class SelectionTool extends WGCreatePlot {
             PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));
+
+            //Clear previous blocks.
+            plotOutline.previousBlocks.clear();
+
+            //Change plot outline to blockType of plot, rather than of selection.
+            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(plotID, world), difficultyMaterial(difficulty), false);
+
+        }
+    }
+
+    //Before this method can be run the player must have gone through the zone creation gui.
+    //This will make sure public/private and expiration time has been set.
+    public void createZone() {
+
+        long expiration = Time.currentTime() + (hours * 1000L * 60L * 60L);
+
+        //Create the zone.
+        if (createZone(u.player, world, location, vector, plotSQL, expiration, is_public)) {
+
+            //Store zone bounds.
+            int i = 1;
+            for (BlockVector2 point : vector) {
+
+                plotSQL.update("INSERT INTO plot_corners(id,corner,x,z) VALUES(" +
+                        plotID + "," + i + "," + point.getX() + "," + point.getZ() + ");");
+                i++;
+
+            }
+
+            //Send feedback.
+            u.player.sendMessage(Utils.success("Zone created with ID &3" + plotID +
+                    "&a, it will expire at &3" + Time.getDateTime(expiration) +
+                    "&a, this can be extended in the Zone Menu."));
+            PlotSystem.getInstance().getLogger().info("Zone created with ID " + plotID +
+                    ", it will expire at " + Time.getDateTime(expiration));
 
             //Clear previous blocks.
             plotOutline.previousBlocks.clear();

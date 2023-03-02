@@ -42,7 +42,7 @@ public class CreateZoneGui extends Gui {
                     u.player.closeInventory();
 
                     //Create plot with the selection created by the user.
-                    eUser.selectionTool.createPlot();
+                    eUser.selectionTool.createZone();
 
                 });
 

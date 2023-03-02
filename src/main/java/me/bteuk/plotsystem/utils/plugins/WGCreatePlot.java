@@ -34,7 +34,7 @@ public class WGCreatePlot {
         WorldGuard wg = WorldGuard.getInstance();
 
         //Get regions.
-        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(Bukkit.getWorld(world.getName())));
+        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
 
         //Checking if regions isn't null, would indicate that the world doesn't exist.
         if (regions == null) {
@@ -48,7 +48,7 @@ public class WGCreatePlot {
         ApplicableRegionSet set = regions.getApplicableRegions(region);
         if (set.size() > 0) {
 
-            p.sendMessage(Utils.error("Your selection overlaps with an existing plot."));
+            p.sendMessage(Utils.error("Your selection overlaps with an existing plot or zone."));
             return false;
 
         }
@@ -58,6 +58,52 @@ public class WGCreatePlot {
 
         //Create the region with valid name.
         region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, -60, 320);
+
+        //Add the regions to the world
+        regions.addRegion(region);
+
+        //Save the new region
+        try {
+            regions.save();
+        } catch (
+                StorageException e1) {
+            e1.printStackTrace();
+        }
+
+        return true;
+    }
+
+    //Create a zone with the current selection.
+    public boolean createZone(Player p, World world, String location, List<BlockVector2> vector, PlotSQL plotSQL, long expiration, boolean is_public) {
+
+        //Get instance of WorldGuard.
+        WorldGuard wg = WorldGuard.getInstance();
+
+        //Get regions.
+        RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+
+        //Checking if regions isn't null, would indicate that the world doesn't exist.
+        if (regions == null) {
+            return false;
+        }
+
+        //Create region to test.
+        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, 1, 256);
+
+        //Check whether the region overlaps an existing plot, if true stop the process.
+        ApplicableRegionSet set = regions.getApplicableRegions(region);
+        if (set.size() > 0) {
+
+            p.sendMessage(Utils.error("Your selection overlaps with an existing plot or zone."));
+            return false;
+
+        }
+
+        //Create an entry in the database for the plot.
+        plotID = plotSQL.createZone(location, expiration, is_public);
+
+        //Create the region with valid name.
+        region = new ProtectedPolygonalRegion("z" + plotID, vector, -60, 320);
 
         //Add the regions to the world
         regions.addRegion(region);

@@ -223,4 +223,38 @@ public class PlotSQL {
             return corners;
         }
     }
+
+    //Creates a new plot and returns the id of the plot.
+    public int createZone(String location, long expiration, boolean is_public) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO zone_data(location,expiration,is_public) VALUES(?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+
+            statement.setString(1, location);
+            statement.setLong(2, expiration);
+            statement.setBoolean(3, is_public);
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
+
+                    return results.getInt(1);
+
+                } else {
+
+                    return 0;
+
+                }
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
+        }
+    }
 }

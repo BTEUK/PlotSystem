@@ -57,8 +57,8 @@ public class PlotSystem extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            Bukkit.getLogger().warning("The config must be configured before the plugin can be enabled!");
-            Bukkit.getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            getLogger().warning("The config must be configured before the plugin can be enabled!");
+            getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
             return;
 
         }
@@ -77,7 +77,7 @@ public class PlotSystem extends JavaPlugin {
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
-            Bukkit.getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -95,18 +95,18 @@ public class PlotSystem extends JavaPlugin {
                 //Create save world.
                 if (!Multiverse.createVoidWorld(config.getString("save_world"))) {
 
-                    Bukkit.getLogger().warning("Failed to create save world!");
+                    getLogger().warning("Failed to create save world!");
 
                 }
 
                 //Enable plugin.
-                Bukkit.getLogger().info("Enabling Plugin");
+                getLogger().info("Enabling Plugin");
                 enablePlugin();
 
             } else {
 
                 //Save world has already been created, enable plugin.
-                Bukkit.getLogger().info("Enabling Plugin");
+                getLogger().info("Enabling Plugin");
                 enablePlugin();
 
 
@@ -114,7 +114,7 @@ public class PlotSystem extends JavaPlugin {
         } else {
 
             //If the server is not in the database the network plugin was not successful.
-            Bukkit.getLogger().warning("Server is not in database, check that the Network plugin is working correctly.");
+            getLogger().warning("Server is not in database, check that the Network plugin is working correctly.");
 
         }
     }
@@ -202,7 +202,7 @@ public class PlotSystem extends JavaPlugin {
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
-        Bukkit.getLogger().info("Disabled PublicBuilds");
+        getLogger().info("Disabled PublicBuilds");
     }
 
     //Creates the mysql connection.
