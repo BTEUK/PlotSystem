@@ -66,6 +66,9 @@ public class SelectionTool extends WGCreatePlot {
         size = 1;
         difficulty = 1;
 
+        hours = 2;
+        is_public = false;
+
         plotOutline = new PlotOutline();
 
     }
@@ -79,6 +82,9 @@ public class SelectionTool extends WGCreatePlot {
 
         size = 1;
         difficulty = 1;
+
+        hours = 2;
+        is_public = false;
 
         vector.clear();
 
@@ -204,7 +210,6 @@ public class SelectionTool extends WGCreatePlot {
         }
 
         area = Math.abs(sum);
-        PlotSystem.getInstance().getLogger().info("Area: " + area);
 
     }
 

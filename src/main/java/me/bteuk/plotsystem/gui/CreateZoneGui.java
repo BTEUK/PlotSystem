@@ -26,6 +26,8 @@ public class CreateZoneGui extends Gui {
 
     private void createGui() {
 
+        //TODO Zone info
+
         //Create zone.
         setItem(13, Utils.createItem(Material.DIAMOND, 1,
                         Utils.title("Create Zone"),
@@ -45,6 +47,74 @@ public class CreateZoneGui extends Gui {
                     eUser.selectionTool.createZone();
 
                 });
+
+        //Set public/private.
+        if (user.selectionTool.is_public) {
+
+            setItem(13, Utils.createItem(Material.OAK_DOOR, 1,
+                            Utils.title("Set the zone to private."),
+                            Utils.line("Click to make the zone private."),
+                            Utils.line("A private zone means the owner has"),
+                            Utils.line("to invite members for them to build.")),
+                    u ->
+
+                    {
+
+                        //Set private.
+                        user.selectionTool.is_public = false;
+
+                        //Refresh the gui.
+                        refresh();
+                        user.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
+
+                    });
+
+        } else {
+
+            setItem(13, Utils.createItem(Material.IRON_DOOR, 1,
+                            Utils.title("Set the zone to public."),
+                            Utils.line("Click to make the zone public."),
+                            Utils.line("A public zone allows JrBuilder+"),
+                            Utils.line("to join without having to request.")),
+                    u ->
+
+                    {
+
+                        //Set private.
+                        user.selectionTool.is_public = true;
+
+                        //Refresh the gui.
+                        refresh();
+                        user.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
+
+                    });
+
+        }
+
+        //Set expiration time.
+        setItem(13, Utils.createItem(Material.CLOCK, user.selectionTool.hours,
+                        Utils.title("Set the zone expiration time."),
+                        Utils.line("Click to cycle through expiration times."),
+                        Utils.line("The current time is " + user.selectionTool.hours + " hours."),
+                        Utils.line("The expiration time can be extended later.")),
+                u ->
+
+                {
+
+                    //Increase expiration time.
+                    switch (user.selectionTool.hours) {
+                        case 2 -> user.selectionTool.hours = 6;
+                        case 6 -> user.selectionTool.hours = 24;
+                        case 24 -> user.selectionTool.hours = 48;
+                        case 48 -> user.selectionTool.hours = 2;
+                    }
+
+                    //Refresh the gui.
+                    refresh();
+                    user.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
+
+                });
+
 
         //Fill the border of the gui with grey stained glass pane.
         /*for (int i = 0; i <= 26; i++) {
