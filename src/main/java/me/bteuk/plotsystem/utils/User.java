@@ -20,6 +20,8 @@ public class User {
     public SelectionTool selectionTool;
 
     public int inPlot = 0;
+    public int inZone = 0;
+
     public boolean plotOwner;
     public boolean plotMember;
     public boolean isClaimed;
