@@ -96,7 +96,9 @@ public class ReviewHotbar implements Listener {
             e.setCancelled(true);
             u.player.closeInventory();
             NetworkUser user = Network.getInstance().getUser(u.player);
-            u.review.reviewGui.open(user);
+            if (u.review != null) {
+                u.review.reviewGui.open(user);
+            }
         }
     }
 
