@@ -146,6 +146,9 @@ public class ReviewGui extends Gui {
                         //Set status of plot back to claimed.
                         plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
 
+                        //Remove submitted plot entry.
+                        PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
+
                         //Update last visit time, to prevent inactivity removal of plot.
                         plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + user.review.plot + ";");
 

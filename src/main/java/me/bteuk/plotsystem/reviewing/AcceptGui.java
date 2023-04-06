@@ -206,6 +206,9 @@ public class AcceptGui extends Gui {
                     //Set plot to completed.
                     plotSQL.update("UPDATE plot_data SET status='completed' WHERE id=" + user.review.plot + ";");
 
+                    //Remove submitted plot entry.
+                    PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
+
                     //Add points to player.
                     //By referencing network plugin.
                     //TODO Enable this when points are added.
