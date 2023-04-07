@@ -303,6 +303,14 @@ public class CreateCommand {
 
         }
 
+        //If the player already has 7 zones, cancel, as this is the maximum.
+        if (plotSQL.getInt("SELECT count(id) FROM zone_members WHERE uuid='" + u.player.getUniqueId() + "' AND is_owner=1;") == 7) {
+
+            u.player.sendMessage(Utils.error("You already have 7 zones, this is the limit."));
+            return;
+
+        }
+
         //Get the user from the network plugin, this plugin handles all guis.
         NetworkUser user = Network.getInstance().getUser(u.player);
 
