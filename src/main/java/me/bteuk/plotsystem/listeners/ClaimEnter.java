@@ -1,7 +1,6 @@
 package me.bteuk.plotsystem.listeners;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -22,6 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+@SuppressWarnings("deprecation")
 public class ClaimEnter implements Listener {
 
     PlotSQL plotSQL;
@@ -40,6 +40,7 @@ public class ClaimEnter implements Listener {
     public void joinEvent(PlayerJoinEvent e) {
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(), () -> {
+
             User u = PlotSystem.getInstance().getUser(e.getPlayer());
             checkRegion(u);
         }, 20L);
@@ -47,53 +48,72 @@ public class ClaimEnter implements Listener {
 
     @EventHandler
     public void moveEvent(PlayerMoveEvent e) {
+
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
-        checkRegion(u);
+
+        //Delay this so the movement has taken place.
+        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> checkRegion(u));
     }
 
     @EventHandler
     public void teleportEvent(PlayerTeleportEvent e) {
+
         User u = PlotSystem.getInstance().getUser(e.getPlayer());
+
         //Delay this so the teleport has taken place.
         Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> checkRegion(u));
     }
 
     public void checkRegion(User u) {
 
+        //Get the location of the user.
         Location l = u.player.getLocation();
 
+        //Create a query for all regions that the player is standing in, this should always contain 1 or less regions.
+        //If more than 1 region is queried then something has gone wrong with creating regions.
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         ApplicableRegionSet applicableRegionSet = query.getApplicableRegions(BukkitAdapter.adapt(l));
 
-        for (ProtectedRegion regions : applicableRegionSet) {
-            try {
+        //Iterate through the regions, which should be at most 1.
+        //If there is more than 1 region, throw an error.
+        if (applicableRegionSet.size() > 1) {
+            PlotSystem.getInstance().getLogger().severe("The player " + u.player.getName() + " is standing in more than 1 region, this should not be possible!");
+            return;
+        }
 
-                //Get plot or zone.
-                String region = regions.getId();
+        //If there is a region, then check if it's a plot or zone.
+        //If this is not the same as the player was previously standing, notify the user and update the information in the user instance.
+        if (applicableRegionSet.size() == 1) {
 
-                //Try for a plot.
-                int plot = tryParse(region);
+            for (ProtectedRegion region : applicableRegionSet.getRegions()) {
 
-                //Try for a zone.
-                int zone = tryParse(region.replace("z", ""));
+                //Get region name.
+                String regionName = region.getId();
 
-                //If plot is not 0.
-                if (plot != 0) {
-                    checkPlot(u, plot);
+                //If the regionName starts with a z, then it's a zone.
+                //Else it's a region.
+                //The try catch will try to prevent any format exceptions.
+                try {
+
+                    if (regionName.startsWith("z")) {
+
+                        checkZone(u, Integer.parseInt(regionName.replace("z", "")));
+
+                    } else {
+
+                        checkPlot(u, Integer.parseInt(regionName));
+
+                    }
+                } catch (NumberFormatException e) {
+
+                    PlotSystem.getInstance().getLogger().warning("ApplicableRegionSet found a region that is not a plot or zone, the region name is " + regionName);
+
                 }
-
-                //If zone is not 0.
-                if (zone != 0) {
-                    checkZone(u, plot);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
-        //If you're current in a plot or zone, but you're not in a region, show the player that they left it.
-        if (applicableRegionSet.size() < 1 && (u.inPlot + u.inZone) > 0) {
+        //If you're currently in a plot or zone, but you're not in a region, show the player that they've left it.
+        if (applicableRegionSet.size() == 0 && (u.inPlot + u.inZone) > 0) {
 
             //If the plot is claimed, send the relevant message.
             if (u.inPlot != 0) {
@@ -107,16 +127,10 @@ public class ClaimEnter implements Listener {
                     //If you are the owner of the plot send the relevant message.
                     if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
-                        u.plotOwner = false;
                         u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                                 TextComponent.fromLegacyText(Utils.success("You have left your plot")));
 
                     } else {
-
-                        //If you are a member of the plot unset plotMember.
-                        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
-                            u.plotMember = false;
-                        }
 
                         //If you are not an owner or member send the relevant message.
                         u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
@@ -126,31 +140,33 @@ public class ClaimEnter implements Listener {
                     }
                 }
 
-                u.inPlot = 0;
-                u.isClaimed = true;
-
             } else if (u.inZone != 0) {
 
                 //Show zone leave message.
                 u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                         TextComponent.fromLegacyText(Utils.success("You have left zone &3" + u.inPlot)));
-                u.inZone = 0;
 
             }
-        }
-    }
 
-    private int tryParse(String text) {
-        try {
-            return Integer.parseInt(text);
-        } catch (NumberFormatException e) {
-            return 0;
+            //Set all variables to default values after the logic has been run.
+            u.inPlot = 0;
+            u.inZone = 0;
+            u.plotOwner = false;
+            u.plotMember = false;
+            u.isClaimed = true;
         }
     }
 
     private void checkPlot(User u, int plot) {
 
+        //If the plot is not equal to the current plot, then notify the player and update the user instance.
         if (u.inPlot != plot) {
+
+            //Set the zone value to zero, since you can never be in both at the same time.
+            u.inZone = 0;
+
+            //Set plot to the current plot.
+            u.inPlot = plot;
 
             //If the plot is claimed, send the relevant message.
             if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + ";")) {
@@ -172,7 +188,7 @@ public class ClaimEnter implements Listener {
 
                     u.plotOwner = true;
                     u.plotMember = false;
-                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
+                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are the owner of this plot.")));
 
@@ -181,7 +197,7 @@ public class ClaimEnter implements Listener {
 
                     u.plotOwner = false;
                     u.plotMember = true;
-                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
+                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are a member of this plot.")));
 
@@ -196,8 +212,6 @@ public class ClaimEnter implements Listener {
 
                 }
             }
-
-            u.inPlot = plot;
 
         } else {
 
@@ -214,6 +228,14 @@ public class ClaimEnter implements Listener {
 
         if (u.inZone != zone) {
 
+            //Set the plot value to zero, since you can never be in both at the same time.
+            u.inPlot = 0;
+            u.plotOwner = false;
+            u.plotMember = false;
+
+            //Set zone to current zone.
+            u.inZone = zone;
+
             //Check if the zone is public.
             if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zone + " AND is_public=1;")) {
 
@@ -226,9 +248,6 @@ public class ClaimEnter implements Listener {
                         TextComponent.fromLegacyText(Utils.success("You have entered zone &3" + zone)));
 
             }
-
-            u.inZone = zone;
-
         }
     }
 }
