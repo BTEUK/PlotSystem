@@ -304,9 +304,15 @@ public class CreateCommand {
         }
 
         //If the player already has a zones, cancel, as this is the maximum.
+        //Lastly there is a limit of 21 total zones at a time.
         if (plotSQL.hasRow("SELECT id FROM zone_members WHERE uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
             u.player.sendMessage(Utils.error("You already have a zone, close this before creating a new one."));
+            return;
+
+        } else if (plotSQL.getInt("SELECT count(id) FROM zones WHERE status='open';") >= 21) {
+
+            u.player.sendMessage(Utils.error("There are currently 21 zones, this is the maximum."));
             return;
 
         }
