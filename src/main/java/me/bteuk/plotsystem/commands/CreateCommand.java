@@ -303,10 +303,10 @@ public class CreateCommand {
 
         }
 
-        //If the player already has 7 zones, cancel, as this is the maximum.
-        if (plotSQL.getInt("SELECT count(id) FROM zone_members WHERE uuid='" + u.player.getUniqueId() + "' AND is_owner=1;") == 7) {
+        //If the player already has a zones, cancel, as this is the maximum.
+        if (plotSQL.hasRow("SELECT id FROM zone_members WHERE uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
-            u.player.sendMessage(Utils.error("You already have 7 zones, this is the limit."));
+            u.player.sendMessage(Utils.error("You already have a zone, close this before creating a new one."));
             return;
 
         }

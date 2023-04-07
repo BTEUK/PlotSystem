@@ -36,8 +36,6 @@ public class CreateZoneGui extends Gui {
 
                 {
 
-                    //Check if settings are valid.
-
                     User eUser = PlotSystem.getInstance().getUser(u.player);
 
                     //Close the inventory.
@@ -51,7 +49,7 @@ public class CreateZoneGui extends Gui {
         //Set public/private.
         if (user.selectionTool.is_public) {
 
-            setItem(13, Utils.createItem(Material.OAK_DOOR, 1,
+            setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
                             Utils.title("Set the zone to private."),
                             Utils.line("Click to make the zone private."),
                             Utils.line("A private zone means the owner has"),
@@ -71,7 +69,7 @@ public class CreateZoneGui extends Gui {
 
         } else {
 
-            setItem(13, Utils.createItem(Material.IRON_DOOR, 1,
+            setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
                             Utils.title("Set the zone to public."),
                             Utils.line("Click to make the zone public."),
                             Utils.line("A public zone allows JrBuilder+"),
@@ -92,7 +90,7 @@ public class CreateZoneGui extends Gui {
         }
 
         //Set expiration time.
-        setItem(13, Utils.createItem(Material.CLOCK, user.selectionTool.hours,
+        setItem(15, Utils.createItem(Material.CLOCK, user.selectionTool.hours,
                         Utils.title("Set the zone expiration time."),
                         Utils.line("Click to cycle through expiration times."),
                         Utils.line("The current time is " + user.selectionTool.hours + " hours."),
@@ -116,8 +114,7 @@ public class CreateZoneGui extends Gui {
                 });
 
 
-        //Fill the border of the gui with grey stained glass pane.
-        /*for (int i = 0; i <= 26; i++) {
+        for (int i = 0; i <= 26; i++) {
 
             //Skip the centre.
             if (i == 10) {
@@ -125,7 +122,7 @@ public class CreateZoneGui extends Gui {
             }
 
             setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""));
-        }*/
+        }
     }
 
     public void refresh() {
