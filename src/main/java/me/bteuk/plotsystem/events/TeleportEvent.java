@@ -49,12 +49,56 @@ public class TeleportEvent {
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
                 //Get location of plot and teleport the player there.
-                u.player.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
+                u.player.teleport(WorldGuardFunctions.getCurrentLocation(event[2], world));
 
             } else {
 
                 //Set the server join event.
                 EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport plot" + id);
+
+                //Teleport them to another server.
+                SwitchServer.switchServer(u.player, server);
+
+            }
+        } else if (event[1].equals("zone")) {
+
+            //Get the user.
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
+            if (p == null) {
+
+                //Send warning to console if player can't be found.
+                Bukkit.getLogger().warning(("Attempting to teleport player with uuid " + uuid + " but they are not on this server."));
+                return;
+
+            }
+
+            User u = PlotSystem.getInstance().getUser(p);
+
+            //Convert the string id to int id.
+            int id = Integer.parseInt(event[2]);
+            String zoneName = "z" + event[2];
+
+            //Teleport to specific zone id.
+            //Get the server of the zone.
+            String server = u.plotSQL.getString("SELECT server FROM location_data WHERE name='"
+                    + u.plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")
+                    + "';");
+
+            //If the zone is on the current server teleport them directly.
+            //Else teleport them to the correct server and them teleport them to the zone.
+            if (server.equals(Network.SERVER_NAME)) {
+
+                //Get world of zone.
+                World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";"));
+
+                //Get location of plot and teleport the player there.
+                u.player.teleport(WorldGuardFunctions.getCurrentLocation(zoneName, world));
+
+            } else {
+
+                //Set the server join event.
+                EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport zone" + id);
 
                 //Teleport them to another server.
                 SwitchServer.switchServer(u.player, server);

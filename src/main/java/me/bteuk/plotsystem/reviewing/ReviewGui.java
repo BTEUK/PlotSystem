@@ -66,7 +66,7 @@ public class ReviewGui extends Gui {
 
                     //Teleport to plot in original state.
                     u.player.closeInventory();
-                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(user.review.plot, world));
+                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world));
 
                 });
 
@@ -77,7 +77,7 @@ public class ReviewGui extends Gui {
 
                     //Teleport to plot in current state.
                     u.player.closeInventory();
-                    u.player.teleport(WorldGuardFunctions.getCurrentLocation(user.review.plot, world));
+                    u.player.teleport(WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world));
 
                 });
 

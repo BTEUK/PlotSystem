@@ -53,7 +53,7 @@ public class ReviewEvent {
                 WorldGuardFunctions.addMember(id, uuid, world);
 
                 //Teleport the reviewer to the plot.
-                p.teleport(WorldGuardFunctions.getCurrentLocation(id, world));
+                p.teleport(WorldGuardFunctions.getCurrentLocation(event[2], world));
 
             } else {
 

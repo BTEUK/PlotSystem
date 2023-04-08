@@ -30,7 +30,7 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 
 public class WorldGuardFunctions {
 
-    public static Location getCurrentLocation(int plot, World world) {
+    public static Location getCurrentLocation(String regionName, World world) {
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
@@ -40,7 +40,7 @@ public class WorldGuardFunctions {
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
         //Get the worldguard region and teleport to player to one of the corners.
-        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
+        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
@@ -50,7 +50,7 @@ public class WorldGuardFunctions {
 
     }
 
-    public static Location getBeforeLocation(int plot, World buildWorld) {
+    public static Location getBeforeLocation(String regionName, World buildWorld) {
 
         //Get instance of plugin and config
         PlotSystem instance = PlotSystem.getInstance();
@@ -66,7 +66,7 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
 
-        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
+        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 

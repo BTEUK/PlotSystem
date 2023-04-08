@@ -57,6 +57,8 @@ public class JoinEvent {
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
 
             }
+        } else if (event[1].equals("zone")) {
+
         }
     }
 }
