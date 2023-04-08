@@ -56,7 +56,7 @@ public class Inactive {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the plot bounds.
-                List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(plot, pasteWorld);
+                List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
 
                 //Create the copyVector by transforming the points in the paste vector with the negative transform.
                 //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.

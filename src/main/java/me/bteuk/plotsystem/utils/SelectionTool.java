@@ -260,7 +260,7 @@ public class SelectionTool extends WGCreatePlot {
             plotOutline.previousBlocks.clear();
 
             //Change plot outline to blockType of plot, rather than of selection.
-            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(plotID, world), difficultyMaterial(difficulty), false);
+            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(String.valueOf(plotID), world), difficultyMaterial(difficulty), false);
 
         }
     }
@@ -278,7 +278,7 @@ public class SelectionTool extends WGCreatePlot {
             int i = 1;
             for (BlockVector2 point : vector) {
 
-                plotSQL.update("INSERT INTO plot_corners(id,corner,x,z) VALUES(" +
+                plotSQL.update("INSERT INTO zone_corners(id,corner,x,z) VALUES(" +
                         plotID + "," + i + "," + point.getX() + "," + point.getZ() + ");");
                 i++;
 
@@ -295,7 +295,7 @@ public class SelectionTool extends WGCreatePlot {
             plotOutline.previousBlocks.clear();
 
             //Change plot outline to blockType of plot, rather than of selection.
-            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(plotID, world), difficultyMaterial(difficulty), false);
+            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints("z" + plotID, world), Material.PURPLE_CONCRETE.createBlockData(), false);
 
         }
     }

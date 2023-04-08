@@ -215,7 +215,7 @@ public class AcceptGui extends Gui {
                     int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world.getName() + "';");
                     int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world.getName() + "';");
 
-                    List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(user.review.plot, world);
+                    List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
                     List<BlockVector2> pasteVector = new ArrayList<>();
 
                     //Create paste vector by taking the copy vector coordinate and adding the coordinate transform.

@@ -32,7 +32,13 @@ public class DeleteEvent {
             String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";");
 
             //Get worlds of plot and save location.
-            World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
+            String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
+            if (save_world == null) {
+                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                return;
+            }
+
+            World copyWorld = Bukkit.getWorld(save_world);
             //Location name is the same as the world name.
             World pasteWorld = Bukkit.getWorld(location);
 
@@ -49,7 +55,7 @@ public class DeleteEvent {
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //Get the plot bounds.
-            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(id, pasteWorld);
+            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
 
             //Create the copyVector by transforming the points in the paste vector with the negative transform.
             //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.

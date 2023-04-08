@@ -44,9 +44,7 @@ public class WorldGuardFunctions {
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
-        Location l = new Location(world, bv.getX(), Utils.getHighestYAt(world, bv.getX(), bv.getZ()), bv.getZ());
-
-        return (l);
+        return (new Location(world, bv.getX(), Utils.getHighestYAt(world, bv.getX(), bv.getZ()), bv.getZ()));
 
     }
 
@@ -78,13 +76,11 @@ public class WorldGuardFunctions {
 
         BlockVector2 bv2 = BlockVector2.at(bv.getX() + xTransform, bv.getZ() + zTransform);
 
-        Location l = new Location(saveWorld, bv2.getX(), Utils.getHighestYAt(saveWorld, bv2.getX(), bv2.getZ()), bv2.getZ());
-
-        return (l);
+        return (new Location(saveWorld, bv2.getX(), Utils.getHighestYAt(saveWorld, bv2.getX(), bv2.getZ()), bv2.getZ()));
 
     }
 
-    public static List<BlockVector2> getPoints(int plot, World world) {
+    public static List<BlockVector2> getPoints(String regionName, World world) {
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
@@ -93,7 +89,7 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
-        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(String.valueOf(plot));
+        ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
 
         return region.getPoints();
 
@@ -113,15 +109,7 @@ public class WorldGuardFunctions {
         //Check whether the region overlaps an existing plot, if true stop the process.
         ApplicableRegionSet set = regions.getApplicableRegions(v);
 
-        if (set.size() > 0) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
+        return set.size() > 0;
     }
 
     public static ApplicableRegionSet getPlots(BlockVector3 min, BlockVector3 max, int radius) {
@@ -144,15 +132,13 @@ public class WorldGuardFunctions {
         ProtectedCuboidRegion region = new ProtectedCuboidRegion("check", BlockVector3.at(min.getX() - radius, 1, min.getZ() - radius), BlockVector3.at(max.getX() + radius, 256, max.getZ() + radius));
 
         //Check whether the region overlaps an existing plot, if true stop the process.
-        ApplicableRegionSet set = saveRegions.getApplicableRegions(region);
-
-        return set;
+        return saveRegions.getApplicableRegions(region);
     }
 
     public static ArrayList<Integer> getNearbyPlots(User u) {
 
         //Create HashMap
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
 
         BlockVector3 pos = BlockVector3.at(u.player.getLocation().getX(), u.player.getLocation().getY(), u.player.getLocation().getZ());
 
@@ -174,7 +160,7 @@ public class WorldGuardFunctions {
     public static ArrayList<Integer> getNearbyPlots(ProtectedPolygonalRegion check) {
 
         //Create HashMap
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
 
         ApplicableRegionSet set = getPlots(check.getMinimumPoint(), check.getMaximumPoint(), 5);
 
