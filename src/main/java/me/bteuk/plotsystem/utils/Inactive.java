@@ -49,7 +49,13 @@ public class Inactive {
                 String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");
 
                 //Get worlds of plot and save location.
-                World copyWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
+                String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
+                if (save_world == null) {
+                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    continue;
+                }
+
+                World copyWorld = Bukkit.getWorld(save_world);
                 World pasteWorld = Bukkit.getWorld(location);
 
                 int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
@@ -57,6 +63,10 @@ public class Inactive {
 
                 //Get the plot bounds.
                 List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
+
+                if (pasteVector == null) {
+                    continue;
+                }
 
                 //Create the copyVector by transforming the points in the paste vector with the negative transform.
                 //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
@@ -69,7 +79,7 @@ public class Inactive {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
-                WorldGuardFunctions.clearMembers(plot, pasteWorld);
+                WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
 
                 //Get the uuid of the plot owner.
                 String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");

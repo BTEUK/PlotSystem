@@ -33,7 +33,7 @@ public class LeaveEvent {
             }
 
             //Remove member from plot.
-            WorldGuardFunctions.removeMember(id, uuid, world);
+            WorldGuardFunctions.removeMember(event[2], uuid, world);
 
             //Remove members from plot in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid='" + uuid + "';");

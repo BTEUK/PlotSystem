@@ -150,7 +150,7 @@ public class ReviewGui extends Gui {
                         plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
 
                         //Remove the reviewer from the plot.
-                        WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);
+                        WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
 
                         //Send feedback.
                         u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &ahas been denied."));
@@ -205,7 +205,7 @@ public class ReviewGui extends Gui {
                 u -> {
 
                     //Remove the reviewer from the plot.
-                    WorldGuardFunctions.removeMember(user.review.plot, u.player.getUniqueId().toString(), world);
+                    WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
 
                     //Set the plot back to submitted.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");

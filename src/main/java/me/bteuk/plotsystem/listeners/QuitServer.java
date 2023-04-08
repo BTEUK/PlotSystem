@@ -37,7 +37,7 @@ public class QuitServer implements Listener {
             PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
             //Remove the reviewer from the plot.
-            WorldGuardFunctions.removeMember(u.review.plot, u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+            WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
 
             //Set status back to submitted.
             plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");

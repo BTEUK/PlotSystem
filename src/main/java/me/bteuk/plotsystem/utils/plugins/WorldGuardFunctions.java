@@ -245,7 +245,7 @@ public class WorldGuardFunctions {
         }
     }
 
-    public static boolean removeMember(int plot, String uuid, World world) {
+    public static void removeMember(String regionName, String uuid, World world) {
 
         //Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
@@ -254,25 +254,39 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            return;
+
+        }
+
         //Check if the member is in the region.
-        if (buildRegions.getRegion(String.valueOf(plot)).getMembers().contains(UUID.fromString(uuid))) {
+        ProtectedRegion region = buildRegions.getRegion(regionName);
+
+        if (region == null) {
+
+            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            return;
+
+        }
+
+        if (region.getMembers().contains(UUID.fromString(uuid))) {
             //Remove the member to the region.
-            buildRegions.getRegion(String.valueOf(plot)).getMembers().removePlayer(UUID.fromString(uuid));
+            region.getMembers().removePlayer(UUID.fromString(uuid));
         } else {
-            return false;
+            return;
         }
 
         //Save the changes
         try {
             buildRegions.saveChanges();
-            return true;
         } catch (StorageException e1) {
             e1.printStackTrace();
-            return false;
         }
     }
 
-    public static boolean clearMembers(int plot, World world) {
+    public static void clearMembers(String regionName, World world) {
 
         //Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
@@ -281,16 +295,30 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            return;
+
+        }
+
+        ProtectedRegion region = buildRegions.getRegion(regionName);
+
+        if (region == null) {
+
+            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            return;
+
+        }
+
         //Remove all members from the region.
-        buildRegions.getRegion(String.valueOf(plot)).getMembers().clear();
+        region.getMembers().clear();
 
         //Save the changes
         try {
             buildRegions.saveChanges();
-            return true;
         } catch (StorageException e1) {
             e1.printStackTrace();
-            return false;
         }
     }
 
