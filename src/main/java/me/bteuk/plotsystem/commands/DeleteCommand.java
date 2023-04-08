@@ -135,7 +135,7 @@ public class DeleteCommand {
         }
 
         //Delete plot.
-        if (WorldGuardFunctions.deletePlot(plotID, world)) {
+        if (WorldGuardFunctions.delete(args[2], world)) {
 
             //Set plot to deleted in database.
             plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");

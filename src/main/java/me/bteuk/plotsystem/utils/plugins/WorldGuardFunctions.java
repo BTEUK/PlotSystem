@@ -39,8 +39,22 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            return null;
+
+        }
+
         //Get the worldguard region and teleport to player to one of the corners.
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
+
+        if (region == null) {
+
+            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            return null;
+
+        }
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
@@ -55,7 +69,13 @@ public class WorldGuardFunctions {
         FileConfiguration config = instance.getConfig();
 
         //Get worlds from config
-        World saveWorld = Bukkit.getServer().getWorld(config.getString("save_world"));
+        String save_world = config.getString("save_world");
+        if (save_world == null) {
+            PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+            return null;
+        }
+
+        World saveWorld = Bukkit.getServer().getWorld(save_world);
 
         //Get worldguard instance
         WorldGuard wg = WorldGuard.getInstance();
@@ -64,7 +84,21 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(buildWorld));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + buildWorld.getName() + " is null!");
+            return null;
+
+        }
+
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
+
+        if (region == null) {
+
+            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            return null;
+
+        }
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
@@ -89,7 +123,21 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            return null;
+
+        }
+
         ProtectedPolygonalRegion region = (ProtectedPolygonalRegion) buildRegions.getRegion(regionName);
+
+        if (region == null) {
+
+            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            return null;
+
+        }
 
         return region.getPoints();
 
@@ -246,7 +294,7 @@ public class WorldGuardFunctions {
         }
     }
 
-    public static boolean deletePlot(int plot, World world) {
+    public static boolean delete(String regionName, World world) {
 
         //Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
@@ -255,8 +303,15 @@ public class WorldGuardFunctions {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
+        if (buildRegions == null) {
+
+            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            return false;
+
+        }
+
         //Attempt to remove the plot.
-        buildRegions.removeRegion(String.valueOf(plot));
+        buildRegions.removeRegion(regionName);
 
         //Save the changes
         try {

@@ -231,7 +231,7 @@ public class AcceptGui extends Gui {
                     PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
 
                     //Remove plot from worldguard.
-                    WorldGuardFunctions.deletePlot(user.review.plot, world);
+                    WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
 
                     //Send feedback in chat and console.
                     u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));

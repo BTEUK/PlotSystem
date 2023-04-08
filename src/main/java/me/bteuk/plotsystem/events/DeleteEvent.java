@@ -90,6 +90,78 @@ public class DeleteEvent {
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
             }
+        } else if (event[1].equals("zone")) {
+
+            //PlotSQL
+            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+            //Convert the string id to int id.
+            int id = Integer.parseInt(event[2]);
+
+            //Get location which is the world.
+            String location = plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";");
+
+            //Get worlds of plot and save location.
+            String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
+            if (save_world == null) {
+                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                return;
+            }
+
+            World copyWorld = Bukkit.getWorld(save_world);
+            //Location name is the same as the world name.
+            World pasteWorld = Bukkit.getWorld(location);
+
+            if (copyWorld == null || pasteWorld == null) {
+
+                //Send error to console.
+                PlotSystem.getInstance().getLogger().severe("Zone delete event failed!");
+                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                return;
+
+            }
+
+            int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+            int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+
+            //Get the zone bounds.
+            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
+
+            //Create the copyVector by transforming the points in the paste vector with the negative transform.
+            //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+            List<BlockVector2> copyVector = new ArrayList<>();
+            for (BlockVector2 bv : pasteVector) {
+                copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
+            }
+
+            //Revert zone to original state.
+            WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+
+            //Remove the zone from worldguard.
+            WorldGuardFunctions.delete("z" + event[2], pasteWorld);
+            WorldGuardFunctions.clearMembers(id, pasteWorld);
+
+            //Remove all members of plot in database.
+            PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+
+            //Set plot status to unclaimed.
+            PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+
+            //Send message to plot owner.
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
+            //If the player is on this server send them a message.
+            if (p != null) {
+
+                p.sendMessage(Utils.success("Plot &3" + id + " &adeleted"));
+
+            } else {
+
+                //Add the message to the database so it can be sent wherever they are currently.
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
+
+            }
         }
     }
 }
