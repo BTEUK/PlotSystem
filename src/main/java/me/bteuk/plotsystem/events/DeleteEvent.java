@@ -57,6 +57,10 @@ public class DeleteEvent {
             //Get the plot bounds.
             List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
 
+            if (pasteVector == null) {
+                return;
+            }
+
             //Create the copyVector by transforming the points in the paste vector with the negative transform.
             //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
             List<BlockVector2> copyVector = new ArrayList<>();
@@ -128,6 +132,10 @@ public class DeleteEvent {
             //Get the zone bounds.
             List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
 
+            if (pasteVector == null) {
+                return;
+            }
+
             //Create the copyVector by transforming the points in the paste vector with the negative transform.
             //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
             List<BlockVector2> copyVector = new ArrayList<>();
@@ -140,7 +148,7 @@ public class DeleteEvent {
 
             //Remove the zone from worldguard.
             WorldGuardFunctions.delete("z" + event[2], pasteWorld);
-            WorldGuardFunctions.clearMembers(id, pasteWorld);
+            WorldGuardFunctions.clearMembers(event[2], pasteWorld);
 
             //Remove all members of plot in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");

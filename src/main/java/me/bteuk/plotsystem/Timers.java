@@ -99,7 +99,7 @@ public class Timers {
         }, 0L, 1L);
 
         //1 second timer.
-        //Update plot outlines.
+        //Update plot and zone outlines.
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             for (User u : users) {
@@ -118,11 +118,19 @@ public class Timers {
 
                     plotID = tryParse(protectedRegion.getId());
 
-                    //Get plot difficulty.
-                    difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
+                    //If plotID is 0, then it's a zone.
+                    if (plotID == 0) {
 
-                    plotOutline.createOutline(u.player, protectedRegion.getPoints(), difficultyMaterial(difficulty), false);
+                        plotOutline.createOutline(u.player, protectedRegion.getPoints(), Material.PURPLE_CONCRETE.createBlockData(), false);
 
+                    } else {
+
+                        //Get plot difficulty.
+                        difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
+
+                        plotOutline.createOutline(u.player, protectedRegion.getPoints(), difficultyMaterial(difficulty), false);
+
+                    }
                 }
             }
         }, 0L, 20L);
