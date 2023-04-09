@@ -21,6 +21,7 @@ public class EventManager {
             case "review" -> ReviewEvent.event(uuid, event);
             case "join" -> JoinEvent.event(uuid, event);
             case "kick" -> KickEvent.event(uuid, event);
+            case "close" -> CloseEvent.event(uuid, event);
         }
 
     }

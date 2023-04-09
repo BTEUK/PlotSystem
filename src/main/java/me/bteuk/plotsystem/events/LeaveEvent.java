@@ -44,12 +44,49 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("You have left plot &3" + id));
+                p.sendMessage(Utils.success("You have left Plot &3" + id));
 
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &4" + id + "');");
+
+            }
+        } else if (event[1].equals("zone")) {
+
+            //Convert the string id to int id.
+            int id = Integer.parseInt(event[2]);
+
+            //Get worlds of plot.
+            World world = Bukkit.getWorld(PlotSystem.getInstance().plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";"));
+
+            if (world == null) {
+
+                //Send error to console.
+                Bukkit.getLogger().severe("Zone leave event failed!");
+                Bukkit.getLogger().severe("Event details:" + Arrays.toString(event));
+                return;
+
+            }
+
+            //Remove member from zone.
+            WorldGuardFunctions.removeMember("z" + event[2], uuid, world);
+
+            //Remove members from zone in database.
+            PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");
+
+            //Send message to plot owner.
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
+            //If the player is on this server send them a message.
+            if (p != null) {
+
+                p.sendMessage(Utils.success("You have left Zone &3" + id));
+
+            } else {
+
+                //Add the message to the database so it can be sent wherever they are currently.
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have left Zone &3" + id + "');");
 
             }
         }
