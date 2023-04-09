@@ -137,7 +137,10 @@ public class Timers {
 
         //1 hour timer.
         //Remove inactive plots.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, Inactive::cancelInactivePlots, 0L, 72000L);
+        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+            Inactive.cancelInactivePlots();
+            Inactive.closeExpiredZones();
+        }, 0L, 72000L);
     }
 
     //Returns the plot difficulty material.

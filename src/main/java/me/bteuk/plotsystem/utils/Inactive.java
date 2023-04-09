@@ -41,15 +41,15 @@ public class Inactive {
         //Iterate through all inactive plots and cancel them.
         for (int plot : inactivePlots) {
 
+            //Get plot location.
+            String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");
+
             //Check if the plot is on this server and that it is claimed, rather than submitted.
-            if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") +
+            if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location +
                     "' AND server='" + PlotSystem.SERVER_NAME + "';") && plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plot + " AND status='claimed';")) {
 
-                //Get plot location.
-                String location = plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";");
-
                 //Get worlds of plot and save location.
-                String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
+                String save_world = config.getString("save_world");
                 if (save_world == null) {
                     PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
                     continue;
@@ -91,10 +91,91 @@ public class Inactive {
                 plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot " + plot + "removed due to inactivity!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
 
                 //Log plot removal to console.
                 PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
+
+            }
+        }
+    }
+
+    public static void closeExpiredZones() {
+
+        //Get config.
+        FileConfiguration config = PlotSystem.getInstance().getConfig();
+
+        //Get current time, this will be compared with the expiration time.
+        long time = Time.currentTime();
+
+        //Get plot sql.
+        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+
+        //Get active zones that have expired.
+        List<Integer> expiredZones = plotSQL.getIntList("SELECT id FROM zones WHERE status='open' AND expiration<" + time + ";");
+
+        //If there are no inactive plots, end the method.
+        if (expiredZones == null || expiredZones.isEmpty()) {
+            return;
+        }
+
+        //Iterate through all expired zones, save and close them.
+        for (int zone : expiredZones) {
+
+            //Get zone location.
+            String location = plotSQL.getString("SELECT location FROM zones WHERE id=" + zone + ";");
+
+            //Check if the zone is on this server.
+            if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location +
+                    "' AND server='" + PlotSystem.SERVER_NAME + "';")) {
+
+                //Get worlds of plot and save location.
+                String save_world = config.getString("save_world");
+                if (save_world == null) {
+                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    continue;
+                }
+
+                World copyWorld = Bukkit.getWorld(location);
+                World pasteWorld = Bukkit.getWorld(save_world);
+
+                int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+
+                //Get the zone bounds.
+                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
+
+                if (copyVector == null) {
+                    continue;
+                }
+
+                //Create the copyVector by transforming the points in the paste vector with the negative transform.
+                //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+                List<BlockVector2> pasteVector = new ArrayList<>();
+                for (BlockVector2 bv : copyVector) {
+                    pasteVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
+                }
+
+                //Save the zone by copying from the building world to the save world.
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+
+                //Delete the worldguard region.
+                WorldGuardFunctions.delete("z" + zone, copyWorld);
+
+                //Get the uuid of the zone owner.
+                String uuid = plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zone + " AND is_owner=1;");
+
+                //Remove all members of zone in database.
+                plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
+
+                //Set the zone status to closed.
+                plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
+
+                //Add message for the plot owner to the database to notify them that their zone was closed.
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
+
+                //Log plot removal to console.
+                PlotSystem.getInstance().getLogger().info("Zone " + zone + " has expired.");
 
             }
         }
