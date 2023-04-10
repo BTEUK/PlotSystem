@@ -1,11 +1,9 @@
 package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
-import java.util.UUID;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -100,14 +98,14 @@ public class WGCreatePlot {
 
         }
 
-        //Add the owner to the region.
-        region.getMembers().addPlayer(p.getUniqueId());
-
         //Create an entry in the database for the plot.
         plotID = plotSQL.createZone(location, expiration, is_public);
 
         //Create the region with valid name.
         region = new ProtectedPolygonalRegion("z" + plotID, vector, -60, 320);
+
+        //Add the owner to the region.
+        region.getMembers().addPlayer(p.getUniqueId());
 
         //Add the regions to the world
         regions.addRegion(region);

@@ -244,9 +244,9 @@ public class AcceptGui extends Gui {
 
                     //Send message to reviewers that a plot has been reviewed.
                     if (plot_count == 1) {
-                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is &31 submitted plot.", "uknet:reviewer");
+                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is &31 &asubmitted plot.", "uknet:reviewer");
                     } else {
-                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are &3" + plot_count + " submitted plots.", "uknet:reviewer");
+                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are &3" + plot_count + " &asubmitted plots.", "uknet:reviewer");
                     }
 
                     //Promote plot owner if they should be.

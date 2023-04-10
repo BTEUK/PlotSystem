@@ -223,7 +223,7 @@ public class WorldGuardFunctions {
         return list;
     }
 
-    public static boolean addMember(int plot, String uuid, World world) {
+    public static boolean addMember(String region, String uuid, World world) {
 
         //Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
@@ -233,7 +233,7 @@ public class WorldGuardFunctions {
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
         //Add the member to the region.
-        buildRegions.getRegion(String.valueOf(plot)).getMembers().addPlayer(UUID.fromString(uuid));
+        buildRegions.getRegion(region).getMembers().addPlayer(UUID.fromString(uuid));
 
         //Save the changes
         try {

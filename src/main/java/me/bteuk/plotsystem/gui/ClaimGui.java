@@ -102,7 +102,7 @@ public class ClaimGui extends Gui {
                     u.player.closeInventory();
 
                     //Check if the plot is not already claimed, since it may happen that the gui is spammed.
-                    if (eUser.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + eUser.inPlot + " status<>'unclaimed';")) {
+                    if (eUser.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + eUser.inPlot + " AND status='unclaimed';")) {
 
                         //If the plot status can be updated, add the player as plot owner.
                         if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
@@ -111,7 +111,7 @@ public class ClaimGui extends Gui {
                             if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
 
                                 //Add player to worldguard region.
-                                if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
+                                if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
 
                                     eUser.player.sendMessage(Utils.success("Successfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
                                     Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);

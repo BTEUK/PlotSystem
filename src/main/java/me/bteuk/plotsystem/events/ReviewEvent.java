@@ -50,7 +50,7 @@ public class ReviewEvent {
                 u.review = new Review(id, u);
 
                 //Add the reviewer to the plot.
-                WorldGuardFunctions.addMember(id, uuid, world);
+                WorldGuardFunctions.addMember(String.valueOf(id), uuid, world);
 
                 //Teleport the reviewer to the plot.
                 p.teleport(WorldGuardFunctions.getCurrentLocation(event[2], world));

@@ -38,7 +38,7 @@ public class JoinEvent {
                 plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + id + ",'" + uuid + "',0," + Time.currentTime() + ");");
 
                 //Add the player to the worldguard region.
-                WorldGuardFunctions.addMember(id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+                WorldGuardFunctions.addMember(String.valueOf(id), uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
 
                 //Send a message to the plot owner.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
@@ -70,15 +70,15 @@ public class JoinEvent {
             PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
             //Add the player to the database.
-            plotSQL.update("INSERT INTO zone_members(id,uuid,is_owner,last_enter) VALUES(" + id + ",'" + uuid + "',0," + Time.currentTime() + ");");
+            plotSQL.update("INSERT INTO zone_members(id,uuid,is_owner) VALUES(" + id + ",'" + uuid + "',0);");
 
             //Add the player to the worldguard region.
-            WorldGuardFunctions.addMember(id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+            WorldGuardFunctions.addMember("z" + id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
 
             //Send a message to the plot owner.
             PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
-                    plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','&3" +
-                    PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined your plot &3" + id + "');");
+                    plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + id + " AND is_owner=1;") + "','&3" +
+                    PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined your Zone &3" + id + "');");
 
             if (p != null) {
 
