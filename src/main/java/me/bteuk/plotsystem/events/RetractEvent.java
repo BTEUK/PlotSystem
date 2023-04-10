@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
@@ -26,8 +27,11 @@ public class RetractEvent {
             //Check if plot is submitted.
             if (PlotSystem.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + id + " AND status='submitted';")) {
 
-                //Set plot status to submitted.
+                //Set plot status to claimed.
                 PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + id + ";");
+
+                //Remove submitted plot entry.
+                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_submissions WHERE id=" + id + ";");
 
                 message = "&aRetracted submission for plot &3" + id;
 

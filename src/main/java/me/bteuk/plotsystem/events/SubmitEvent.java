@@ -59,6 +59,9 @@ public class SubmitEvent {
                     //Set plot status to submitted.
                     PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + id + ";");
 
+                    //Create new submitted plot key.
+                    PlotSystem.getInstance().plotSQL.update("INSERT INTO plot_submissions(id,submit_time) VALUES(" + id + "," + Time.currentTime() + ");");
+
                     //Update last submit time in playerdata.
                     PlotSystem.getInstance().globalSQL.update("UPDATE player_data SET last_submit=" + Time.currentTime() + " WHERE uuid='" + uuid + "';");
 

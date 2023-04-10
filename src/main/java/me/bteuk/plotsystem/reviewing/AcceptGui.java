@@ -206,6 +206,9 @@ public class AcceptGui extends Gui {
                     //Set plot to completed.
                     plotSQL.update("UPDATE plot_data SET status='completed' WHERE id=" + user.review.plot + ";");
 
+                    //Remove submitted plot entry.
+                    PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
+
                     //Add points to player.
                     //By referencing network plugin.
                     //TODO Enable this when points are added.
@@ -239,7 +242,7 @@ public class AcceptGui extends Gui {
                     //Get number of submitted plots.
                     int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                    //Send message to reviewers that a plot has been submitted.
+                    //Send message to reviewers that a plot has been reviewed.
                     if (plot_count == 1) {
                         Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is &31 submitted plot.", "uknet:reviewer");
                     } else {
