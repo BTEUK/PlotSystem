@@ -101,46 +101,54 @@ public class ClaimGui extends Gui {
                     User eUser = PlotSystem.getInstance().getUser(u.player);
                     u.player.closeInventory();
 
-                    //If the plot status can be updated, add the player as plot owner.
-                    if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
+                    //Check if the plot is not already claimed, since it may happen that the gui is spammed.
+                    if (eUser.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + eUser.inPlot + " status<>'unclaimed';")) {
 
-                        //If the player can't be given owner, set the plot status back to unclaimed.
-                        if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
+                        //If the plot status can be updated, add the player as plot owner.
+                        if (eUser.plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + eUser.inPlot + ";")) {
 
-                            //Add player to worldguard region.
-                            if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
+                            //If the player can't be given owner, set the plot status back to unclaimed.
+                            if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
 
-                                eUser.player.sendMessage(Utils.success("Successfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
-                                Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
+                                //Add player to worldguard region.
+                                if (WorldGuardFunctions.addMember(eUser.inPlot, eUser.uuid, eUser.player.getWorld())) {
+
+                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
+                                    Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
+
+                                } else {
+
+                                    eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
+                                    Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
+
+                                }
 
                             } else {
 
-                                eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
-                                Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
+                                eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
+                                Bukkit.getLogger().warning("Plot owner insert failed for plot " + eUser.inPlot);
 
+                                //Attempt to set plot back to unclaimed
+                                if (eUser.plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + eUser.inPlot + ";")) {
+
+                                    Bukkit.getLogger().warning("Plot " + eUser.inPlot + " has been set back to unclaimed.");
+
+                                } else {
+
+                                    Bukkit.getLogger().severe("Plot " + eUser.inPlot + " is set to claimed but has no owner!");
+
+                                }
                             }
 
                         } else {
 
                             eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                            Bukkit.getLogger().warning("Plot owner insert failed for plot " + eUser.inPlot);
+                            Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + eUser.inPlot);
 
-                            //Attempt to set plot back to unclaimed
-                            if (eUser.plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + eUser.inPlot + ";")) {
-
-                                Bukkit.getLogger().warning("Plot " + eUser.inPlot + " has been set back to unclaimed.");
-
-                            } else {
-
-                                Bukkit.getLogger().severe("Plot " + eUser.inPlot + " is set to claimed but has no owner!");
-
-                            }
                         }
-
                     } else {
 
-                        eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                        Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + eUser.inPlot);
+                        eUser.player.sendMessage(Utils.error("This plot is already claimed, it could be due to clicking the claim button multiple times."));
 
                     }
 

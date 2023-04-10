@@ -228,7 +228,7 @@ public class PlotSQL {
     public int createZone(String location, long expiration, boolean is_public) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO zone_data(location,expiration,is_public) VALUES(?, ?, ?);",
+                "INSERT INTO zones(location,expiration,is_public) VALUES(?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
 

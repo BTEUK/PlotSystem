@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
+import java.util.UUID;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.sql.PlotSQL;
@@ -98,6 +99,9 @@ public class WGCreatePlot {
             return false;
 
         }
+
+        //Add the owner to the region.
+        region.getMembers().addPlayer(p.getUniqueId());
 
         //Create an entry in the database for the plot.
         plotID = plotSQL.createZone(location, expiration, is_public);

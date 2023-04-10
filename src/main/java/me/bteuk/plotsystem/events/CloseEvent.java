@@ -47,7 +47,7 @@ public class CloseEvent {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the zone bounds.
-                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
+                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
 
                 if (copyVector == null) {
                     return;

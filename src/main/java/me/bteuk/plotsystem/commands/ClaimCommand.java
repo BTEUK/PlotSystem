@@ -6,7 +6,6 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -92,17 +91,17 @@ public class ClaimCommand implements CommandExecutor {
 
         //If the plot is already claimed tell them.
         //If they are the owner or a member tell them.
-        if (u.plotOwner) {
+        if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
             u.player.sendMessage(Utils.error("You are already the owner of this plot!"));
             return false;
 
-        } else if (u.plotMember) {
+        } else if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=0;")) {
 
             u.player.sendMessage(Utils.error("You are already a member of this plot!"));
             return false;
 
-        } else if (u.isClaimed) {
+        } else if (u.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + u.inPlot + " AND status='claimed';")) {
 
             u.player.sendMessage(Utils.error("This plot is already claimed!"));
             return false;

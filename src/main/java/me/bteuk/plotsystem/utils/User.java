@@ -5,7 +5,6 @@ import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.reviewing.Review;
@@ -21,10 +20,6 @@ public class User {
 
     public int inPlot = 0;
     public int inZone = 0;
-
-    public boolean plotOwner;
-    public boolean plotMember;
-    public boolean isClaimed;
 
     public Review review = null;
 

@@ -274,6 +274,9 @@ public class SelectionTool extends WGCreatePlot {
         //Create the zone.
         if (createZone(u.player, world, location, vector, plotSQL, expiration, is_public)) {
 
+            //Add owner.
+            plotSQL.update("INSERT INTO zone_members(id,uuid,is_owner) VALUES(" + plotID + ",'" + u.player.getUniqueId() + "',1);");
+
             //Store zone bounds.
             int i = 1;
             for (BlockVector2 point : vector) {

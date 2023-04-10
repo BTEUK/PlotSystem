@@ -144,16 +144,14 @@ public class ClaimEnter implements Listener {
 
                 //Show zone leave message.
                 u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText(Utils.success("You have left zone &3" + u.inPlot)));
+                        TextComponent.fromLegacyText(Utils.success("You have left zone &3" + u.inZone)));
 
             }
 
             //Set all variables to default values after the logic has been run.
             u.inPlot = 0;
             u.inZone = 0;
-            u.plotOwner = false;
-            u.plotMember = false;
-            u.isClaimed = true;
+
         }
     }
 
@@ -171,23 +169,14 @@ public class ClaimEnter implements Listener {
             //If the plot is claimed, send the relevant message.
             if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + ";")) {
 
-                //Set the claimed value to false to indicate the plot is not claimed.
-                u.isClaimed = false;
-                u.plotOwner = false;
-                u.plotMember = false;
                 u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                         TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, it is unclaimed.")));
 
             } else {
 
-                //Set the claimed value to true to indicate the plot is already claimed.
-                u.isClaimed = true;
-
                 //If you are the owner of the plot send the relevant message.
                 if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
-                    u.plotOwner = true;
-                    u.plotMember = false;
                     plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are the owner of this plot.")));
@@ -195,8 +184,6 @@ public class ClaimEnter implements Listener {
                     //If you are a member of the plot send the relevant message.
                 } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
 
-                    u.plotOwner = false;
-                    u.plotMember = true;
                     plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(Utils.success("You have entered plot &3" + plot + "&a, you are a member of this plot.")));
@@ -204,8 +191,6 @@ public class ClaimEnter implements Listener {
                 } else {
 
                     //If you are not an owner or member send the relevant message.
-                    u.plotOwner = false;
-                    u.plotMember = false;
                     u.player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(Utils.success("You have entered &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
                                     plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';") + "'s &aplot.")));
@@ -216,7 +201,7 @@ public class ClaimEnter implements Listener {
         } else {
 
             //If you are the owner or member of this plot update your last enter time.
-            if (u.plotMember || u.plotOwner) {
+            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';")) {
 
                 plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "';");
 
@@ -230,8 +215,6 @@ public class ClaimEnter implements Listener {
 
             //Set the plot value to zero, since you can never be in both at the same time.
             u.inPlot = 0;
-            u.plotOwner = false;
-            u.plotMember = false;
 
             //Set zone to current zone.
             u.inZone = zone;
