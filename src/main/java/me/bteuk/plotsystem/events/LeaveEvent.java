@@ -3,6 +3,8 @@ package me.bteuk.plotsystem.events;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -44,7 +46,8 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("You have left Plot &3" + id));
+                p.sendMessage(Utils.success("You have left Plot ")
+                        .append(Component.text(id, NamedTextColor.DARK_AQUA)));
 
             } else {
 
@@ -81,7 +84,8 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("You have left Zone &3" + id));
+                p.sendMessage(Utils.success("You have left Zone ")
+                        .append(Component.text(id, NamedTextColor.DARK_AQUA)));
 
             } else {
 

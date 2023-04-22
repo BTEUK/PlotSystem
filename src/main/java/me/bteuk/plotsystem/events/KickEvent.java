@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.events;
 
-import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -39,7 +39,7 @@ public class KickEvent {
             //Send message to plot owner.
             if (owner != null) {
 
-                owner.sendMessage(Utils.chat(messageOwner));
+                owner.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageOwner));
 
             } else {
 
@@ -51,7 +51,7 @@ public class KickEvent {
             //Send message to plot member.
             if (member != null) {
 
-                member.sendMessage(Utils.chat(messageMember));
+                member.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageMember));
 
             } else {
 
@@ -83,7 +83,7 @@ public class KickEvent {
             //Send message to plot owner.
             if (owner != null) {
 
-                owner.sendMessage(Utils.chat(messageOwner));
+                owner.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageOwner));
 
             } else {
 
@@ -95,7 +95,7 @@ public class KickEvent {
             //Send message to plot member.
             if (member != null) {
 
-                member.sendMessage(Utils.chat(messageMember));
+                member.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageMember));
 
             } else {
 

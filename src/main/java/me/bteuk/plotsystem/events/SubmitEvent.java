@@ -4,6 +4,9 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -78,7 +81,7 @@ public class SubmitEvent {
             //Send message to player if they are on the server.
             if (p != null) {
 
-                p.sendMessage(Utils.chat(message));
+                p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
 
             } else {
 
@@ -93,9 +96,13 @@ public class SubmitEvent {
 
                 //Send message to reviewers that a plot has been submitted.
                 if (plot_count == 1) {
-                    Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there is 1 submitted plot.", "uknet:reviewer");
+                    Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been submitted, there is ")
+                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success("submitted plot.")), "uknet:reviewer");
                 } else {
-                    Network.getInstance().chat.broadcastMessage("&aA plot has been submitted, there are " + plot_count + " submitted plots.", "uknet:reviewer");
+                    Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been submitted, there are ")
+                            .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success("submitted plots.")), "uknet:reviewer");
                 }
             }
         }

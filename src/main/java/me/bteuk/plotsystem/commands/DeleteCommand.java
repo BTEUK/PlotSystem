@@ -7,6 +7,8 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -66,7 +68,7 @@ public class DeleteCommand {
         if (sender instanceof Player p) {
 
             if (!(p.hasPermission("uknet.plots.delete.plot"))) {
-                p.sendMessage(Utils.error("&cYou do not have permission to use this command."));
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
                 return;
             }
 
@@ -139,12 +141,14 @@ public class DeleteCommand {
 
             //Set plot to deleted in database.
             plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
-            sender.sendMessage(Utils.success("Plot &3" + plotID + "&a deleted."));
+            sender.sendMessage(Utils.success("Plot ")
+                    .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" deleted.")));
 
         } else {
 
             sender.sendMessage(Utils.error("An error occured while deleting the plot."));
-            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot &3" + plotID + "&a from WorldGuard.");
+            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
 
         }
     }
@@ -172,7 +176,9 @@ public class DeleteCommand {
         //Check if location exists.
         if (!(plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';"))) {
 
-            sender.sendMessage(Utils.error("The location &4" + args[2] + " &cdoes not exist."));
+            sender.sendMessage(Utils.error("The location ")
+                    .append(Component.text(args[2], NamedTextColor.DARK_RED))
+                    .append(Utils.error(" does not exist.")));
             return;
 
         }
@@ -198,7 +204,8 @@ public class DeleteCommand {
 
             //Delete location from database.
             plotSQL.update("DELETE FROM location_data WHERE name='" + args[2] + "';");
-            sender.sendMessage(Utils.success("Deleted location &3" + args[2] + "&a."));
+            sender.sendMessage(Utils.success("Deleted location ")
+                    .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
             PlotSystem.getInstance().getLogger().info("Deleted location " + args[2] + ".");
 
             //Get regions from database.
