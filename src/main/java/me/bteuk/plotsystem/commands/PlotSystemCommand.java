@@ -5,6 +5,8 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -81,12 +83,15 @@ public class PlotSystemCommand implements CommandExecutor {
 
     private void help(CommandSender sender) {
 
-        sender.sendMessage(Utils.chat("&7/plotsystem setalias [location] [alias]"));
-        sender.sendMessage(Utils.chat("&7/plotsystem selectiontool &f- Get the selection tool to create plots."));
-        sender.sendMessage(Utils.chat("&7/plotsystem create plot &f- Create a plot for your current selection."));
-        sender.sendMessage(Utils.chat("&7/plotsystem delete plot <plotID> &f- Delete an unclaimed plot."));
-        sender.sendMessage(Utils.chat("&7/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
-        sender.sendMessage(Utils.chat("&7/plotsystem delete location [name]"));
+        sender.sendMessage(Component.text("/plotsystem setalias [location] [alias]", NamedTextColor.GRAY));
+        sender.sendMessage(Component.text("/plotsystem selectiontool ", NamedTextColor.GRAY)
+                .append(Utils.line("- Get the selection tool to create plots.")));
+        sender.sendMessage(Component.text("/plotsystem create plot ", NamedTextColor.GRAY)
+                .append(Utils.line("- Create a plot for your current selection.")));
+        sender.sendMessage(Component.text("/plotsystem delete plot <plotID> ", NamedTextColor.GRAY)
+                .append(Utils.line("- Delete an unclaimed plot.")));
+        sender.sendMessage(Component.text("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>", NamedTextColor.GRAY));
+        sender.sendMessage(Component.text("/plotsystem delete location [name]", NamedTextColor.GRAY));
 
     }
 
@@ -129,11 +134,16 @@ public class PlotSystemCommand implements CommandExecutor {
 
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location + "';")) {
 
-            plotSQL.update("UPDATE location_data SET alias='" + alias.replace("'", "\\'") + "' WHERE name='" + location+ "';");
-            sender.sendMessage(Utils.success("Set alias of location &3" + location + "&a to &3" + alias + "&a."));
+            plotSQL.update("UPDATE location_data SET alias='" + alias.replace("'", "\\'") + "' WHERE name='" + location + "';");
+            sender.sendMessage(Utils.success("Set alias of location ")
+                    .append(Component.text(location, NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" to "))
+                    .append(Component.text(alias, NamedTextColor.DARK_AQUA)));
 
         } else {
-            sender.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+            sender.sendMessage(Utils.error("The location ")
+                    .append(Component.text(location, NamedTextColor.DARK_RED))
+                    .append(Utils.error(" does not exist.")));
         }
     }
 }

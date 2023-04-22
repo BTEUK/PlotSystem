@@ -1,12 +1,14 @@
 package me.bteuk.plotsystem.reviewing;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
+
+import java.util.Objects;
 
 public class EditBook implements Listener {
 	
@@ -38,7 +40,7 @@ public class EditBook implements Listener {
 			review.reviewGui.open(Network.getInstance().getUser(e.getPlayer()));
 		}
 		
-		if (e.getNewBookMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Feedback")) {
+		if (Objects.equals(e.getNewBookMeta().displayName(), Utils.success("Feedback"))) {
 
 			//Save editing of book.
 			review.bookMeta = e.getNewBookMeta();
@@ -47,10 +49,8 @@ public class EditBook implements Listener {
 			//Set isEdited to true to indicate the book has been edited.
 			isEdited = true;
 
-		} else {
-			return;
 		}
-		
+
 	}
 	
 	public void unregister() {

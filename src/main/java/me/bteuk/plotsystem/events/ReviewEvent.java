@@ -7,6 +7,7 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -53,7 +54,13 @@ public class ReviewEvent {
                 WorldGuardFunctions.addMember(String.valueOf(id), uuid, world);
 
                 //Teleport the reviewer to the plot.
-                p.teleport(WorldGuardFunctions.getCurrentLocation(event[2], world));
+                Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
+
+                if (l == null) {
+                    p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
+                    return;
+                }
+                p.teleport(l);
 
             } else {
 
