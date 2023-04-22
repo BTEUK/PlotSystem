@@ -10,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
@@ -67,15 +66,7 @@ public class ReviewGui extends Gui {
 
                     //Teleport to plot in original state.
                     u.player.closeInventory();
-
-                    Location l = WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world);
-
-                    if (l == null) {
-                        PlotSystem.getInstance().getLogger().warning("Could not find before view of plot " + user.review.plot);
-                        return;
-                    }
-
-                    u.player.teleport(l);
+                    u.player.teleport(WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world));
 
                 });
 
@@ -86,15 +77,7 @@ public class ReviewGui extends Gui {
 
                     //Teleport to plot in current state.
                     u.player.closeInventory();
-
-                    Location l = WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world);
-
-                    if (l == null) {
-                        PlotSystem.getInstance().getLogger().warning("Could not find current view of plot " + user.review.plot);
-                        return;
-                    }
-
-                    u.player.teleport(l);
+                    u.player.teleport(WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world));
 
                 });
 
@@ -144,7 +127,7 @@ public class ReviewGui extends Gui {
                     for (String text : book) {
                         //Add escape characters to '
                         if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
-                            u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
+                            u.player.sendMessage(Utils.error("An error occured, please notify an admin."));
                             return;
                         }
                         i++;
@@ -184,13 +167,9 @@ public class ReviewGui extends Gui {
 
                         //Send message to reviewers that a plot has been reviewed.
                         if (plot_count == 1) {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
-                                    .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success("submitted plot.")), "uknet:reviewer");
+                            Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is &31 &asubmitted plot.", "uknet:reviewer");
                         } else {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
-                                    .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success("submitted plots.")), "uknet:reviewer");
+                            Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are &3" + plot_count + " &asubmitted plots.", "uknet:reviewer");
                         }
 
                         //Close review.
@@ -200,7 +179,7 @@ public class ReviewGui extends Gui {
 
                     } else {
 
-                        u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
+                        u.player.sendMessage(Utils.error("An error occured, please notify an admin."));
 
                     }
                 });
@@ -239,8 +218,7 @@ public class ReviewGui extends Gui {
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");
 
                     //Send feedback.
-                    u.player.sendMessage(Utils.success("Cancelled reviewing of plot ")
-                            .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA)));
+                    u.player.sendMessage(Utils.success("Cancelled reviewing of plot &3" + user.review.plot));
 
                     //Close review.
                     u.player.closeInventory();

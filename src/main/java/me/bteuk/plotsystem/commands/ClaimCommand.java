@@ -7,8 +7,6 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,8 +42,31 @@ public class ClaimCommand implements CommandExecutor {
 
             NetworkUser user = Network.getInstance().getUser(u.player);
 
-            if (!hasClaimPermission(u, user)) {
-                return true;
+            //Check if the player has permission to claim a plot of this difficulty.
+            if (!user.player.hasPermission("uknet.plots.claim.all")) {
+                switch (u.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";")) {
+
+                    case 1 -> {
+                        if (!user.player.hasPermission("uknet.plots.claim.easy")) {
+                            user.player.sendMessage(Utils.error("You do not have permission to claim an &4Easy &cplot."));
+                            return true;
+                        }
+                    }
+
+                    case 2 -> {
+                        if (!user.player.hasPermission("uknet.plots.claim.normal")) {
+                            user.player.sendMessage(Utils.error("You do not have permission to claim a &4Normal &cplot."));
+                            return true;
+                        }
+                    }
+
+                    case 3 -> {
+                        if (!user.player.hasPermission("uknet.plots.claim.hard")) {
+                            user.player.sendMessage(Utils.error("You do not have permission to claim a &4Hard &cplot."));
+                            return true;
+                        }
+                    }
+                }
             }
 
             //Open claim gui.
@@ -96,44 +117,6 @@ public class ClaimCommand implements CommandExecutor {
         }
 
         //Checks passed, return true.
-        return true;
-    }
-
-    public static boolean hasClaimPermission(User u, NetworkUser user) {
-
-        //Check if the player has permission to claim a plot of this difficulty.
-        if (!user.player.hasPermission("uknet.plots.claim.all")) {
-            switch (u.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";")) {
-
-                case 1 -> {
-                    if (!user.player.hasPermission("uknet.plots.claim.easy")) {
-                        user.player.sendMessage(Utils.error("You do not have permission to claim an ")
-                                .append(Component.text("Easy", NamedTextColor.DARK_RED))
-                                .append(Utils.error(" plot.")));
-                        return false;
-                    }
-                }
-
-                case 2 -> {
-                    if (!user.player.hasPermission("uknet.plots.claim.normal")) {
-                        user.player.sendMessage(Utils.error("You do not have permission to claim a ")
-                                .append(Component.text("Normal", NamedTextColor.DARK_RED))
-                                .append(Utils.error(" plot.")));
-                        return false;
-                    }
-                }
-
-                case 3 -> {
-                    if (!user.player.hasPermission("uknet.plots.claim.hard")) {
-                        user.player.sendMessage(Utils.error("You do not have permission to claim a ")
-                                .append(Component.text("Hard", NamedTextColor.DARK_RED))
-                                .append(Utils.error(" plot.")));
-                        return false;
-                    }
-                }
-            }
-        }
-
         return true;
     }
 }

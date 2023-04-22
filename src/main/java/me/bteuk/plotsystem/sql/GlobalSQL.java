@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class GlobalSQL {
 
     private final BasicDataSource dataSource;
+    private int success;
 
     public GlobalSQL(BasicDataSource dataSource) {
 
@@ -143,7 +144,7 @@ public class GlobalSQL {
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            int success = statement.executeUpdate();
+            success = statement.executeUpdate();
 
             //If the insert was successful return true;
             if (success > 0) {return true;}

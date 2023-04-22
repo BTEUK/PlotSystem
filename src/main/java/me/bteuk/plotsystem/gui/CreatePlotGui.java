@@ -110,7 +110,7 @@ public class CreatePlotGui extends Gui {
                 i = 17;
             }
 
-            setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, Component.empty()));
+            setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""));
         }
     }
 

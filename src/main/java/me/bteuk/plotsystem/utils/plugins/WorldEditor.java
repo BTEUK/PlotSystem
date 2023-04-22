@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 
+import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.World;
@@ -44,6 +46,7 @@ public class WorldEditor {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(pasteWorld).fastMode(true).checkMemory(false).limitUnlimited().changeSetNull().build()) {
+            @SuppressWarnings("resource")
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
@@ -75,6 +78,9 @@ public class WorldEditor {
                     editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
             );
             Operations.complete(forwardExtentCopy);
+        } catch (WorldEditException e) {
+            e.printStackTrace();
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -82,6 +88,7 @@ public class WorldEditor {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(pasteWorld).fastMode(false).checkMemory(true).limitUnlimited().changeSetNull().build()) {
+            @SuppressWarnings("resource")
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
@@ -89,6 +96,9 @@ public class WorldEditor {
                     // configure here
                     .build();
             Operations.complete(operation);
+        } catch (WorldEditException e) {
+            e.printStackTrace();
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

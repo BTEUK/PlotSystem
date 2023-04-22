@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -39,7 +39,7 @@ public class KickEvent {
             //Send message to plot owner.
             if (owner != null) {
 
-                owner.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageOwner));
+                owner.sendMessage(Utils.chat(messageOwner));
 
             } else {
 
@@ -51,7 +51,7 @@ public class KickEvent {
             //Send message to plot member.
             if (member != null) {
 
-                member.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageMember));
+                member.sendMessage(Utils.chat(messageMember));
 
             } else {
 
@@ -78,24 +78,24 @@ public class KickEvent {
             plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Remove the player to the worldguard region.
-            WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
+            WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
 
             //Send message to plot owner.
             if (owner != null) {
 
-                owner.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageOwner));
+                owner.sendMessage(Utils.chat(messageOwner));
 
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + id + " AND is_owner=1;") + "','" + messageOwner + "');");
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','" + messageOwner + "');");
 
             }
 
             //Send message to plot member.
             if (member != null) {
 
-                member.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(messageMember));
+                member.sendMessage(Utils.chat(messageMember));
 
             } else {
 

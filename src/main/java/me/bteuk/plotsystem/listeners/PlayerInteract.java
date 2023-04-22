@@ -2,8 +2,6 @@ package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,8 +13,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-
-import java.util.Objects;
 
 public class PlayerInteract implements Listener {
 
@@ -60,7 +56,7 @@ public class PlayerInteract implements Listener {
                 e.setCancelled(true);
 
                 //Check if they are in a world where plots are allowed to be created.
-                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + Objects.requireNonNull(e.getClickedBlock()).getWorld().getName() + "';")) {
+                if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getClickedBlock().getWorld().getName() + "';")) {
 
                     u.player.sendMessage(Utils.error("You can't create plots in this world!"));
                     return;
@@ -77,13 +73,10 @@ public class PlayerInteract implements Listener {
 
                 //Passed the checks, start a new selection at the clicked block.
                 u.selectionTool.startSelection(e.getClickedBlock(), e.getClickedBlock().getWorld().getName());
-                u.player.sendMessage(Utils.success("Started a new selection at ")
-                        .append(Component.text(e.getClickedBlock().getX(), NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(", "))
-                        .append(Component.text(e.getClickedBlock().getZ(), NamedTextColor.DARK_AQUA)));
+                u.player.sendMessage(Utils.success("Started a new selection at &3" + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
                 //If the player right clicks then add a point to the existing selection.
-            } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
+            } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getHand().equals(EquipmentSlot.HAND)) {
 
                 e.setCancelled(true);
 
@@ -96,7 +89,7 @@ public class PlayerInteract implements Listener {
                 }
 
                 //Check if they are making their plot in the same world as their first point.
-                if (!Objects.requireNonNull(e.getClickedBlock()).getWorld().equals(u.selectionTool.world())) {
+                if (!e.getClickedBlock().getWorld().equals(u.selectionTool.world())) {
 
                     u.player.sendMessage(Utils.error("You already started a selection in a different world, please create a new selection first."));
                     return;
@@ -117,10 +110,7 @@ public class PlayerInteract implements Listener {
 
                 }
 
-                u.player.sendMessage(Utils.success("Added point at ")
-                        .append(Component.text(e.getClickedBlock().getX(), NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(", "))
-                        .append(Component.text(e.getClickedBlock().getZ(), NamedTextColor.DARK_AQUA)));
+                u.player.sendMessage(Utils.success("Added point at &3" + e.getClickedBlock().getX() + ", " + e.getClickedBlock().getZ()));
 
             }
         }

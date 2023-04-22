@@ -7,8 +7,6 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -290,11 +288,9 @@ public class SelectionTool extends WGCreatePlot {
             }
 
             //Send feedback.
-            u.player.sendMessage(Utils.success("Zone created with ID ")
-                    .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", it will expire at "))
-                    .append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", this can be extended in the Zone Menu.")));
+            u.player.sendMessage(Utils.success("Zone created with ID &3" + plotID +
+                    "&a, it will expire at &3" + Time.getDateTime(expiration) +
+                    "&a, this can be extended in the Zone Menu."));
             PlotSystem.getInstance().getLogger().info("Zone created with ID " + plotID +
                     ", it will expire at " + Time.getDateTime(expiration));
 

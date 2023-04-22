@@ -1,6 +1,5 @@
 package me.bteuk.plotsystem.reviewing;
 
-import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -53,7 +52,8 @@ public class Review {
         //Feedback book details.
         book = new ItemStack(Material.WRITABLE_BOOK);
         bookMeta = (BookMeta) book.getItemMeta();
-        bookMeta.displayName(Utils.success("Feedback"));
+        //noinspection deprecation
+        bookMeta.setDisplayName(ChatColor.GREEN + "Feedback");
         book.setItemMeta(bookMeta);
         editBook = new EditBook(PlotSystem.getInstance(), this);
 

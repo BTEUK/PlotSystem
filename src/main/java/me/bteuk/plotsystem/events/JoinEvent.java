@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,7 +49,7 @@ public class JoinEvent {
 
             if (p != null) {
 
-                p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
+                p.sendMessage(Utils.chat(message));
 
             } else {
 
@@ -82,7 +82,7 @@ public class JoinEvent {
 
             if (p != null) {
 
-                p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
+                p.sendMessage(Utils.chat(message));
 
             } else {
 

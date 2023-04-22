@@ -26,6 +26,8 @@ public class CreateZoneGui extends Gui {
 
     private void createGui() {
 
+        //TODO Zone info
+
         //Create zone.
         setItem(13, Utils.createItem(Material.DIAMOND, 1,
                         Utils.title("Create Zone"),
@@ -119,7 +121,7 @@ public class CreateZoneGui extends Gui {
                 i = 17;
             }
 
-            setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, Component.empty()));
+            setItem(i, Utils.createItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""));
         }
     }
 

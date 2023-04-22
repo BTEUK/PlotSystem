@@ -6,8 +6,6 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -88,9 +86,7 @@ public class DeleteEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("Plot ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" deleted")));
+                p.sendMessage(Utils.success("Plot &3" + id + " &adeleted"));
 
             } else {
 
@@ -166,14 +162,12 @@ public class DeleteEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("Zone ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" deleted")));
+                p.sendMessage(Utils.success("Plot &3" + id + " &adeleted"));
 
             } else {
 
                 //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
             }
         }

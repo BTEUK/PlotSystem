@@ -73,7 +73,7 @@ public class CloseEvent {
                 plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
                 //Add message for the plot owner to the database to notify them that their zone was closed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + " &a, its content has been saved.');");
 
                 //Log plot removal to console.
                 PlotSystem.getInstance().getLogger().info("Zone " + zone + " has been closed.");

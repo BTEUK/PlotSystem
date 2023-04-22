@@ -132,7 +132,7 @@ public class PlotSystem extends JavaPlugin {
         //Create gui item
         gui = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta2 = gui.getItemMeta();
-        meta2.displayName(Utils.title("Building Menu"));
+        meta2.setLocalizedName(ChatColor.AQUA + "" + ChatColor.BOLD + "Building Menu");
         gui.setItemMeta(meta2);
 
         //Setup Timers
@@ -145,7 +145,7 @@ public class PlotSystem extends JavaPlugin {
         //Create selection tool item
         selectionTool = new ItemStack(Material.BLAZE_ROD);
         ItemMeta meta = selectionTool.getItemMeta();
-        meta.displayName(Utils.success("Selection Tool"));
+        meta.setLocalizedName(Utils.success("Selection Tool"));
         selectionTool.setItemMeta(meta);
 
         //Listeners

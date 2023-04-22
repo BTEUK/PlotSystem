@@ -13,8 +13,6 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -43,10 +41,26 @@ public class CreateCommand {
         }
 
         switch (args[1]) {
-            case "plot" -> createPlot(sender);
-            case "location" -> createLocation(sender, args);
-            case "zone" -> createZone(sender);
-            default -> sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
+
+            case "plot":
+
+                createPlot(sender);
+                break;
+
+            case "location":
+
+                createLocation(sender, args);
+                break;
+
+            case "zone":
+
+                createZone(sender);
+                break;
+
+            default:
+
+                sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
+
         }
 
 
@@ -141,9 +155,7 @@ public class CreateCommand {
         //Check if the location name is unique.
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';")) {
 
-            sender.sendMessage(Utils.error("The location ")
-                    .append(Component.text(args[2], NamedTextColor.DARK_RED))
-                    .append(Utils.error(" already exists.")));
+            sender.sendMessage(Utils.error("The location &4" + args[2] + " &calready exists."));
             return;
 
         }
@@ -190,12 +202,7 @@ public class CreateCommand {
                         sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
                         return;
                     } else {
-                        sender.sendMessage(Utils.success("Copied region ")
-                                .append(Component.text(i, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(","))
-                                .append(Component.text(j, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" to "))
-                                .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
+                        sender.sendMessage(Utils.success("&aCopied region &3" + i + "," + j + " &ato &3" + args[2]));
                     }
 
                 }
@@ -215,8 +222,7 @@ public class CreateCommand {
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
                     + args[2] + "','" + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
 
-                sender.sendMessage(Utils.success("Created new location ")
-                        .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
+                sender.sendMessage(Utils.success("Created new location " + args[2]));
 
                 //Set the status of all effected regions in the region database.
                 for (int i = regionXMin; i <= regionXMax; i++) {
@@ -258,12 +264,8 @@ public class CreateCommand {
 
                 //Teleport to the location.
                 World world = Bukkit.getWorld(args[2]);
-
-                double y = 64;
-                if (world != null) {
-                    y = world.getHighestBlockYAt((int) x, (int) z);
-                    y++;
-                }
+                double y = world.getHighestBlockYAt((int) x, (int) z);
+                y++;
 
                 EventManager.createTeleportEvent(false, p.getUniqueId().toString(), "network", "teleport " + args[2] + " " + x + " " + y + " " + z + " "
                                 + p.getLocation().getYaw() + " " + p.getLocation().getPitch(),
