@@ -78,7 +78,7 @@ public class KickEvent {
             plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Remove the player to the worldguard region.
-            WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+            WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
 
             //Send message to plot owner.
             if (owner != null) {
@@ -88,7 +88,7 @@ public class KickEvent {
             } else {
 
                 //Send a cross-server message.
-                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','" + messageOwner + "');");
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + id + " AND is_owner=1;") + "','" + messageOwner + "');");
 
             }
 
