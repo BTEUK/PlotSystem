@@ -112,7 +112,9 @@ public class ClaimGui extends Gui {
                                 //Add player to worldguard region.
                                 if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
 
-                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
+                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
+                                            .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", good luck building.")));
                                     Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
                                 } else {

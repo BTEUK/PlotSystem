@@ -251,9 +251,12 @@ public class SelectionTool extends WGCreatePlot {
             }
 
             //Send feedback.
-            u.player.sendMessage(Utils.success("Plot created with ID &3" + plotID +
-                    "&a, difficulty &3" + PlotValues.difficultyName(difficulty) +
-                    "&a and size &3" + PlotValues.sizeName(size)));
+            u.player.sendMessage(Utils.success("Plot created with ID ")
+                    .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(", difficulty "))
+                    .append(Component.text(PlotValues.difficultyName(difficulty), NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" and size "))
+                    .append(Component.text(PlotValues.sizeName(size), NamedTextColor.DARK_AQUA)));
             PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));

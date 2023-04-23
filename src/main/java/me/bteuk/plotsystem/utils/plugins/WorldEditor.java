@@ -18,6 +18,9 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import static me.bteuk.network.utils.Constants.MAX_Y;
+import static me.bteuk.network.utils.Constants.MIN_Y;
+
 public class WorldEditor {
 
     public static boolean updateWorld(List<BlockVector2> copyVector, List<BlockVector2> pasteVector, World copy, World paste) {
@@ -26,8 +29,8 @@ public class WorldEditor {
         com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
         com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
 
-        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, -60, 319);
-        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, -60, 319);
+        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, MIN_Y, (MAX_Y-1));
+        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, MIN_Y, (MAX_Y-1));
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
@@ -48,6 +51,7 @@ public class WorldEditor {
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
+                    .copyBiomes(true)
                     // configure here
                     .build();
             Operations.complete(operation);
@@ -87,6 +91,7 @@ public class WorldEditor {
                     .createPaste(editSession)
                     .to(pasteMin)
                     .ignoreAirBlocks(true)
+                    .copyBiomes(true)
                     // configure here
                     .build();
             Operations.complete(operation);

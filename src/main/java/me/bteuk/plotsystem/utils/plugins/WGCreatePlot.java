@@ -15,6 +15,9 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import org.bukkit.entity.Player;
 
+import static me.bteuk.network.utils.Constants.MAX_Y;
+import static me.bteuk.network.utils.Constants.MIN_Y;
+
 /*
 This class adds the implementation of plot creation using worldguard.
  */
@@ -41,7 +44,7 @@ public class WGCreatePlot {
         }
 
         //Create region to test.
-        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, 1, 256);
+        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, MIN_Y, (MAX_Y-1));
 
         //Check whether the region overlaps an existing plot, if true stop the process.
         ApplicableRegionSet set = regions.getApplicableRegions(region);
@@ -56,7 +59,7 @@ public class WGCreatePlot {
         plotID = plotSQL.createPlot(size, difficulty, location);
 
         //Create the region with valid name.
-        region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, -60, 320);
+        region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, MIN_Y, (MAX_Y-1));
 
         //Add the regions to the world
         regions.addRegion(region);
@@ -87,7 +90,7 @@ public class WGCreatePlot {
         }
 
         //Create region to test.
-        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, 1, 256);
+        ProtectedPolygonalRegion region = new ProtectedPolygonalRegion("test", vector, MIN_Y, (MAX_Y-1));
 
         //Check whether the region overlaps an existing plot, if true stop the process.
         ApplicableRegionSet set = regions.getApplicableRegions(region);
@@ -102,7 +105,7 @@ public class WGCreatePlot {
         plotID = plotSQL.createZone(location, expiration, is_public);
 
         //Create the region with valid name.
-        region = new ProtectedPolygonalRegion("z" + plotID, vector, -60, 320);
+        region = new ProtectedPolygonalRegion("z" + plotID, vector, MIN_Y, (MAX_Y-1));
 
         //Add the owner to the region.
         region.getMembers().addPlayer(p.getUniqueId());

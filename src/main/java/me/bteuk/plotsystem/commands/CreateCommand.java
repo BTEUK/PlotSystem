@@ -10,6 +10,7 @@ import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.CopyRegionFormat;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -20,6 +21,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static me.bteuk.network.utils.Constants.MAX_Y;
+import static me.bteuk.network.utils.Constants.MIN_Y;
 
 public class CreateCommand {
 
@@ -177,26 +184,76 @@ public class CreateCommand {
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
         sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
+
+        //Create atomic boolean to query whether a region can be copied.
+        AtomicBoolean isReady = new AtomicBoolean(true);
+
+        //Create a list of regions to copy paste.
+        ArrayList<CopyRegionFormat> regions = new ArrayList<>();
+
+        for (int i = regionXMin; i <= regionXMax; i++) {
+            for (int j = regionZMin; j <= regionZMax; j++) {
+
+                //Split the region into 4 equal segments of 256x256.
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512, MIN_Y, j * 512),
+                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 255),
+                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512),
+                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 255),
+                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512, MIN_Y, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 511),
+                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 511),
+                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
+                );
+            }
+        }
+
+        PlotSystem.getInstance().getLogger().info("Add segments to list, there are " + regions.size());
+        sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
+
+        //Iterate until all regions are done.
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
 
-            for (int i = regionXMin; i <= regionXMax; i++) {
-                for (int j = regionZMin; j <= regionZMax; j++) {
+            while (regions.size() > 0) {
 
-                    if (!WorldEditor.largeCopy(BlockVector3.at(i * 512, -60, j * 512),
-                            BlockVector3.at(i * 512 + 511, 319, j * 512 + 511),
-                            BlockVector3.at(i * 512 + xTransform, -60, j * 512 + zTransform)
-                            , copy, paste)) {
-                        sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
-                        return;
-                    } else {
-                        sender.sendMessage(Utils.success("Copied region ")
-                                .append(Component.text(i, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(","))
-                                .append(Component.text(j, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" to "))
-                                .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
-                    }
+                if (isReady.get()) {
 
+                    //Set isReady to false so the loop will wait until the previous copy-paste is done.
+                    isReady.set(false);
+
+                    CopyRegionFormat regionFormat = regions.get(0);
+
+                    Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+
+                        if (!WorldEditor.largeCopy(regionFormat.minPoint, regionFormat.maxPoint, regionFormat.pasteMinPoint, copy, paste)) {
+                            sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
+                        } else {
+                            regions.remove(regionFormat);
+                            sender.sendMessage(Utils.success("Segment copied, there are ")
+                                    .append(Component.text(regions.size(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" remaining.")));
+                            PlotSystem.getInstance().getLogger().info("Segment copied, there are " + regions.size() + " remaining.");
+                            isReady.set(true);
+                        }
+
+                    });
                 }
             }
 
@@ -204,11 +261,11 @@ public class CreateCommand {
 
             int coordMin = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    (regionXMin * 512), -60, (regionZMin * 512), 0, 0));
+                    (regionXMin * 512), MIN_Y, (regionZMin * 512), 0, 0));
 
             int coordMax = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    ((regionXMax * 512) + 511), 319, ((regionZMax * 512) + 511), 0, 0));
+                    ((regionXMax * 512) + 511), MAX_Y-1, ((regionZMax * 512) + 511), 0, 0));
 
             //Add the location to the database.
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
@@ -219,7 +276,6 @@ public class CreateCommand {
 
                 //Set the status of all effected regions in the region database.
                 for (int i = regionXMin; i <= regionXMax; i++) {
-
                     for (int j = regionZMin; j <= regionZMax; j++) {
 
                         String region = i + "," + j;
@@ -248,11 +304,11 @@ public class CreateCommand {
 
                 //Get middle.
                 double x = ((globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordMax + ";") +
-                        globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordMin + ";"))/2) +
+                        globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordMin + ";")) / 2) +
                         plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + args[2] + "';");
 
                 double z = ((globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordMax + ";") +
-                        globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordMin + ";"))/2) +
+                        globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordMin + ";")) / 2) +
                         plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + args[2] + "';");
 
                 //Teleport to the location.
@@ -268,6 +324,7 @@ public class CreateCommand {
                                 + p.getLocation().getYaw() + " " + p.getLocation().getPitch(),
                         "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + args[2] + "';"), p.getLocation());
             }
+
         });
     }
 

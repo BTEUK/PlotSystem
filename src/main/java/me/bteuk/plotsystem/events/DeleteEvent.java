@@ -71,33 +71,35 @@ public class DeleteEvent {
             }
 
             //Revert plot to original state.
-            WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+            Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-            //Remove all members from the worldguard plot.
-            WorldGuardFunctions.clearMembers(event[2], pasteWorld);
+                //Remove all members from the worldguard plot.
+                WorldGuardFunctions.clearMembers(event[2], pasteWorld);
 
-            //Remove all members of plot in database.
-            PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+                //Remove all members of plot in database.
+                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
 
-            //Set plot status to unclaimed.
-            PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                //Set plot status to unclaimed.
+                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
 
-            //Send message to plot owner.
-            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+                //Send message to plot owner.
+                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-            //If the player is on this server send them a message.
-            if (p != null) {
+                //If the player is on this server send them a message.
+                if (p != null) {
 
-                p.sendMessage(Utils.success("Plot ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" deleted")));
+                    p.sendMessage(Utils.success("Plot ")
+                            .append(Component.text(id, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" deleted")));
 
-            } else {
+                } else {
 
-                //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
+                    //Add the message to the database so it can be sent wherever they are currently.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
-            }
+                }
+            });
         } else if (event[1].equals("zone")) {
 
             //PlotSQL
@@ -148,34 +150,36 @@ public class DeleteEvent {
             }
 
             //Revert zone to original state.
-            WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+            Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-            //Remove the zone from worldguard.
-            WorldGuardFunctions.delete("z" + event[2], pasteWorld);
-            WorldGuardFunctions.clearMembers(event[2], pasteWorld);
+                //Remove the zone from worldguard.
+                WorldGuardFunctions.delete("z" + event[2], pasteWorld);
+                WorldGuardFunctions.clearMembers(event[2], pasteWorld);
 
-            //Remove all members of plot in database.
-            PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+                //Remove all members of plot in database.
+                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
 
-            //Set plot status to unclaimed.
-            PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                //Set plot status to unclaimed.
+                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
 
-            //Send message to plot owner.
-            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+                //Send message to plot owner.
+                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-            //If the player is on this server send them a message.
-            if (p != null) {
+                //If the player is on this server send them a message.
+                if (p != null) {
 
-                p.sendMessage(Utils.success("Zone ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" deleted")));
+                    p.sendMessage(Utils.success("Zone ")
+                            .append(Component.text(id, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" deleted")));
 
-            } else {
+                } else {
 
-                //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
+                    //Add the message to the database so it can be sent wherever they are currently.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
 
-            }
+                }
+            });
         }
     }
 }

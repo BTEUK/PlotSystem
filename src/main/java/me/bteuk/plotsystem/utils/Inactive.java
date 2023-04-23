@@ -76,26 +76,28 @@ public class Inactive {
                 }
 
                 //Revert plot to original state.
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-                //Remove all members from the worldguard plot.
-                WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                    //Remove all members from the worldguard plot.
+                    WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
 
-                //Get the uuid of the plot owner.
-                String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
+                    //Get the uuid of the plot owner.
+                    String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
 
-                //Remove all members of plot in database.
-                plotSQL.update("DELETE FROM plot_members WHERE id=" + plot + ";");
+                    //Remove all members of plot in database.
+                    plotSQL.update("DELETE FROM plot_members WHERE id=" + plot + ";");
 
-                //Set plot status to unclaimed.
-                plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
+                    //Set plot status to unclaimed.
+                    plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
-                //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
+                    //Add message for the plot owner to the database to notify them that their plot was removed.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
 
-                //Log plot removal to console.
-                PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
+                    //Log plot removal to console.
+                    PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
 
+                });
             }
         }
     }
@@ -157,26 +159,28 @@ public class Inactive {
                 }
 
                 //Save the zone by copying from the building world to the save world.
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-                //Delete the worldguard region.
-                WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    //Delete the worldguard region.
+                    WorldGuardFunctions.delete("z" + zone, copyWorld);
 
-                //Get the uuid of the zone owner.
-                String uuid = plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zone + " AND is_owner=1;");
+                    //Get the uuid of the zone owner.
+                    String uuid = plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zone + " AND is_owner=1;");
 
-                //Remove all members of zone in database.
-                plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
+                    //Remove all members of zone in database.
+                    plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
 
-                //Set the zone status to closed.
-                plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
+                    //Set the zone status to closed.
+                    plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
-                //Add message for the plot owner to the database to notify them that their zone was closed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
+                    //Add message for the plot owner to the database to notify them that their zone was closed.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
 
-                //Log plot removal to console.
-                PlotSystem.getInstance().getLogger().info("Zone " + zone + " has expired.");
+                    //Log plot removal to console.
+                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has expired.");
 
+                });
             }
         }
     }

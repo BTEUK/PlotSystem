@@ -245,57 +245,59 @@ public class AcceptGui extends Gui {
                     }
 
                     //Update the world by copying the build world to the save world.
-                    WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
+                    Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                        WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
 
-                    PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
+                        PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
 
-                    //Remove plot from worldguard.
-                    WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
+                        //Remove plot from worldguard.
+                        WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
 
-                    //Send feedback in chat and console.
-                    u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));
+                        //Send feedback in chat and console.
+                        u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));
 
-                    //Get number of submitted plots.
-                    int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+                        //Get number of submitted plots.
+                        int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                    //Send message to reviewers that a plot has been reviewed.
-                    if (plot_count == 1) {
-                        Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
-                                .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success("submitted plot.")), "uknet:reviewer");
-                    } else {
-                        Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
-                                .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success("submitted plots.")), "uknet:reviewer");
-                    }
-
-                    //Promote plot owner if they should be.
-                    int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
-
-                    String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
-
-                    if (difficulty == 1 && role.equals("default")) {
-                        //Promote player to apprentice.
-                        Roles.promoteBuilder(plotOwner, "default", "apprentice");
-                    } else if (difficulty == 2) {
-                        if (role.equals("default")) {
-                            //Promote player to jrbuilder.
-                            Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
-                        } else if (role.equals("apprentice")) {
-                            Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                        //Send message to reviewers that a plot has been reviewed.
+                        if (plot_count == 1) {
+                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
+                                    .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success("submitted plot.")), "uknet:reviewer");
+                        } else {
+                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
+                                    .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success("submitted plots.")), "uknet:reviewer");
                         }
-                    } else if (difficulty == 3) {
-                        switch (role) {
-                            case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
-                            case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
-                            case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
+
+                        //Promote plot owner if they should be.
+                        int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
+
+                        String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
+
+                        if (difficulty == 1 && role.equals("default")) {
+                            //Promote player to apprentice.
+                            Roles.promoteBuilder(plotOwner, "default", "apprentice");
+                        } else if (difficulty == 2) {
+                            if (role.equals("default")) {
+                                //Promote player to jrbuilder.
+                                Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
+                            } else if (role.equals("apprentice")) {
+                                Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                            }
+                        } else if (difficulty == 3) {
+                            switch (role) {
+                                case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
+                                case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
+                                case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
+                            }
                         }
-                    }
 
-                    //Close gui and clear review.
-                    user.review.closeReview();
-                    user.review = null;
+                        //Close gui and clear review.
+                        user.review.closeReview();
+                        user.review = null;
 
+                    });
                 }
         );
 
