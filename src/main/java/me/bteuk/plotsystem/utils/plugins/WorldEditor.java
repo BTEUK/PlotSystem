@@ -35,6 +35,7 @@ public class WorldEditor {
             ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
                     editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
             );
+            forwardExtentCopy.setCopyingBiomes(true);
             // configure here
             Operations.complete(forwardExtentCopy);
         } catch (WorldEditException e) {
@@ -59,14 +60,13 @@ public class WorldEditor {
         return true;
     }
 
-    public static boolean largeCopy(BlockVector3 copyMin, BlockVector3 copyMax, BlockVector3 pasteMin, BlockVector3 pasteMax, World copy, World paste) {
+    public static boolean largeCopy(BlockVector3 copyMin, BlockVector3 copyMax, BlockVector3 pasteMin, World copy, World paste) {
 
         //Get the worlds in worldEdit format
         com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
         com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
 
         CuboidRegion copyRegion = new CuboidRegion(copyWorld, copyMin, copyMax);
-        CuboidRegion pasteRegion = new CuboidRegion(pasteWorld, pasteMin, pasteMax);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
@@ -74,6 +74,7 @@ public class WorldEditor {
             ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
                     editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
             );
+            forwardExtentCopy.setCopyingBiomes(true);
             Operations.complete(forwardExtentCopy);
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,7 +85,7 @@ public class WorldEditor {
                 .world(pasteWorld).fastMode(false).checkMemory(true).limitUnlimited().changeSetNull().build()) {
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
-                    .to(pasteRegion.getMinimumPoint())
+                    .to(pasteMin)
                     .ignoreAirBlocks(true)
                     // configure here
                     .build();

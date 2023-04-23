@@ -184,8 +184,7 @@ public class CreateCommand {
 
                     if (!WorldEditor.largeCopy(BlockVector3.at(i * 512, -60, j * 512),
                             BlockVector3.at(i * 512 + 511, 319, j * 512 + 511),
-                            BlockVector3.at(i * 512 + xTransform, -60, j * 512 + zTransform),
-                            BlockVector3.at(i * 512 + 511 + xTransform, 319, j * 512 + 511 + zTransform)
+                            BlockVector3.at(i * 512 + xTransform, -60, j * 512 + zTransform)
                             , copy, paste)) {
                         sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
                         return;
