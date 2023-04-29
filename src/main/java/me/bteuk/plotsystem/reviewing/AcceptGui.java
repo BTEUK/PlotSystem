@@ -263,11 +263,11 @@ public class AcceptGui extends Gui {
                         if (plot_count == 1) {
                             Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
                                     .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success("submitted plot.")), "uknet:reviewer");
+                                    .append(Utils.success(" submitted plot.")), "uknet:reviewer");
                         } else {
                             Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
                                     .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success("submitted plots.")), "uknet:reviewer");
+                                    .append(Utils.success(" submitted plots.")), "uknet:reviewer");
                         }
 
                         //Promote plot owner if they should be.
