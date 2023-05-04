@@ -232,7 +232,7 @@ public class AcceptGui extends Gui {
                     List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
                     List<BlockVector2> pasteVector = new ArrayList<>();
 
-                    if (copyVector== null) {
+                    if (copyVector == null) {
                         PlotSystem.getInstance().getLogger().warning("CopyVector is null!!!");
                         return;
                     }
@@ -254,7 +254,9 @@ public class AcceptGui extends Gui {
                         WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
 
                         //Send feedback in chat and console.
-                        u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));
+                        u.player.sendMessage(Utils.success("Plot ")
+                                .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" accepted.")));
 
                         //Get number of submitted plots.
                         int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
@@ -275,23 +277,26 @@ public class AcceptGui extends Gui {
 
                         String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
 
-                        if (difficulty == 1 && role.equals("default")) {
-                            //Promote player to apprentice.
-                            Roles.promoteBuilder(plotOwner, "default", "apprentice");
-                        } else if (difficulty == 2) {
-                            if (role.equals("default")) {
-                                //Promote player to jrbuilder.
-                                Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
-                            } else if (role.equals("apprentice")) {
-                                Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                        //Run the promotion on sync, since it has to execute a command through the console.
+                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
+                            if (difficulty == 1 && role.equals("default")) {
+                                //Promote player to apprentice.
+                                Roles.promoteBuilder(plotOwner, "default", "apprentice");
+                            } else if (difficulty == 2) {
+                                if (role.equals("default")) {
+                                    //Promote player to jrbuilder.
+                                    Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
+                                } else if (role.equals("apprentice")) {
+                                    Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                                }
+                            } else if (difficulty == 3) {
+                                switch (role) {
+                                    case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
+                                    case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
+                                    case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
+                                }
                             }
-                        } else if (difficulty == 3) {
-                            switch (role) {
-                                case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
-                                case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
-                                case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
-                            }
-                        }
+                        });
 
                         //Close gui and clear review.
                         user.review.closeReview();
@@ -324,13 +329,13 @@ public class AcceptGui extends Gui {
 
     public double accuracyMultiplier() {
 
-        return (1 + (accuracy-3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
+        return (1 + (accuracy - 3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
 
     }
 
     public double qualityMultiplier() {
 
-        return (1 + (quality-3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
+        return (1 + (quality - 3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
 
     }
 }

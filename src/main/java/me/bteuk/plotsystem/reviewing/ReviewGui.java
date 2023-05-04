@@ -177,7 +177,9 @@ public class ReviewGui extends Gui {
                         WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
 
                         //Send feedback.
-                        u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &ahas been denied."));
+                        u.player.sendMessage(Utils.success("Plot ")
+                                .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" has been denied.")));
 
                         //Get number of submitted plots.
                         int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
