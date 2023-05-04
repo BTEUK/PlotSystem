@@ -60,23 +60,25 @@ public class CloseEvent {
                     pasteVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
                 }
 
-                //Save the zone by copying from the building world to the save world.
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                    //Save the zone by copying from the building world to the save world.
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-                //Delete the worldguard region.
-                WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    //Delete the worldguard region.
+                    WorldGuardFunctions.delete("z" + zone, copyWorld);
 
-                //Remove all members of zone in database.
-                plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
+                    //Remove all members of zone in database.
+                    plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
 
-                //Set the zone status to closed.
-                plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
+                    //Set the zone status to closed.
+                    plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
-                //Add message for the plot owner to the database to notify them that their zone was closed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + " &a, its content has been saved.');");
+                    //Add message for the plot owner to the database to notify them that their zone was closed.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
 
-                //Log plot removal to console.
-                PlotSystem.getInstance().getLogger().info("Zone " + zone + " has been closed.");
+                    //Log plot removal to console.
+                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has been closed.");
+                });
             }
         }
     }

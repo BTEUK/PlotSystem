@@ -71,7 +71,7 @@ public class PlotOutline {
 
                         //Get location.
                         l = new Location(world, i,
-                                world.getHighestBlockYAt(i, j), j);
+                                world.getHighestBlockYAt(i, j) + 1, j);
 
                         //Add previous block to list.
                         if (saveBlocks) {
@@ -107,7 +107,7 @@ public class PlotOutline {
 
         //Get location.
         l = new Location(world, bv.getX(),
-                world.getHighestBlockYAt(bv.getX(), bv.getZ()), bv.getZ());
+                world.getHighestBlockYAt(bv.getX(), bv.getZ()) + 1, bv.getZ());
 
         //Add previous block to list.
         previousBlocks.put(l, l.getBlock().getBlockData());
@@ -144,7 +144,7 @@ public class PlotOutline {
 
             //Get location.
             l = new Location(world, intPos[0],
-                    world.getHighestBlockYAt(intPos[0], intPos[1]), intPos[1]);
+                    world.getHighestBlockYAt(intPos[0], intPos[1]) + 1, intPos[1]);
 
             //Add previous block to list.
             previousBlocks.put(l, l.getBlock().getBlockData());

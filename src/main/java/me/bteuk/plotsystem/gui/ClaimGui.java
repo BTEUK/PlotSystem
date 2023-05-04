@@ -10,10 +10,9 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -74,16 +73,16 @@ public class ClaimGui extends Gui {
                             user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.inPlot + ";") + "';");
 
                     //Convert to irl coordinates.
+
                     try {
 
                         final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
                         double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
 
                         //Generate link to google maps.
-                        TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
-                        message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
-
-                        u.player.spigot().sendMessage(message);
+                        Component message = Utils.success("Click here to open the plot in Google Maps.");
+                        message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
+                        u.player.sendMessage(message);
 
                     } catch (OutOfProjectionBoundsException e) {
                         e.printStackTrace();
@@ -113,12 +112,14 @@ public class ClaimGui extends Gui {
                                 //Add player to worldguard region.
                                 if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
 
-                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot &3" + eUser.inPlot + "&a, good luck building."));
+                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
+                                            .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", good luck building.")));
                                     Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
                                 } else {
 
-                                    eUser.player.sendMessage(Utils.chat("&cAn error occurred while claiming the plot."));
+                                    eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
                                     Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
 
                                 }

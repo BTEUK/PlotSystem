@@ -3,14 +3,18 @@ package me.bteuk.plotsystem.events;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class TeleportEvent {
 
@@ -43,13 +47,19 @@ public class TeleportEvent {
 
             //If the plot is on the current server teleport them directly.
             //Else teleport them to the correct server and them teleport them to the plot.
-            if (server.equals(Network.SERVER_NAME)) {
+            if (server.equals(SERVER_NAME)) {
 
                 //Get world of plot.
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
                 //Get location of plot and teleport the player there.
-                u.player.teleport(WorldGuardFunctions.getCurrentLocation(event[2], world));
+                Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
+
+                if (l == null) {
+                    p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
+                    return;
+                }
+                u.player.teleport(l);
 
             } else {
 
@@ -87,13 +97,19 @@ public class TeleportEvent {
 
             //If the zone is on the current server teleport them directly.
             //Else teleport them to the correct server and them teleport them to the zone.
-            if (server.equals(Network.SERVER_NAME)) {
+            if (server.equals(SERVER_NAME)) {
 
                 //Get world of zone.
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";"));
 
                 //Get location of plot and teleport the player there.
-                u.player.teleport(WorldGuardFunctions.getCurrentLocation(zoneName, world));
+                Location l = WorldGuardFunctions.getCurrentLocation(zoneName, world);
+
+                if (l == null) {
+                    p.sendMessage(Utils.error("You could not be teleported to the zone, please notify an admin."));
+                    return;
+                }
+                u.player.teleport(l);
 
             } else {
 

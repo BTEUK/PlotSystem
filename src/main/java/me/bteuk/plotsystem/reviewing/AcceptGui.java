@@ -151,8 +151,19 @@ public class AcceptGui extends Gui {
                     //Get world of plot.
                     World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
 
+                    if (world == null) {
+                        PlotSystem.getInstance().getLogger().warning("World of plot is null!!!");
+                        return;
+                    }
+
                     //Get save world.
-                    World saveWorld = Bukkit.getWorld(PlotSystem.getInstance().getConfig().getString("save_world"));
+                    String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
+                    if (save_world == null) {
+                        PlotSystem.getInstance().getLogger().warning("Save world is not set in config!");
+                        return;
+                    }
+
+                    World saveWorld = Bukkit.getWorld(save_world);
 
                     //Set bookID to 0 if it has not been edited.
                     int bookID = 0;
@@ -174,7 +185,7 @@ public class AcceptGui extends Gui {
 
                         for (String text : book) {
                             if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
-                                u.player.sendMessage(Utils.chat("&cAn error occured, please notify an admin."));
+                                u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
                                 return;
                             }
                             i++;
@@ -192,7 +203,7 @@ public class AcceptGui extends Gui {
                             user.review.plot + ",'" + plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
                             accuracy + "," + quality + "," + Time.currentTime() + ");")) {
 
-                        PlotSystem.getInstance().getLogger().severe(Utils.chat("&cAn error occured while inserting to accept_data."));
+                        PlotSystem.getInstance().getLogger().severe("An error occurred while inserting to accept_data.");
 
                     }
 
@@ -221,6 +232,11 @@ public class AcceptGui extends Gui {
                     List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
                     List<BlockVector2> pasteVector = new ArrayList<>();
 
+                    if (copyVector == null) {
+                        PlotSystem.getInstance().getLogger().warning("CopyVector is null!!!");
+                        return;
+                    }
+
                     //Create paste vector by taking the copy vector coordinate and adding the coordinate transform.
                     for (BlockVector2 bv : copyVector) {
 
@@ -229,55 +245,64 @@ public class AcceptGui extends Gui {
                     }
 
                     //Update the world by copying the build world to the save world.
-                    WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
+                    Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+                        WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
 
-                    PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
+                        PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
 
-                    //Remove plot from worldguard.
-                    WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
+                        //Remove plot from worldguard.
+                        WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
 
-                    //Send feedback in chat and console.
-                    u.player.sendMessage(Utils.success("Plot &3" + user.review.plot + " &aaccepted."));
+                        //Send feedback in chat and console.
+                        u.player.sendMessage(Utils.success("Plot ")
+                                .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" accepted.")));
 
-                    //Get number of submitted plots.
-                    int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+                        //Get number of submitted plots.
+                        int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                    //Send message to reviewers that a plot has been reviewed.
-                    if (plot_count == 1) {
-                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there is &31 &asubmitted plot.", "uknet:reviewer");
-                    } else {
-                        Network.getInstance().chat.broadcastMessage("&aA plot has been reviewed, there are &3" + plot_count + " &asubmitted plots.", "uknet:reviewer");
-                    }
-
-                    //Promote plot owner if they should be.
-                    int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
-
-                    String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
-
-                    if (difficulty == 1 && role.equals("default")) {
-                        //Promote player to apprentice.
-                        Roles.promoteBuilder(plotOwner, "default", "apprentice");
-                    } else if (difficulty == 2) {
-                        if (role.equals("default")) {
-                            //Promote player to jrbuilder.
-                            Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
-                        } else if (role.equals("apprentice")) {
-                            Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                        //Send message to reviewers that a plot has been reviewed.
+                        if (plot_count == 1) {
+                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
+                                    .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" submitted plot.")), "uknet:reviewer");
+                        } else {
+                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
+                                    .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" submitted plots.")), "uknet:reviewer");
                         }
-                    } else if (difficulty == 3) {
-                        if (role.equals("default")) {
-                            Roles.promoteBuilder(plotOwner, "default", "builder");
-                        } else if (role.equals("apprentice")) {
-                            Roles.promoteBuilder(plotOwner, "apprentice", "builder");
-                        } else if (role.equals("jrbuilder")) {
-                            Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
-                        }
-                    }
 
-                    //Close gui and clear review.
-                    user.review.closeReview();
-                    user.review = null;
+                        //Promote plot owner if they should be.
+                        int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
 
+                        String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
+
+                        //Run the promotion on sync, since it has to execute a command through the console.
+                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
+                            if (difficulty == 1 && role.equals("default")) {
+                                //Promote player to apprentice.
+                                Roles.promoteBuilder(plotOwner, "default", "apprentice");
+                            } else if (difficulty == 2) {
+                                if (role.equals("default")) {
+                                    //Promote player to jrbuilder.
+                                    Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
+                                } else if (role.equals("apprentice")) {
+                                    Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
+                                }
+                            } else if (difficulty == 3) {
+                                switch (role) {
+                                    case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
+                                    case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
+                                    case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
+                                }
+                            }
+                        });
+
+                        //Close gui and clear review.
+                        user.review.closeReview();
+                        user.review = null;
+
+                    });
                 }
         );
 
@@ -304,13 +329,13 @@ public class AcceptGui extends Gui {
 
     public double accuracyMultiplier() {
 
-        return (1 + (accuracy-3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
+        return (1 + (accuracy - 3) * PlotSystem.getInstance().getConfig().getDouble("accuracy_multiplier"));
 
     }
 
     public double qualityMultiplier() {
 
-        return (1 + (quality-3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
+        return (1 + (quality - 3) * PlotSystem.getInstance().getConfig().getDouble("quality_multiplier"));
 
     }
 }

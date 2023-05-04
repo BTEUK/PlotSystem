@@ -192,7 +192,7 @@ public class PlotSQL {
 
             int[][] corners = new int[results.getInt(1)][2];
 
-            corners = getPlotCorners(corners, plotID);
+            getPlotCorners(corners, plotID);
 
             return corners;
 

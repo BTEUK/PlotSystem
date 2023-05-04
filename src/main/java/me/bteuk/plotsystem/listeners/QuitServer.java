@@ -28,7 +28,8 @@ public class QuitServer implements Listener {
 
         //If no user was found print error in console.
         if (u == null) {
-            instance.getLogger().warning("&cError: User " + e.getPlayer().getName() + " not found in the list of online users!");
+            instance.getLogger().warning("Error: User " + e.getPlayer().getName() + " not found in the list of online users!");
+            return;
         }
 
         //If the player is in a review, cancel it.

@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
@@ -69,30 +70,8 @@ public class ClaimEvent {
             NetworkUser user = Network.getInstance().getUser(u.player);
 
             //Check if the player has permission to claim a plot of this difficulty.
-            if (!user.player.hasPermission("uknet.plots.claim.all")) {
-                switch (u.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + u.inPlot + ";")) {
-
-                    case 1 -> {
-                        if (!user.player.hasPermission("uknet.plots.claim.easy")) {
-                            user.player.sendMessage(Utils.error("You do not have permission to claim an &4Easy &cplot."));
-                            return;
-                        }
-                    }
-
-                    case 2 -> {
-                        if (!user.player.hasPermission("uknet.plots.claim.normal")) {
-                            user.player.sendMessage(Utils.error("You do not have permission to claim a &4Normal &cplot."));
-                            return;
-                        }
-                    }
-
-                    case 3 -> {
-                        if (!user.player.hasPermission("uknet.plots.claim.hard")) {
-                            user.player.sendMessage(Utils.error("You do not have permission to claim a &4Hard &cplot."));
-                            return;
-                        }
-                    }
-                }
+            if (!ClaimCommand.hasClaimPermission(u, user)) {
+                return;
             }
 
             u.player.closeInventory();
