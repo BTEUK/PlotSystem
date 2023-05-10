@@ -153,7 +153,7 @@ public class ReviewGui extends Gui {
                     //Update deny data.
                     if (plotSQL.update("INSERT INTO deny_data(id,uuid,reviewer,book_id,attempt,deny_time) VALUES(" + user.review.plot + ",'" +
                             plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
-                            (1 + plotSQL.getInt("SELECT attempt FROM deny_data WHERE id=" + user.review.plot + " AND uuid='" + plotOwner + "';")) +
+                            (1 + plotSQL.getInt("SELECT COUNT(attempt) FROM deny_data WHERE id=" + user.review.plot + " AND uuid='" + plotOwner + "';")) +
                             "," + Time.currentTime() + ");")) {
 
                         //Send message to plot owner.
