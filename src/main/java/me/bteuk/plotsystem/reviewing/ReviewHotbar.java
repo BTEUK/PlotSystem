@@ -151,6 +151,13 @@ public class ReviewHotbar implements Listener {
 
         //Unregister listeners.
         PlayerEditBookEvent.getHandlerList().unregister(this);
+        InventoryClickEvent.getHandlerList().unregister(this);
+        InventoryDragEvent.getHandlerList().unregister(this);
+        InventoryMoveItemEvent.getHandlerList().unregister(this);
+        PlayerInteractEvent.getHandlerList().unregister(this);
+        PlayerDropItemEvent.getHandlerList().unregister(this);
+        PlayerSwapHandItemsEvent.getHandlerList().unregister(this);
+
     }
 
     /*
@@ -167,51 +174,41 @@ public class ReviewHotbar implements Listener {
             return;
         }
 
-        if (e.getOffHandItem().equals(reviewGuiItem)) {
-            e.setCancelled(true);
-        } else if (e.getOffHandItem().equals(u.review.book)) {
-            e.setCancelled(true);
-        }
+        e.setCancelled(cancelEvent(e.getOffHandItem()));
 
     }
 
     @EventHandler
     public void dropItem(PlayerDropItemEvent e) {
-
-        if (e.getItemDrop().getItemStack().equals(reviewGuiItem)) {
-            e.setCancelled(true);
-        } else if (e.getItemDrop().getItemStack().equals(u.review.book)) {
-            e.setCancelled(true);
-        }
-
+        e.setCancelled(cancelEvent(e.getItemDrop().getItemStack()));
     }
 
     @EventHandler
     public void moveItem(InventoryMoveItemEvent e) {
-        if (e.getItem().equals(reviewGuiItem)) {
-            e.setCancelled(true);
-        } else if (e.getItem().equals(u.review.book)) {
-            e.setCancelled(true);
-        }
-
+        e.setCancelled(cancelEvent(e.getItem()));
     }
 
     @EventHandler
     public void dragItem(InventoryDragEvent e) {
-        if (e.getOldCursor().equals(reviewGuiItem)) {
+        if (cancelEvent(e.getOldCursor())) {
             e.setCancelled(true);
-        } else if (e.getOldCursor().equals(u.review.book)) {
-            e.setCancelled(true);
-        }
-
-        if (e.getCursor() == null) {
             return;
         }
 
-        if (e.getCursor().equals(reviewGuiItem)) {
-            e.setCancelled(true);
-        } else if (e.getCursor().equals(u.review.book)) {
-            e.setCancelled(true);
+        if (e.getCursor() != null) {
+            if (cancelEvent(e.getCursor())) {
+                e.setCancelled(true);
+            }
         }
+    }
+
+    public boolean cancelEvent(ItemStack item) {
+
+        //Check if review is not null.
+        if (u.review != null) {
+            return item.equals(reviewGuiItem) || item.equals(u.review.book);
+        }
+
+        return false;
     }
 }
