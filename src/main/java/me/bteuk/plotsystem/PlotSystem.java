@@ -5,11 +5,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
 import me.bteuk.plotsystem.listeners.*;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -49,6 +52,10 @@ public class PlotSystem extends JavaPlugin {
 
     //Listeners
     public ClaimEnter claimEnter;
+
+    //Outline manager.
+    @Getter @Setter
+    public Outlines outlines;
 
     @Override
     public void onEnable() {
@@ -170,6 +177,8 @@ public class PlotSystem extends JavaPlugin {
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
         getCommand("claim").setExecutor(claimCommand);
+
+        //Outlines, this will be accessed from other classes, so it must have a getter and setter.
 
     }
 
