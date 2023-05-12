@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class DeleteCommand {
 
     private final GlobalSQL globalSQL;
@@ -148,7 +150,7 @@ public class DeleteCommand {
         } else {
 
             sender.sendMessage(Utils.error("An error occured while deleting the plot."));
-            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
+            LOGGER.warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
 
         }
     }
@@ -206,7 +208,7 @@ public class DeleteCommand {
             plotSQL.update("DELETE FROM location_data WHERE name='" + args[2] + "';");
             sender.sendMessage(Utils.success("Deleted location ")
                     .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
-            PlotSystem.getInstance().getLogger().info("Deleted location " + args[2] + ".");
+            LOGGER.info("Deleted location " + args[2] + ".");
 
             //Get regions from database.
             ArrayList<String> regions = plotSQL.getStringList("SELECT region FROM regions WHERE location='" + args[2] + "';");
@@ -224,7 +226,7 @@ public class DeleteCommand {
         } else {
 
             sender.sendMessage(Utils.error("An error occurred while deleting the world."));
-            PlotSystem.getInstance().getLogger().warning("An error occurred while deleting world " + args[2] + ".");
+            LOGGER.warning("An error occurred while deleting world " + args[2] + ".");
 
         }
     }

@@ -24,6 +24,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class AcceptGui extends Gui {
 
     //Reviewing values.
@@ -152,14 +154,14 @@ public class AcceptGui extends Gui {
                     World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.review.plot + ";"));
 
                     if (world == null) {
-                        PlotSystem.getInstance().getLogger().warning("World of plot is null!!!");
+                        LOGGER.warning("World of plot is null!!!");
                         return;
                     }
 
                     //Get save world.
                     String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
                     if (save_world == null) {
-                        PlotSystem.getInstance().getLogger().warning("Save world is not set in config!");
+                        LOGGER.warning("Save world is not set in config!");
                         return;
                     }
 
@@ -203,7 +205,7 @@ public class AcceptGui extends Gui {
                             user.review.plot + ",'" + plotOwner + "','" + u.player.getUniqueId() + "'," + bookID + "," +
                             accuracy + "," + quality + "," + Time.currentTime() + ");")) {
 
-                        PlotSystem.getInstance().getLogger().severe("An error occurred while inserting to accept_data.");
+                        LOGGER.severe("An error occurred while inserting to accept_data.");
 
                     }
 
@@ -233,7 +235,7 @@ public class AcceptGui extends Gui {
                     List<BlockVector2> pasteVector = new ArrayList<>();
 
                     if (copyVector == null) {
-                        PlotSystem.getInstance().getLogger().warning("CopyVector is null!!!");
+                        LOGGER.warning("CopyVector is null!!!");
                         return;
                     }
 
@@ -248,7 +250,7 @@ public class AcceptGui extends Gui {
                     Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                         WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
 
-                        PlotSystem.getInstance().getLogger().info("Plot " + user.review.plot + " successfully saved.");
+                        LOGGER.info("Plot " + user.review.plot + " successfully saved.");
 
                         //Remove plot from worldguard.
                         WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);

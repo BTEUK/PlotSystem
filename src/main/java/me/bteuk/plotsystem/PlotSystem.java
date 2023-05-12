@@ -3,6 +3,7 @@ package me.bteuk.plotsystem;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
@@ -23,6 +24,9 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
 public class PlotSystem extends JavaPlugin {
+
+    //Logger
+    public static Logger LOGGER;
 
     //SQL Classes.
     public GlobalSQL globalSQL;
@@ -49,6 +53,8 @@ public class PlotSystem extends JavaPlugin {
     @Override
     public void onEnable() {
 
+        LOGGER = getLogger();
+
         //Config Setup
         PlotSystem.instance = this;
         PlotSystem.config = this.getConfig();
@@ -57,8 +63,8 @@ public class PlotSystem extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            getLogger().warning("The config must be configured before the plugin can be enabled!");
-            getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            LOGGER.warning("The config must be configured before the plugin can be enabled!");
+            LOGGER.warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
             return;
 
         }
@@ -77,7 +83,7 @@ public class PlotSystem extends JavaPlugin {
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
-            getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            LOGGER.severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -95,18 +101,18 @@ public class PlotSystem extends JavaPlugin {
                 //Create save world.
                 if (!Multiverse.createVoidWorld(config.getString("save_world"))) {
 
-                    getLogger().warning("Failed to create save world!");
+                    LOGGER.warning("Failed to create save world!");
 
                 }
 
                 //Enable plugin.
-                getLogger().info("Enabling Plugin");
+                LOGGER.info("Enabling Plugin");
                 enablePlugin();
 
             } else {
 
                 //Save world has already been created, enable plugin.
-                getLogger().info("Enabling Plugin");
+                LOGGER.info("Enabling Plugin");
                 enablePlugin();
 
 
@@ -114,7 +120,7 @@ public class PlotSystem extends JavaPlugin {
         } else {
 
             //If the server is not in the database the network plugin was not successful.
-            getLogger().warning("Server is not in database, check that the Network plugin is working correctly.");
+            LOGGER.warning("Server is not in database, check that the Network plugin is working correctly.");
 
         }
     }
@@ -202,7 +208,7 @@ public class PlotSystem extends JavaPlugin {
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
-        getLogger().info("Disabled PublicBuilds");
+        LOGGER.info("Disabled PublicBuilds");
     }
 
     //Creates the mysql connection.

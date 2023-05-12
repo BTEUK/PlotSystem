@@ -10,6 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class QuitServer implements Listener {
 
     public QuitServer(PlotSystem plugin) {
@@ -28,7 +30,7 @@ public class QuitServer implements Listener {
 
         //If no user was found print error in console.
         if (u == null) {
-            instance.getLogger().warning("Error: User " + e.getPlayer().getName() + " not found in the list of online users!");
+            LOGGER.warning("Error: User " + e.getPlayer().getName() + " not found in the list of online users!");
             return;
         }
 

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class CreateCommand {
 
@@ -225,7 +226,7 @@ public class CreateCommand {
             }
         }
 
-        PlotSystem.getInstance().getLogger().info("Add segments to list, there are " + regions.size());
+        LOGGER.info("Add segments to list, there are " + regions.size());
         sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
 
         //Iterate until all regions are done.
@@ -249,7 +250,7 @@ public class CreateCommand {
                             sender.sendMessage(Utils.success("Segment copied, there are ")
                                     .append(Component.text(regions.size(), NamedTextColor.DARK_AQUA))
                                     .append(Utils.success(" remaining.")));
-                            PlotSystem.getInstance().getLogger().info("Segment copied, there are " + regions.size() + " remaining.");
+                            LOGGER.info("Segment copied, there are " + regions.size() + " remaining.");
                             isReady.set(true);
                         }
 

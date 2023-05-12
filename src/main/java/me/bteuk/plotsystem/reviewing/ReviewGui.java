@@ -20,6 +20,8 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 import java.util.List;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class ReviewGui extends Gui {
 
     private final GlobalSQL globalSQL;
@@ -71,7 +73,7 @@ public class ReviewGui extends Gui {
                     Location l = WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world);
 
                     if (l == null) {
-                        PlotSystem.getInstance().getLogger().warning("Could not find before view of plot " + user.review.plot);
+                        LOGGER.warning("Could not find before view of plot " + user.review.plot);
                         return;
                     }
 
@@ -90,7 +92,7 @@ public class ReviewGui extends Gui {
                     Location l = WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world);
 
                     if (l == null) {
-                        PlotSystem.getInstance().getLogger().warning("Could not find current view of plot " + user.review.plot);
+                        LOGGER.warning("Could not find current view of plot " + user.review.plot);
                         return;
                     }
 

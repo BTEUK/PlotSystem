@@ -15,6 +15,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class Inactive {
 
     public static void cancelInactivePlots() {
@@ -51,7 +53,7 @@ public class Inactive {
                 //Get worlds of plot and save location.
                 String save_world = config.getString("save_world");
                 if (save_world == null) {
-                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                     continue;
                 }
 
@@ -95,7 +97,7 @@ public class Inactive {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
 
                     //Log plot removal to console.
-                    PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
+                    LOGGER.info("Plot " + plot + " removed due to inactivity!");
 
                 });
             }
@@ -134,7 +136,7 @@ public class Inactive {
                 //Get worlds of plot and save location.
                 String save_world = config.getString("save_world");
                 if (save_world == null) {
-                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                     continue;
                 }
 
@@ -178,7 +180,7 @@ public class Inactive {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
 
                     //Log plot removal to console.
-                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has expired.");
+                    LOGGER.info("Zone " + zone + " has expired.");
 
                 });
             }

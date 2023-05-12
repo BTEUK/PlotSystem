@@ -18,6 +18,8 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class SelectionTool extends WGCreatePlot {
 
     //Stores a reference to the user for simplicity.
@@ -257,7 +259,7 @@ public class SelectionTool extends WGCreatePlot {
                     .append(Component.text(PlotValues.difficultyName(difficulty), NamedTextColor.DARK_AQUA))
                     .append(Utils.success(" and size "))
                     .append(Component.text(PlotValues.sizeName(size), NamedTextColor.DARK_AQUA)));
-            PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
+            LOGGER.info("Plot created with ID " + plotID +
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));
 
@@ -298,7 +300,7 @@ public class SelectionTool extends WGCreatePlot {
                     .append(Utils.success(", it will expire at "))
                     .append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA))
                     .append(Utils.success(", this can be extended in the Zone Menu.")));
-            PlotSystem.getInstance().getLogger().info("Zone created with ID " + plotID +
+            LOGGER.info("Zone created with ID " + plotID +
                     ", it will expire at " + Time.getDateTime(expiration));
 
             //Clear previous blocks.

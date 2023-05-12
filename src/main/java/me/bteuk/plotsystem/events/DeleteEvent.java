@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class DeleteEvent {
 
     public static void event(String uuid, String[] event) {
@@ -36,7 +38,7 @@ public class DeleteEvent {
             //Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
-                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                 return;
             }
 
@@ -114,8 +116,8 @@ public class DeleteEvent {
             //Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
-                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
-                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
+                LOGGER.severe("Event details:" + Arrays.toString(event));
                 return;
             }
 
@@ -126,8 +128,8 @@ public class DeleteEvent {
             if (copyWorld == null || pasteWorld == null) {
 
                 //Send error to console.
-                PlotSystem.getInstance().getLogger().severe("Zone delete event failed!");
-                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                LOGGER.severe("Zone delete event failed!");
+                LOGGER.severe("Event details:" + Arrays.toString(event));
                 return;
 
             }

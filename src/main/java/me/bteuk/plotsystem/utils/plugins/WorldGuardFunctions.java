@@ -28,6 +28,8 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import me.bteuk.plotsystem.sql.PlotSQL;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class WorldGuardFunctions {
 
     public static Location getCurrentLocation(String regionName, World world) {
@@ -41,7 +43,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return null;
 
         }
@@ -51,7 +53,7 @@ public class WorldGuardFunctions {
 
         if (region == null) {
 
-            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            LOGGER.warning("Region " + regionName + " does not exist!");
             return null;
 
         }
@@ -71,7 +73,7 @@ public class WorldGuardFunctions {
         //Get worlds from config
         String save_world = config.getString("save_world");
         if (save_world == null) {
-            PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+            LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
             return null;
         }
 
@@ -86,7 +88,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + buildWorld.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + buildWorld.getName() + " is null!");
             return null;
 
         }
@@ -95,7 +97,7 @@ public class WorldGuardFunctions {
 
         if (region == null) {
 
-            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            LOGGER.warning("Region " + regionName + " does not exist!");
             return null;
 
         }
@@ -125,7 +127,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return null;
 
         }
@@ -134,7 +136,7 @@ public class WorldGuardFunctions {
 
         if (region == null) {
 
-            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            LOGGER.warning("Region " + regionName + " does not exist!");
             return null;
 
         }
@@ -256,7 +258,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return;
 
         }
@@ -266,7 +268,7 @@ public class WorldGuardFunctions {
 
         if (region == null) {
 
-            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            LOGGER.warning("Region " + regionName + " does not exist!");
             return;
 
         }
@@ -297,7 +299,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return;
 
         }
@@ -306,7 +308,7 @@ public class WorldGuardFunctions {
 
         if (region == null) {
 
-            PlotSystem.getInstance().getLogger().warning("Region " + regionName + " does not exist!");
+            LOGGER.warning("Region " + regionName + " does not exist!");
             return;
 
         }
@@ -333,7 +335,7 @@ public class WorldGuardFunctions {
 
         if (buildRegions == null) {
 
-            PlotSystem.getInstance().getLogger().warning("RegionManager for world " + world.getName() + " is null!");
+            LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
 
         }

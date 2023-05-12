@@ -12,6 +12,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class CloseEvent {
 
     public static void event(String uuid, String[] event) {
@@ -36,7 +38,7 @@ public class CloseEvent {
                 //Get worlds of plot and save location.
                 String save_world = config.getString("save_world");
                 if (save_world == null) {
-                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                     return;
                 }
 
@@ -77,7 +79,7 @@ public class CloseEvent {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
 
                     //Log plot removal to console.
-                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has been closed.");
+                    LOGGER.info("Zone " + zone + " has been closed.");
                 });
             }
         }
