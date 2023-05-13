@@ -19,8 +19,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-import static me.bteuk.network.utils.Constants.MAX_Y;
-import static me.bteuk.network.utils.Constants.MIN_Y;
+import static me.bteuk.network.utils.Constants.*;
 
 //This class deals with plot and zone outlines.
 //It will have method to refresh outlines.
@@ -43,7 +42,9 @@ public class Outlines {
     //Add player
     public BlockLocations addPlayer(Player player) {
         if (!outlineBlockLocations.containsKey(player)) {
-            return outlineBlockLocations.put(player, new BlockLocations(player));
+            BlockLocations bl = new BlockLocations(player);
+            outlineBlockLocations.put(player, bl);
+            return bl;
         } else {
             return outlineBlockLocations.get(player);
         }
@@ -73,8 +74,10 @@ public class Outlines {
             locations = outlineBlockLocations.get(player);
             //If the world has changed, clear the list.
             if (!locations.getWorld().equals(player.getWorld())) {
-                locations.clear();
+                locations.clear(true);
                 locations.setWorld(player.getWorld());
+            } else {
+                locations.clear(false);
             }
         } else {
             locations = addPlayer(player);
@@ -99,14 +102,14 @@ public class Outlines {
             //If plotID is 0, then it's a zone.
             if (plotID == 0) {
 
-                locations.addOutline(region, Material.PURPLE_CONCRETE.createBlockData());
+                locations.addOutline(protectedRegion, Material.PURPLE_CONCRETE.createBlockData());
 
             } else {
 
                 //Get plot difficulty.
                 int difficulty = PlotSystem.getInstance().plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
 
-                locations.addOutline(region, difficultyMaterial(difficulty));
+                locations.addOutline(protectedRegion, difficultyMaterial(difficulty));
 
             }
         }
@@ -137,7 +140,7 @@ public class Outlines {
                         locations = outlineBlockLocations.get(p);
                         //If the world has changed, clear the list.
                         if (!locations.getWorld().equals(p.getWorld())) {
-                            locations.clear();
+                            locations.clear(true);
                             locations.setWorld(p.getWorld());
                         }
                     } else {
@@ -186,7 +189,7 @@ public class Outlines {
             locations = outlineBlockLocations.get(player);
             //If the world has changed, clear the list.
             if (!locations.getWorld().equals(player.getWorld())) {
-                locations.clear();
+                locations.clear(true);
                 locations.setWorld(player.getWorld());
             }
         } else {
@@ -196,7 +199,7 @@ public class Outlines {
         ProtectedRegion region = new ProtectedPolygonalRegion("test", vector, MIN_Y, (MAX_Y-1));
 
         //Add points and draw it.
-        locations.addOutline(region, block);
+        locations.addTempOutline(region, block);
 
     }
 
@@ -209,7 +212,7 @@ public class Outlines {
         //Remove the outline.
         if (outlineBlockLocations.containsKey(player)) {
             BlockLocations locations = outlineBlockLocations.get(player);
-            locations.removeOutline(region);
+            locations.removeTempOutline(region);
         }
 
     }
@@ -222,7 +225,7 @@ public class Outlines {
             locations = outlineBlockLocations.get(player);
             //If the world has changed, clear the list.
             if (!locations.getWorld().equals(player.getWorld())) {
-                locations.clear();
+                locations.clear(true);
                 locations.setWorld(player.getWorld());
             }
         } else {
@@ -252,7 +255,7 @@ public class Outlines {
             locations = outlineBlockLocations.get(player);
             //If the world has changed, clear the list.
             if (!locations.getWorld().equals(player.getWorld())) {
-                locations.clear();
+                locations.clear(true);
                 locations.setWorld(player.getWorld());
             }
         } else {

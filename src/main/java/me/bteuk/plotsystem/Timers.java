@@ -94,10 +94,12 @@ public class Timers {
                 if (!u.player.getWorld().equals(u.lastLocation.getWorld())) {
 
                     outlines.addNearbyOutlines(u.player);
+                    u.lastLocation = u.player.getLocation();
 
                 } else if (u.player.getLocation().distance(u.lastLocation) >= 50) {
 
                     outlines.addNearbyOutlines(u.player);
+                    u.lastLocation = u.player.getLocation();
 
                 } else {
 
@@ -105,6 +107,7 @@ public class Timers {
                         outlines.refreshOutlinesForPlayer(u.player);
                     } catch (NullPointerException e) {
                         outlines.addNearbyOutlines(u.player);
+                        u.lastLocation = u.player.getLocation();
                     }
 
                 }

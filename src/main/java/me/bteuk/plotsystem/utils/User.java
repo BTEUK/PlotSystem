@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.utils;
 
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
@@ -51,6 +52,8 @@ public class User {
 
         //Set last location to current location.
         lastLocation = player.getLocation();
+        //Set outlines for player.
+        PlotSystem.getInstance().getOutlines().addNearbyOutlines(player);
 
     }
 }

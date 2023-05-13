@@ -185,46 +185,6 @@ public class WorldGuardFunctions {
         return saveRegions.getApplicableRegions(region);
     }
 
-    public static ArrayList<Integer> getNearbyPlots(User u) {
-
-        //Create HashMap
-        ArrayList<Integer> list = new ArrayList<>();
-
-        BlockVector3 pos = BlockVector3.at(u.player.getLocation().getX(), u.player.getLocation().getY(), u.player.getLocation().getZ());
-
-        ApplicableRegionSet set = getPlots(pos, pos, 100);
-
-        if (set.size() == 0) {
-            return list;
-        }
-
-        for (ProtectedRegion entry : set) {
-            if (!(entry.getOwners().contains(UUID.fromString(u.uuid)))) {
-                list.add(Integer.parseInt(entry.getId()));
-            }
-        }
-
-        return list;
-    }
-
-    public static ArrayList<Integer> getNearbyPlots(ProtectedPolygonalRegion check) {
-
-        //Create HashMap
-        ArrayList<Integer> list = new ArrayList<>();
-
-        ApplicableRegionSet set = getPlots(check.getMinimumPoint(), check.getMaximumPoint(), 5);
-
-        if (set.size() == 0) {
-            return list;
-        }
-
-        for (ProtectedRegion entry : set) {
-            list.add(Integer.parseInt(entry.getId()));
-        }
-
-        return list;
-    }
-
     public static boolean addMember(String region, String uuid, World world) {
 
         //Get instance of WorldGuard.
@@ -338,6 +298,13 @@ public class WorldGuardFunctions {
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
 
+        }
+
+        //Get the region to remove the outlines.
+        ProtectedRegion region = buildRegions.getRegion(regionName);
+
+        if (region != null) {
+            PlotSystem.getInstance().getOutlines().removeOutline(region, world);
         }
 
         //Attempt to remove the plot.

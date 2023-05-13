@@ -55,7 +55,7 @@ public class PlotSystem extends JavaPlugin {
 
     //Outline manager.
     @Getter @Setter
-    public Outlines outlines;
+    private Outlines outlines;
 
     @Override
     public void onEnable() {

@@ -6,7 +6,6 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -155,10 +154,10 @@ public class SelectionTool extends WGCreatePlot {
 
         } else {
 
-            vector.add(bv2);
-
             //Clear previous selection outline.
             clearOutlines();
+
+            vector.add(bv2);
 
             //Create new outline.
             //Adding a point already means at least 2 points, so we can ignore the 1 point case.
