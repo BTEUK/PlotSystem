@@ -4,23 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.bteuk.plotsystem.events.EventManager;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.Inactive;
-import me.bteuk.plotsystem.utils.PlotOutline;
+import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.User;
-import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
 
 public class Timers {
 
@@ -35,40 +25,29 @@ public class Timers {
 
     //SQL
     private final GlobalSQL globalSQL;
-    private final PlotSQL plotSQL;
 
     //Server events
     private HashMap<String, String> events;
 
-    //Block data
-    BlockData redConc = Material.RED_CONCRETE.createBlockData();
-    BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
-    BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
-
-    //Regions
-    RegionManager regions;
-    ProtectedRegion region;
-    int plotID;
-    int difficulty;
-    PlotOutline plotOutline;
+    //Outlines.
+    private final Outlines outlines;
 
     WorldGuard wg;
 
-    public Timers(PlotSystem instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
+    public Timers(PlotSystem instance, GlobalSQL globalSQL) {
 
         this.instance = instance;
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
-        this.plotSQL = plotSQL;
 
         SERVER_NAME = PlotSystem.SERVER_NAME;
 
         events = new HashMap<>();
 
-        plotOutline = new PlotOutline();
-
         wg = WorldGuard.getInstance();
+
+        outlines = instance.getOutlines();
 
     }
 
@@ -104,34 +83,33 @@ public class Timers {
 
             for (User u : users) {
 
-                //Get regions.
-                regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(u.player.getWorld()));
+                /*Check if the location of the player has changed by more than 50 blocks,
+                    or if the player has switched world.
+                   If either are true, recalculate the outlines.
+                   Else try to update the existing outlines,
+                    catch a nullpointerexception,
+                    this implies that the player has no outlines
+                    then also add the outlines anew.
+                 */
+                if (!u.player.getWorld().equals(u.lastLocation.getWorld())) {
 
-                if (regions == null) {return;}
+                    outlines.addNearbyOutlines(u.player);
 
-                region = new ProtectedCuboidRegion("test",
-                        BlockVector3.at(u.player.getLocation().getX() - 100, -60, u.player.getLocation().getZ() - 100),
-                        BlockVector3.at(u.player.getLocation().getX() + 100, 320, u.player.getLocation().getZ() + 100));
-                ApplicableRegionSet set = regions.getApplicableRegions(region);
+                } else if (u.player.getLocation().distance(u.lastLocation) >= 50) {
 
-                for (ProtectedRegion protectedRegion : set) {
+                    outlines.addNearbyOutlines(u.player);
 
-                    plotID = tryParse(protectedRegion.getId());
+                } else {
 
-                    //If plotID is 0, then it's a zone.
-                    if (plotID == 0) {
-
-                        plotOutline.createOutline(u.player, protectedRegion.getPoints(), Material.PURPLE_CONCRETE.createBlockData(), false);
-
-                    } else {
-
-                        //Get plot difficulty.
-                        difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
-
-                        plotOutline.createOutline(u.player, protectedRegion.getPoints(), difficultyMaterial(difficulty), false);
-
+                    try {
+                        outlines.refreshOutlinesForPlayer(u.player);
+                    } catch (NullPointerException e) {
+                        outlines.addNearbyOutlines(u.player);
                     }
+
                 }
+
+
             }
         }, 0L, 20L);
 
@@ -141,24 +119,5 @@ public class Timers {
             Inactive.cancelInactivePlots();
             Inactive.closeExpiredZones();
         }, 0L, 72000L);
-    }
-
-    //Returns the plot difficulty material.
-    public BlockData difficultyMaterial(int difficulty) {
-
-        return switch (difficulty) {
-            case 1 -> limeConc;
-            case 2 -> yellowConc;
-            case 3 -> redConc;
-            default -> null;
-        };
-    }
-
-    public int tryParse(String text) {
-        try {
-            return Integer.parseInt(text);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
     }
 }

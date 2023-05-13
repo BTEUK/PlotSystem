@@ -63,6 +63,9 @@ public class QuitServer implements Listener {
             u.createZoneGui.delete();
         }
 
+        //Remove player from outlines.
+        PlotSystem.getInstance().getOutlines().removePlayer(e.getPlayer());
+
         //Remove user from list
         instance.removeUser(u);
 

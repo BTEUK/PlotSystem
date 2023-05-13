@@ -5,6 +5,7 @@ import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.reviewing.Review;
@@ -31,6 +32,9 @@ public class User {
     public CreatePlotGui createPlotGui;
     public CreateZoneGui createZoneGui;
 
+    //Store the location of the player on interval, this allows the server to check when to update the outlines.
+    public Location lastLocation;
+
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         //Set sql
@@ -44,6 +48,9 @@ public class User {
 
         //Set selection tool, only players with the valid roles can use it.
         selectionTool = new SelectionTool(this, plotSQL);
+
+        //Set last location to current location.
+        lastLocation = player.getLocation();
 
     }
 }

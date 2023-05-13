@@ -104,26 +104,17 @@ public class PlotSystem extends JavaPlugin {
             //Save world name is in config.
             //This implies first launch with plugin.
             if (!Multiverse.hasWorld(config.getString("save_world"))) {
-
                 //Create save world.
                 if (!Multiverse.createVoidWorld(config.getString("save_world"))) {
 
                     LOGGER.warning("Failed to create save world!");
 
                 }
-
-                //Enable plugin.
-                LOGGER.info("Enabling Plugin");
-                enablePlugin();
-
-            } else {
-
-                //Save world has already been created, enable plugin.
-                LOGGER.info("Enabling Plugin");
-                enablePlugin();
-
-
             }
+
+            LOGGER.info("Enabling Plugin");
+            enablePlugin();
+
         } else {
 
             //If the server is not in the database the network plugin was not successful.
@@ -148,8 +139,11 @@ public class PlotSystem extends JavaPlugin {
         meta2.displayName(Utils.title("Building Menu"));
         gui.setItemMeta(meta2);
 
+        //Outlines, this will be accessed from other classes, so it must have a getter and setter.
+        outlines = new Outlines();
+
         //Setup Timers
-        timers = new Timers(this, globalSQL, plotSQL);
+        timers = new Timers(this, globalSQL);
         timers.startTimers();
 
         //Create bungeecord channel
@@ -177,8 +171,6 @@ public class PlotSystem extends JavaPlugin {
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
         getCommand("claim").setExecutor(claimCommand);
-
-        //Outlines, this will be accessed from other classes, so it must have a getter and setter.
 
     }
 
