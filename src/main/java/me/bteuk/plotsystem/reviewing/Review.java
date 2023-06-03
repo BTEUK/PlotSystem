@@ -79,5 +79,8 @@ public class Review {
         //Convert inventory back to how it was pre-review.
         u.player.getInventory().setContents(inventory);
 
+        //Set review to null.
+        u.review = null;
+
     }
 }

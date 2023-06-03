@@ -302,7 +302,6 @@ public class AcceptGui extends Gui {
 
                         //Close gui and clear review.
                         user.review.closeReview();
-                        user.review = null;
 
                     });
                 }
