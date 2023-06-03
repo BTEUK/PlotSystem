@@ -198,7 +198,6 @@ public class ReviewGui extends Gui {
                         //Close review.
                         u.player.closeInventory();
                         user.review.closeReview();
-                        user.review = null;
 
                     } else {
 
@@ -247,7 +246,6 @@ public class ReviewGui extends Gui {
                     //Close review.
                     u.player.closeInventory();
                     user.review.closeReview();
-                    user.review = null;
 
                 });
     }
