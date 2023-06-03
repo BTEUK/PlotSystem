@@ -1,6 +1,8 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -34,7 +36,13 @@ public class KickEvent {
             plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Remove the player to the worldguard region.
-            WorldGuardFunctions.removeMember(String.valueOf(id), uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+            try {
+                WorldGuardFunctions.removeMember(String.valueOf(id), uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+            } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                //Send a cross-server message.
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while trying to kick the user from the plot, please notify an admin.','" + messageOwner + "');");
+                e.printStackTrace();
+            }
 
             //Send message to plot owner.
             if (owner != null) {
@@ -78,7 +86,13 @@ public class KickEvent {
             plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
             //Remove the player to the worldguard region.
-            WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
+            try {
+                WorldGuardFunctions.removeMember("z" + event[2], uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
+            } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                //Send a cross-server message.
+                globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while trying to kick the user from the zone, please notify an admin.','" + messageOwner + "');");
+                e.printStackTrace();
+            }
 
             //Send message to plot owner.
             if (owner != null) {

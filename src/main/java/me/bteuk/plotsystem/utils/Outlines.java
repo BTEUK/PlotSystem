@@ -21,15 +21,17 @@ import java.util.List;
 
 import static me.bteuk.network.utils.Constants.*;
 
-//This class deals with plot and zone outlines.
-//It will have method to refresh outlines.
+/**
+ * This class deals with plot and zone outlines.
+ * It will have method to refresh outlines.
+ */
 public class Outlines {
 
     //List of block locations where outlines should be generated when the outlines are refreshed.
     //The y-level is calculated when the block is placed, as this could change often.
-    HashMap<Player, BlockLocations> outlineBlockLocations;
+    final HashMap<Player, BlockLocations> outlineBlockLocations;
 
-    WorldGuard wg;
+    final WorldGuard wg;
 
     public Outlines() {
 
@@ -152,7 +154,6 @@ public class Outlines {
                 }
             }
         }
-
     }
 
     //Remove the outline of a specific region for all nearby players.
@@ -179,8 +180,19 @@ public class Outlines {
         }
     }
 
-    //Add an outline from a list of BlockVector2.
-    //This is for players drawing outlines with the selectiontool.
+    /**
+     * Add an outline from a list of BlockVector2.
+     * This is for players drawing outlines with the selection tool.
+     * Additionally, this is used to draw the outline of a plot in the before view.
+     * This will be drawn in the same colour as the difficulty of the plot.
+     *
+     * @param player
+     * the player to draw the outline for
+     * @param vector
+     * the vector that makes up the region
+     * @param block
+     * the block to draw the outline with
+     */
     public void addOutline(Player player, List<BlockVector2> vector, BlockData block) {
 
         //If the player does not have a key, add it.

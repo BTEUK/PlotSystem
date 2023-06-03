@@ -1,10 +1,11 @@
 package me.bteuk.plotsystem.events;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -53,13 +54,13 @@ public class TeleportEvent {
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
                 //Get location of plot and teleport the player there.
-                Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
-
-                if (l == null) {
+                try {
+                    Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
+                    u.player.teleport(l);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
                     p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
-                    return;
+                    e.printStackTrace();
                 }
-                u.player.teleport(l);
 
             } else {
 
@@ -102,14 +103,14 @@ public class TeleportEvent {
                 //Get world of zone.
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";"));
 
-                //Get location of plot and teleport the player there.
-                Location l = WorldGuardFunctions.getCurrentLocation(zoneName, world);
-
-                if (l == null) {
+                //Get location of zone and teleport the player there.
+                try {
+                    Location l = WorldGuardFunctions.getCurrentLocation(zoneName, world);
+                    u.player.teleport(l);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
                     p.sendMessage(Utils.error("You could not be teleported to the zone, please notify an admin."));
-                    return;
+                    e.printStackTrace();
                 }
-                u.player.teleport(l);
 
             } else {
 

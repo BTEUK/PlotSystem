@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public class PlotSystemCommand implements CommandExecutor {
 
     //SQL
-    PlotSQL plotSQL;
-    GlobalSQL globalSQL;
+    final PlotSQL plotSQL;
+    final GlobalSQL globalSQL;
 
 
     public PlotSystemCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {

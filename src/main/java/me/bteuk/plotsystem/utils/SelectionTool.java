@@ -43,10 +43,10 @@ public class SelectionTool extends WGCreatePlot {
     public int size;
     public int difficulty;
 
-    public BlockData outlineBlock = Material.LIGHT_BLUE_CONCRETE.createBlockData();
-    public BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
-    public BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
-    public BlockData redConc = Material.RED_CONCRETE.createBlockData();
+    public final BlockData outlineBlock = Material.LIGHT_BLUE_CONCRETE.createBlockData();
+    public final BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
+    public final BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
+    public final BlockData redConc = Material.RED_CONCRETE.createBlockData();
 
     //PlotSQL
     private final PlotSQL plotSQL;

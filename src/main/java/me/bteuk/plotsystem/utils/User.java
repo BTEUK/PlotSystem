@@ -14,11 +14,11 @@ import me.bteuk.plotsystem.reviewing.Review;
 public class User {
 
     //Basic information about the player.
-    public Player player;
-    public String uuid;
-    public String name;
+    public final Player player;
+    public final String uuid;
+    public final String name;
 
-    public SelectionTool selectionTool;
+    public final SelectionTool selectionTool;
 
     public int inPlot = 0;
     public int inZone = 0;

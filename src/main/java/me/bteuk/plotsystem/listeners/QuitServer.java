@@ -1,6 +1,8 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
@@ -40,7 +42,11 @@ public class QuitServer implements Listener {
             PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
             //Remove the reviewer from the plot.
-            WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+            try {
+                WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+            } catch (RegionManagerNotFoundException | RegionNotFoundException ex) {
+                ex.printStackTrace();
+            }
 
             //Set status back to submitted.
             plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");

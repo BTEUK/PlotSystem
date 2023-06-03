@@ -1,7 +1,10 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -38,7 +41,22 @@ public class JoinEvent {
                 plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + id + ",'" + uuid + "',0," + Time.currentTime() + ");");
 
                 //Add the player to the worldguard region.
-                WorldGuardFunctions.addMember(String.valueOf(id), uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+                try {
+                    WorldGuardFunctions.addMember(String.valueOf(id), uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")));
+                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                    if (p != null) {
+
+                        p.sendMessage(Utils.error("An error occurred while adding you to the plot, please contact an admin."));
+
+                    } else {
+
+                        //Send a cross-server message.
+                        PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + "&cAn error occurred while adding you to the plot, please contact an admin." + "');");
+
+                    }
+                    e.printStackTrace();
+                    return;
+                }
 
                 //Send a message to the plot owner.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
@@ -73,7 +91,22 @@ public class JoinEvent {
             plotSQL.update("INSERT INTO zone_members(id,uuid,is_owner) VALUES(" + id + ",'" + uuid + "',0);");
 
             //Add the player to the worldguard region.
-            WorldGuardFunctions.addMember("z" + id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
+            try {
+                WorldGuardFunctions.addMember("z" + id, uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";")));
+            } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                if (p != null) {
+
+                    p.sendMessage(Utils.error("An error occurred while adding you to the zone, please contact an admin."));
+
+                } else {
+
+                    //Send a cross-server message.
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + "&cAn error occurred while adding you to the plot, please contact an admin." + "');");
+
+                }
+                e.printStackTrace();
+                return;
+            }
 
             //Send a message to the plot owner.
             PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +

@@ -10,7 +10,6 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.*;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;

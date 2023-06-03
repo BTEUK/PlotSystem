@@ -5,6 +5,8 @@ import java.util.List;
 
 import me.bteuk.network.utils.Time;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -64,9 +66,11 @@ public class Inactive {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the plot bounds.
-                List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
-
-                if (pasteVector == null) {
+                List<BlockVector2> pasteVector;
+                try {
+                    pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    e.printStackTrace();
                     continue;
                 }
 
@@ -82,7 +86,11 @@ public class Inactive {
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Remove all members from the worldguard plot.
-                    WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                    try {
+                        WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                    } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
                     //Get the uuid of the plot owner.
                     String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
@@ -147,9 +155,11 @@ public class Inactive {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the zone bounds.
-                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
-
-                if (copyVector == null) {
+                List<BlockVector2> copyVector;
+                try {
+                    copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    e.printStackTrace();
                     continue;
                 }
 
@@ -165,7 +175,11 @@ public class Inactive {
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
-                    WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    try {
+                        WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    } catch (RegionManagerNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
                     //Get the uuid of the zone owner.
                     String uuid = plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zone + " AND is_owner=1;");

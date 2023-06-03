@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,7 +37,12 @@ public class LeaveEvent {
             }
 
             //Remove member from plot.
-            WorldGuardFunctions.removeMember(event[2], uuid, world);
+            try {
+                WorldGuardFunctions.removeMember(event[2], uuid, world);
+            } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while removing you from the plot, please contact an admin.');");
+                e.printStackTrace();
+            }
 
             //Remove members from plot in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + " AND uuid='" + uuid + "';");
@@ -73,7 +80,12 @@ public class LeaveEvent {
             }
 
             //Remove member from zone.
-            WorldGuardFunctions.removeMember("z" + event[2], uuid, world);
+            try {
+                WorldGuardFunctions.removeMember("z" + event[2], uuid, world);
+            } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while removing you from the zone, please contact an admin.');");
+                e.printStackTrace();
+            }
 
             //Remove members from zone in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");

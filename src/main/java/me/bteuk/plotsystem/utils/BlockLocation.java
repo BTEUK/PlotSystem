@@ -12,7 +12,7 @@ public class BlockLocation {
     private final int z;
 
     @Getter
-    public BlockData block;
+    public final BlockData block;
 
     public BlockLocation(int x, int z, BlockData block) {
         this.x = x;

@@ -25,8 +25,8 @@ import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class ClaimEnter implements Listener {
 
-    PlotSQL plotSQL;
-    GlobalSQL globalSQL;
+    final PlotSQL plotSQL;
+    final GlobalSQL globalSQL;
 
     public ClaimEnter(PlotSystem plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
 

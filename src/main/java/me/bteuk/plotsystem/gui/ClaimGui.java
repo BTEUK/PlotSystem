@@ -4,6 +4,8 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.utils.PlotValues;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -110,18 +112,23 @@ public class ClaimGui extends Gui {
                             if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
 
                                 //Add player to worldguard region.
-                                if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
+                                try {
+                                    if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
 
-                                    eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
-                                            .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(", good luck building.")));
-                                    Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
+                                        eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
+                                                .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", good luck building.")));
+                                        Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
-                                } else {
+                                    } else {
 
-                                    eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                                    Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
+                                        eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
+                                        Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
 
+                                    }
+                                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                                    eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot, please notify an admin."));
+                                    e.printStackTrace();
                                 }
 
                             } else {

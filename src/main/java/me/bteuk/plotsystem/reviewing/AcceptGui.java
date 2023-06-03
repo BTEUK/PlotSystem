@@ -9,6 +9,8 @@ import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -20,6 +22,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -177,16 +180,15 @@ public class AcceptGui extends Gui {
                     if (user.review.editBook.isEdited) {
 
                         //Get the feedback written in the book.
-                        //noinspection deprecation
-                        List<String> book = user.review.bookMeta.getPages();
+                        List<Component> book = user.review.bookMeta.pages();
                         //Create new book id.
                         bookID = 1 + plotSQL.getInt("SELECT id FROM book_data ORDER BY id DESC;");
 
                         //Iterate through all pages and store them in database.
                         int i = 1;
 
-                        for (String text : book) {
-                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
+                        for (Component text : book) {
+                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + PlainTextComponentSerializer.plainText().serialize(text).replace("'", "\\'") + "');"))) {
                                 u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
                                 return;
                             }
@@ -231,13 +233,16 @@ public class AcceptGui extends Gui {
                     int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world.getName() + "';");
                     int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world.getName() + "';");
 
-                    List<BlockVector2> copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
-                    List<BlockVector2> pasteVector = new ArrayList<>();
+                    List<BlockVector2> copyVector;
 
-                    if (copyVector == null) {
-                        LOGGER.warning("CopyVector is null!!!");
+                    try {
+                        copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
+                    } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                        u.player.sendMessage(Utils.error("An error occurred in the plot accepting process, please contact an admin."));
+                        e.printStackTrace();
                         return;
                     }
+                    List<BlockVector2> pasteVector = new ArrayList<>();
 
                     //Create paste vector by taking the copy vector coordinate and adding the coordinate transform.
                     for (BlockVector2 bv : copyVector) {
@@ -253,7 +258,13 @@ public class AcceptGui extends Gui {
                         LOGGER.info("Plot " + user.review.plot + " successfully saved.");
 
                         //Remove plot from worldguard.
-                        WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
+                        try {
+                            WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
+                        } catch (RegionManagerNotFoundException e) {
+                            u.player.sendMessage(Utils.error("An error occurred while removing the plot, please contact an admin."));
+                            e.printStackTrace();
+                            return;
+                        }
 
                         //Send feedback in chat and console.
                         u.player.sendMessage(Utils.success("Plot ")

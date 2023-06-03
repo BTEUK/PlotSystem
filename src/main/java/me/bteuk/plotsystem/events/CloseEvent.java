@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -49,9 +51,12 @@ public class CloseEvent {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the zone bounds.
-                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
-
-                if (copyVector == null) {
+                List<BlockVector2> copyVector;
+                try {
+                    copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
+                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                    e.printStackTrace();
                     return;
                 }
 
@@ -67,7 +72,13 @@ public class CloseEvent {
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
-                    WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    try {
+                        WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    } catch (RegionManagerNotFoundException e) {
+                        PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                        e.printStackTrace();
+                        return;
+                    }
 
                     //Remove all members of zone in database.
                     plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");

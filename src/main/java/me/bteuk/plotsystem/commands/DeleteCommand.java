@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.commands;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -139,19 +141,24 @@ public class DeleteCommand {
         }
 
         //Delete plot.
-        if (WorldGuardFunctions.delete(args[2], world)) {
+        try {
+            if (WorldGuardFunctions.delete(args[2], world)) {
 
-            //Set plot to deleted in database.
-            plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
-            sender.sendMessage(Utils.success("Plot ")
-                    .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" deleted.")));
+                //Set plot to deleted in database.
+                plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
+                sender.sendMessage(Utils.success("Plot ")
+                        .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
+                        .append(Utils.success(" deleted.")));
 
-        } else {
+            } else {
 
-            sender.sendMessage(Utils.error("An error occured while deleting the plot."));
-            LOGGER.warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
+                sender.sendMessage(Utils.error("An error occured while deleting the plot."));
+                LOGGER.warning("An error occurred while deleting plot " + plotID + " from WorldGuard.");
 
+            }
+        } catch (RegionManagerNotFoundException e) {
+            sender.sendMessage(Utils.error("An error occurred while deleting the plot, please contact an admin."));
+            e.printStackTrace();
         }
     }
 

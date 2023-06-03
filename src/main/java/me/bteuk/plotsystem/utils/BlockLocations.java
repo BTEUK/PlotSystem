@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 import static java.lang.Math.*;
-import static java.lang.Math.round;
-import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 //A list of block locations, can be altered in bulk.
 public class BlockLocations {

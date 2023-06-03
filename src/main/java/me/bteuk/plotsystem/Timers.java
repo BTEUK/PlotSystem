@@ -32,7 +32,7 @@ public class Timers {
     //Outlines.
     private final Outlines outlines;
 
-    WorldGuard wg;
+    final WorldGuard wg;
 
     public Timers(PlotSystem instance, GlobalSQL globalSQL) {
 

@@ -10,6 +10,8 @@ import lombok.Setter;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.listeners.*;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.Outlines;
@@ -166,7 +168,7 @@ public class PlotSystem extends JavaPlugin {
 
         //Create instance of claim command,
         //as it is used to check whether a person is able to claim the plot they're standing in.
-        ClaimCommand claimCommand = new ClaimCommand(plotSQL);
+        ClaimCommand claimCommand = new ClaimCommand();
 
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
@@ -194,7 +196,11 @@ public class PlotSystem extends JavaPlugin {
                     PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
                     //Remove the reviewer from the plot.
-                    WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+                    try {
+                        WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+                    } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
                     //Set status back to submitted.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");

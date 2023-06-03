@@ -1,14 +1,19 @@
 package me.bteuk.plotsystem.reviewing;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import me.bteuk.plotsystem.exceptions.WorldNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +25,7 @@ import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 import java.util.List;
 
-import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+import static me.bteuk.plotsystem.utils.PlotValues.difficultyMaterial;
 
 public class ReviewGui extends Gui {
 
@@ -70,14 +75,32 @@ public class ReviewGui extends Gui {
                     //Teleport to plot in original state.
                     u.player.closeInventory();
 
-                    Location l = WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world);
-
-                    if (l == null) {
-                        LOGGER.warning("Could not find before view of plot " + user.review.plot);
-                        return;
+                    try {
+                        Location l = WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world);
+                        u.player.teleport(l);
+                    } catch (RegionManagerNotFoundException | RegionNotFoundException | WorldNotFoundException e) {
+                        u.player.sendMessage(Utils.error("Unable to teleport you to the before view of this plot, please contact an admin."));
+                        e.printStackTrace();
                     }
 
-                    u.player.teleport(l);
+                    //Try to create the outline of the before view.
+                    try {
+
+                        //Get outlines of the plot.
+                        List<BlockVector2> vector = WorldGuardFunctions.getPointsTransformedToSaveWorld(String.valueOf(user.review.plot), world);
+
+                        //Get the plot difficulty.
+                        int difficulty = PlotSystem.getInstance().plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
+
+                        //Draw the outline.
+                        PlotSystem.getInstance().getOutlines().addOutline(u.player, vector, difficultyMaterial(difficulty).createBlockData());
+
+                    } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+
+                        u.player.sendMessage(Component.text("Outline could not be drawn in save world, please contact an admin!", NamedTextColor.DARK_RED));
+                        e.printStackTrace();
+
+                    }
 
                 });
 
@@ -89,14 +112,13 @@ public class ReviewGui extends Gui {
                     //Teleport to plot in current state.
                     u.player.closeInventory();
 
-                    Location l = WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world);
-
-                    if (l == null) {
-                        LOGGER.warning("Could not find current view of plot " + user.review.plot);
-                        return;
+                    try {
+                        Location l = WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world);
+                        u.player.teleport(l);
+                    } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                        u.player.sendMessage(Utils.error("Unable to teleport you to the this plot, please contact an admin."));
+                        e.printStackTrace();
                     }
-
-                    u.player.teleport(l);
 
                 });
 
@@ -135,17 +157,16 @@ public class ReviewGui extends Gui {
                     }
 
                     //Get the feedback written in the book.
-                    //noinspection deprecation
-                    List<String> book = user.review.bookMeta.getPages();
+                    List<Component> book = user.review.bookMeta.pages();
                     //Create new book id.
                     int bookID = 1 + plotSQL.getInt("SELECT id FROM book_data ORDER BY id DESC;");
 
                     //Iterate through all pages and store them in database.
                     int i = 1;
 
-                    for (String text : book) {
+                    for (Component text : book) {
                         //Add escape characters to '
-                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + text.replace("'", "\\'") + "');"))) {
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + PlainTextComponentSerializer.plainText().serialize(text).replace("'", "\\'") + "');"))) {
                             u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
                             return;
                         }
@@ -176,7 +197,14 @@ public class ReviewGui extends Gui {
                         plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
 
                         //Remove the reviewer from the plot.
-                        WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
+                        try {
+                            WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
+                        } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+
+                            u.player.sendMessage(Utils.error("Unable to remove you from the plot, please notify an admin."));
+                            e.printStackTrace();
+
+                        }
 
                         //Send feedback.
                         u.player.sendMessage(Utils.success("Plot ")
@@ -236,7 +264,15 @@ public class ReviewGui extends Gui {
                 u -> {
 
                     //Remove the reviewer from the plot.
-                    WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
+                    try {
+                        WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
+                    } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+
+                        u.player.sendMessage(Utils.error("Unable to remove you from the plot, please notify an admin."));
+                        e.printStackTrace();
+
+                    }
+
 
                     //Set the plot back to submitted.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");

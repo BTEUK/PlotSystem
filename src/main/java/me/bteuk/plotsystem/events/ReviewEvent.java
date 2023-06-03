@@ -2,10 +2,13 @@ package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.reviewing.Review;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -51,16 +54,21 @@ public class ReviewEvent {
                 u.review = new Review(id, u);
 
                 //Add the reviewer to the plot.
-                WorldGuardFunctions.addMember(String.valueOf(id), uuid, world);
+                try {
+                    WorldGuardFunctions.addMember(String.valueOf(id), uuid, world);
+                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                    u.player.sendMessage(Component.text("Unable to add you as a member of the plot you are reviewing, please contact an admin to report this issue."));
+                    e.printStackTrace();
+                }
 
                 //Teleport the reviewer to the plot.
-                Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
-
-                if (l == null) {
-                    p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
-                    return;
+                try {
+                    Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
+                    p.teleport(l);
+                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                    u.player.sendMessage(Component.text("Unable to teleport you to the plot, please contact an admin to report this issue."));
+                    e.printStackTrace();
                 }
-                p.teleport(l);
 
             } else {
 
