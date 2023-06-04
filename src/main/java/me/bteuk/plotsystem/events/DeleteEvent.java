@@ -160,7 +160,7 @@ public class DeleteEvent {
                 PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
 
                 //Set plot status to unclaimed.
-                PlotSystem.getInstance().plotSQL.update("UPDATE zone_data SET status='closed' WHERE id=" + id + ";");
+                PlotSystem.getInstance().plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
