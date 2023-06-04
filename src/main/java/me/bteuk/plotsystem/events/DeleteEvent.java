@@ -155,13 +155,12 @@ public class DeleteEvent {
 
                 //Remove the zone from worldguard.
                 WorldGuardFunctions.delete("z" + event[2], pasteWorld);
-                WorldGuardFunctions.clearMembers(event[2], pasteWorld);
 
                 //Remove all members of plot in database.
-                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+                PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
 
                 //Set plot status to unclaimed.
-                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                PlotSystem.getInstance().plotSQL.update("UPDATE zone_data SET status='closed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
