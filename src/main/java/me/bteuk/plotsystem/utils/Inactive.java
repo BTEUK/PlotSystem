@@ -66,14 +66,14 @@ public class Inactive {
             int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
-                //Get the plot bounds.
-                List<BlockVector2> pasteVector;
-                try {
-                    pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
-                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                    e.printStackTrace();
-                    continue;
-                }
+            //Get the plot bounds.
+            List<BlockVector2> pasteVector;
+            try {
+                pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
+            } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                e.printStackTrace();
+                continue;
+            }
 
             //Create the copyVector by transforming the points in the paste vector with the negative transform.
             //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
@@ -86,12 +86,12 @@ public class Inactive {
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
-                    //Remove all members from the worldguard plot.
-                    try {
-                        WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
-                    } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                //Remove all members from the worldguard plot.
+                try {
+                    WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 //Get the uuid of the plot owner.
                 String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
@@ -105,11 +105,10 @@ public class Inactive {
                 //Add message for the plot owner to the database to notify them that their plot was removed.
                 PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
 
-                    //Log plot removal to console.
-                    LOGGER.info("Plot " + plot + " removed due to inactivity!");
+                //Log plot removal to console.
+                LOGGER.info("Plot " + plot + " removed due to inactivity!");
 
-                });
-            }
+            });
         }
     }
 
