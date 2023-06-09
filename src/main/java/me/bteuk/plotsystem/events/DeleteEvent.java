@@ -176,18 +176,17 @@ public class DeleteEvent {
                 //Remove the zone from worldguard.
                 try {
                     WorldGuardFunctions.delete("z" + event[2], pasteWorld);
-                    WorldGuardFunctions.clearMembers(event[2], pasteWorld);
-                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                } catch (RegionManagerNotFoundException e) {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
                     e.printStackTrace();
                     return;
                 }
 
-                //Remove all members of plot in database.
-                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+                //Remove all members of zone in database.
+                PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
 
-                //Set plot status to unclaimed.
-                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                //Set zone status to closed.
+                PlotSystem.getInstance().plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));

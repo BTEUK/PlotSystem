@@ -121,6 +121,6 @@ public class Timers {
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
             Inactive.cancelInactivePlots();
             Inactive.closeExpiredZones();
-        }, 0L, 72000L);
+        }, 1200L, 72000L);
     }
 }
