@@ -108,7 +108,7 @@ public class JoinEvent {
                 return;
             }
 
-            //Send a message to the plot owner.
+            //Send a message to the zone owner.
             PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" +
                     plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + id + " AND is_owner=1;") + "','&3" +
                     PlotSystem.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined your Zone &3" + id + "');");

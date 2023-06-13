@@ -103,7 +103,7 @@ public class Inactive {
                 plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");
 
                 //Log plot removal to console.
                 LOGGER.info("Plot " + plot + " removed due to inactivity!");

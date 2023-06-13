@@ -72,7 +72,7 @@ public class ReviewEvent {
 
             } else {
 
-                p.sendMessage(Utils.error("The plot is not submitted."));
+                p.sendMessage(Utils.error("The plot is no longer submitted."));
 
             }
         }
