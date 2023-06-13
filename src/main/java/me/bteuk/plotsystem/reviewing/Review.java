@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.reviewing;
 
+import lombok.Getter;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ public class Review {
     private final ItemStack[] inventory;
 
     //User instance.
+    @Getter
     private final User u;
 
     //Review Gui and Listener.
