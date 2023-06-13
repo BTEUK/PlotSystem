@@ -4,6 +4,7 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -82,5 +83,9 @@ public class Review {
         //Set review to null.
         u.review = null;
 
+    }
+
+    public boolean isSamePlayer(Player p) {
+        return p.equals(u.player);
     }
 }

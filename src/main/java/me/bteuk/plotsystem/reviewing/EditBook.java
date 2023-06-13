@@ -30,8 +30,9 @@ public class EditBook implements Listener {
 
 	@EventHandler
 	public void onBookEdit(PlayerEditBookEvent e) {
-		
-		if (PlotSystem.getInstance().getUser(e.getPlayer()).review.plot != review.plot) {
+
+		//If the player is not the same as the reviewer return.
+		if (!review.isSamePlayer(e.getPlayer())) {
 			return;
 		}
 		
