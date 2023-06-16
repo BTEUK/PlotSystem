@@ -181,56 +181,95 @@ public class CreateCommand {
         World copy = Bukkit.getWorld(saveWorld);
         World paste = Bukkit.getWorld(args[2]);
 
+        //Check that the worlds are not null, else delete the Multiverse world.
+        if (copy == null || paste == null) {
+
+            sender.sendMessage("An error occurred, please contact an admin.");
+            Multiverse.deleteWorld(args[2]);
+            return;
+
+        }
+
+        //Find the min and max point of the area.
+        sender.sendMessage("Searching for min and max elevation of the area.");
+        int min = MAX_Y;
+        int max = MIN_Y;
+        int elev;
+
+        //Iterate through every block and check the elevation.
+        for (int i = regionXMin * 512; i <= regionXMax * 512 + 511; i++) {
+            for (int j = regionZMin * 512; j <= regionZMax * 512 + 511; j++) {
+
+                elev = copy.getHighestBlockYAt(i, j);
+
+                if (elev > max) {
+                    max = elev;
+                }
+
+                if (elev < min) {
+                    min = elev;
+                }
+
+            }
+        }
+
+        //Reduce max if it exceeds world limit.
+        final int finalMax = Math.min(MAX_Y - 1, max);
+
+        //Reduce min by 10 blocks, or MIN_Y if that is larger than min - 10.
+        sender.sendMessage("Found min elevation at y=" + min + " and max elevation at y=" + max + " reducing minimum elevation by 10 blocks to give sufficient surface depth.");
+        final int finalMin = Math.max(MIN_Y, (min - 10));
+
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
         sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
 
-        //Create atomic boolean to query whether a region can be copied.
-        AtomicBoolean isReady = new AtomicBoolean(true);
-
-        //Create a list of regions to copy paste.
-        ArrayList<CopyRegionFormat> regions = new ArrayList<>();
-
-        for (int i = regionXMin; i <= regionXMax; i++) {
-            for (int j = regionZMin; j <= regionZMax; j++) {
-
-                //Split the region into 4 equal segments of 256x256.
-                regions.add(new CopyRegionFormat(
-                        copy, paste,
-                        BlockVector3.at(i * 512, MIN_Y, j * 512),
-                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 255),
-                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + zTransform))
-                );
-
-                regions.add(new CopyRegionFormat(
-                        copy, paste,
-                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512),
-                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 255),
-                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + zTransform))
-                );
-
-                regions.add(new CopyRegionFormat(
-                        copy, paste,
-                        BlockVector3.at(i * 512, MIN_Y, j * 512 + 256),
-                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 511),
-                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
-                );
-
-                regions.add(new CopyRegionFormat(
-                        copy, paste,
-                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512 + 256),
-                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 511),
-                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
-                );
-            }
-        }
-
-        LOGGER.info("Add segments to list, there are " + regions.size());
-        sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
-
         //Iterate until all regions are done.
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
+
+            //Create atomic boolean to query whether a region can be copied.
+            AtomicBoolean isReady = new AtomicBoolean(true);
+
+            //Create a list of regions to copy paste.
+            ArrayList<CopyRegionFormat> regions = new ArrayList<>();
+
+            for (int i = regionXMin; i <= regionXMax; i++) {
+                for (int j = regionZMin; j <= regionZMax; j++) {
+
+                    //Split the region into 4 equal segments of 256x256.
+                    regions.add(new CopyRegionFormat(
+                            copy, paste,
+                            BlockVector3.at(i * 512, finalMin, j * 512),
+                            BlockVector3.at(i * 512 + 255, finalMax, j * 512 + 255),
+                            BlockVector3.at(i * 512 + xTransform, finalMin, j * 512 + zTransform))
+                    );
+
+                    regions.add(new CopyRegionFormat(
+                            copy, paste,
+                            BlockVector3.at(i * 512 + 256, finalMin, j * 512),
+                            BlockVector3.at(i * 512 + 511, finalMax, j * 512 + 255),
+                            BlockVector3.at(i * 512 + 256 + xTransform, finalMin, j * 512 + zTransform))
+                    );
+
+                    regions.add(new CopyRegionFormat(
+                            copy, paste,
+                            BlockVector3.at(i * 512, finalMin, j * 512 + 256),
+                            BlockVector3.at(i * 512 + 255, finalMax - 1, j * 512 + 511),
+                            BlockVector3.at(i * 512 + xTransform, finalMin, j * 512 + 256 + zTransform))
+                    );
+
+                    regions.add(new CopyRegionFormat(
+                            copy, paste,
+                            BlockVector3.at(i * 512 + 256, finalMin, j * 512 + 256),
+                            BlockVector3.at(i * 512 + 511, finalMax - 1, j * 512 + 511),
+                            BlockVector3.at(i * 512 + 256 + xTransform, finalMin, j * 512 + 256 + zTransform))
+                    );
+                }
+            }
+
+            LOGGER.info("Add segments to list, there are " + regions.size());
+            sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
 
             while (regions.size() > 0) {
 
@@ -266,7 +305,7 @@ public class CreateCommand {
 
             int coordMax = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    ((regionXMax * 512) + 511), MAX_Y-1, ((regionZMax * 512) + 511), 0, 0));
+                    ((regionXMax * 512) + 511), MAX_Y - 1, ((regionZMax * 512) + 511), 0, 0));
 
             //Add the location to the database.
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
