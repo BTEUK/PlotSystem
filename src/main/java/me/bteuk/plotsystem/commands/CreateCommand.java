@@ -11,6 +11,7 @@ import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.CopyRegionFormat;
+import me.bteuk.plotsystem.utils.HeightAdjuster;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -192,33 +193,14 @@ public class CreateCommand {
 
         //Find the min and max point of the area.
         sender.sendMessage("Searching for min and max elevation of the area.");
-        int min = MAX_Y;
-        int max = MIN_Y;
-        int elev;
 
-        //Iterate through every block and check the elevation.
-        for (int i = regionXMin * 512; i <= regionXMax * 512 + 511; i++) {
-            for (int j = regionZMin * 512; j <= regionZMax * 512 + 511; j++) {
-
-                elev = copy.getHighestBlockYAt(i, j);
-
-                if (elev > max) {
-                    max = elev;
-                }
-
-                if (elev < min) {
-                    min = elev;
-                }
-
-            }
-        }
-
-        //Reduce max if it exceeds world limit.
-        final int finalMax = Math.min(MAX_Y - 1, max);
+        int[] elev = HeightAdjuster.getAdjustedYMinMax(regionXMin * 512, regionXMax * 512 + 511, regionZMin * 512, regionZMax * 512 + 511, copy, -10, 0);
 
         //Reduce min by 10 blocks, or MIN_Y if that is larger than min - 10.
-        sender.sendMessage("Found min elevation at y=" + min + " and max elevation at y=" + max + " reducing minimum elevation by 10 blocks to give sufficient surface depth.");
-        final int finalMin = Math.max(MIN_Y, (min - 10));
+        sender.sendMessage("Found min elevation at y=" + elev[0] + " and max elevation at y=" + elev[1]);
+
+        int finalMin = elev[0];
+        int finalMax = elev[1];
 
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.

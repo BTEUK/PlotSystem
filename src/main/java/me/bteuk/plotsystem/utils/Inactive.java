@@ -82,9 +82,12 @@ public class Inactive {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
+            assert copyWorld != null;
+            int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
+
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
 
                 //Remove all members from the worldguard plot.
                 try {
@@ -170,9 +173,12 @@ public class Inactive {
                     pasteVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
                 }
 
+                assert copyWorld != null;
+                int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
+
                 //Save the zone by copying from the building world to the save world.
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
 
                     //Delete the worldguard region.
                     try {

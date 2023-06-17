@@ -13,6 +13,7 @@ import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.HeightAdjuster;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -251,9 +252,11 @@ public class AcceptGui extends Gui {
 
                     }
 
+                    int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, world, -50, 0);
+
                     //Update the world by copying the build world to the save world.
                     Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                        WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);
+                        WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld, elev[0], elev[1]);
 
                         LOGGER.info("Plot " + user.review.plot + " successfully saved.");
 

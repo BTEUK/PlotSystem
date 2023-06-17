@@ -6,6 +6,7 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
+import me.bteuk.plotsystem.utils.HeightAdjuster;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
@@ -77,9 +78,11 @@ public class DeleteEvent {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
+            int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
+
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
 
                 //Remove all members from the worldguard plot.
                 try {
@@ -169,9 +172,11 @@ public class DeleteEvent {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
+            int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
+
             //Revert zone to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
 
                 //Remove the zone from worldguard.
                 try {
