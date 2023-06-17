@@ -83,11 +83,10 @@ public class Inactive {
             }
 
             assert copyWorld != null;
-            int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
 
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
+                WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
                 try {
@@ -174,11 +173,10 @@ public class Inactive {
                 }
 
                 assert copyWorld != null;
-                int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
 
                 //Save the zone by copying from the building world to the save world.
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
                     try {

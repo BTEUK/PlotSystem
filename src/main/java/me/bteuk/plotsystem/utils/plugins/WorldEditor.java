@@ -18,16 +18,19 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import static me.bteuk.network.utils.Constants.MAX_Y;
+import static me.bteuk.network.utils.Constants.MIN_Y;
+
 public class WorldEditor {
 
-    public static boolean updateWorld(List<BlockVector2> copyVector, List<BlockVector2> pasteVector, World copy, World paste, int yMin, int yMax) {
+    public static boolean updateWorld(List<BlockVector2> copyVector, List<BlockVector2> pasteVector, World copy, World paste) {
 
         //Get the worlds in worldEdit format
         com.sk89q.worldedit.world.World copyWorld = new BukkitWorld(copy);
         com.sk89q.worldedit.world.World pasteWorld = new BukkitWorld(paste);
 
-        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, yMin, yMax);
-        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, yMin, yMax);
+        Polygonal2DRegion copyRegion = new Polygonal2DRegion(copyWorld, copyVector, MIN_Y, MAX_Y - 1);
+        Polygonal2DRegion pasteRegion = new Polygonal2DRegion(pasteWorld, pasteVector, MIN_Y, MAX_Y - 1);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()

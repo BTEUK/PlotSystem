@@ -1,12 +1,10 @@
 package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.utils.HeightAdjuster;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -16,8 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.bteuk.network.utils.Constants.MAX_Y;
-import static me.bteuk.network.utils.Constants.MIN_Y;
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class CloseEvent {
@@ -66,8 +62,6 @@ public class CloseEvent {
                     return;
                 }
 
-                int[] elev = HeightAdjuster.getAdjustedYMinMax(copyVector, copyWorld, -50, 0);
-
                 //Create the copyVector by transforming the points in the paste vector with the negative transform.
                 //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
                 List<BlockVector2> pasteVector = new ArrayList<>();
@@ -77,7 +71,7 @@ public class CloseEvent {
 
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                     //Save the zone by copying from the building world to the save world.
-                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld, elev[0], elev[1]);
+                    WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
                     try {

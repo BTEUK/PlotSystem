@@ -11,7 +11,6 @@ import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.CopyRegionFormat;
-import me.bteuk.plotsystem.utils.HeightAdjuster;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
@@ -26,6 +25,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
@@ -118,31 +119,36 @@ public class CreateCommand {
         }
 
         //Check if they have enough args.
-        if (args.length < 7) {
+        if (args.length < 9) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
 
         int xmin;
+        int ymin;
         int zmin;
 
         int xmax;
+        int ymax;
         int zmax;
 
         //Check if the coordinates are actual numbers.
         try {
 
             xmin = Integer.parseInt(args[3]);
-            zmin = Integer.parseInt(args[4]);
+            ymin = Integer.parseInt(args[4]);
+            zmin = Integer.parseInt(args[5]);
 
-            xmax = Integer.parseInt(args[5]);
-            zmax = Integer.parseInt(args[6]);
+            xmax = Integer.parseInt(args[6]);
+            ymax = Integer.parseInt(args[7]);
+            zmax = Integer.parseInt(args[8]);
+
 
         } catch (NumberFormatException e) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
@@ -191,67 +197,60 @@ public class CreateCommand {
 
         }
 
-        //Find the min and max point of the area.
-        sender.sendMessage("Searching for min and max elevation of the area.");
-
-        int[] elev = HeightAdjuster.getAdjustedYMinMax(regionXMin * 512, regionXMax * 512 + 511, regionZMin * 512, regionZMax * 512 + 511, copy, -10, 0);
-
-        //Reduce min by 10 blocks, or MIN_Y if that is larger than min - 10.
-        sender.sendMessage("Found min elevation at y=" + elev[0] + " and max elevation at y=" + elev[1]);
-
-        int finalMin = elev[0];
-        int finalMax = elev[1];
-
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
         sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
 
+
+        //Create atomic boolean to query whether a region can be copied.
+        AtomicBoolean isReady = new AtomicBoolean(true);
+
+        //Create a list of regions to copy paste.
+        ArrayList<CopyRegionFormat> regions = new ArrayList<>();
+
+        final int yMin = max(ymin, MIN_Y);
+        final int yMax = min(ymax, MAX_Y-1);
+
+        for (int i = regionXMin; i <= regionXMax; i++) {
+            for (int j = regionZMin; j <= regionZMax; j++) {
+
+                //Split the region into 4 equal segments of 256x256.
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512, yMin, j * 512),
+                        BlockVector3.at(i * 512 + 255, yMax, j * 512 + 255),
+                        BlockVector3.at(i * 512 + xTransform, yMin, j * 512 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512 + 256, yMin, j * 512),
+                        BlockVector3.at(i * 512 + 511, yMax, j * 512 + 255),
+                        BlockVector3.at(i * 512 + 256 + xTransform, yMin, j * 512 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512, yMin, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 255, yMax, j * 512 + 511),
+                        BlockVector3.at(i * 512 + xTransform, yMin, j * 512 + 256 + zTransform))
+                );
+
+                regions.add(new CopyRegionFormat(
+                        copy, paste,
+                        BlockVector3.at(i * 512 + 256, yMin, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 511, yMax, j * 512 + 511),
+                        BlockVector3.at(i * 512 + 256 + xTransform, yMin, j * 512 + 256 + zTransform))
+                );
+            }
+        }
+
+        LOGGER.info("Add segments to list, there are " + regions.size());
+        sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
+
         //Iterate until all regions are done.
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
-
-            //Create atomic boolean to query whether a region can be copied.
-            AtomicBoolean isReady = new AtomicBoolean(true);
-
-            //Create a list of regions to copy paste.
-            ArrayList<CopyRegionFormat> regions = new ArrayList<>();
-
-            for (int i = regionXMin; i <= regionXMax; i++) {
-                for (int j = regionZMin; j <= regionZMax; j++) {
-
-                    //Split the region into 4 equal segments of 256x256.
-                    regions.add(new CopyRegionFormat(
-                            copy, paste,
-                            BlockVector3.at(i * 512, finalMin, j * 512),
-                            BlockVector3.at(i * 512 + 255, finalMax, j * 512 + 255),
-                            BlockVector3.at(i * 512 + xTransform, finalMin, j * 512 + zTransform))
-                    );
-
-                    regions.add(new CopyRegionFormat(
-                            copy, paste,
-                            BlockVector3.at(i * 512 + 256, finalMin, j * 512),
-                            BlockVector3.at(i * 512 + 511, finalMax, j * 512 + 255),
-                            BlockVector3.at(i * 512 + 256 + xTransform, finalMin, j * 512 + zTransform))
-                    );
-
-                    regions.add(new CopyRegionFormat(
-                            copy, paste,
-                            BlockVector3.at(i * 512, finalMin, j * 512 + 256),
-                            BlockVector3.at(i * 512 + 255, finalMax - 1, j * 512 + 511),
-                            BlockVector3.at(i * 512 + xTransform, finalMin, j * 512 + 256 + zTransform))
-                    );
-
-                    regions.add(new CopyRegionFormat(
-                            copy, paste,
-                            BlockVector3.at(i * 512 + 256, finalMin, j * 512 + 256),
-                            BlockVector3.at(i * 512 + 511, finalMax - 1, j * 512 + 511),
-                            BlockVector3.at(i * 512 + 256 + xTransform, finalMin, j * 512 + 256 + zTransform))
-                    );
-                }
-            }
-
-            LOGGER.info("Add segments to list, there are " + regions.size());
-            sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
 
             while (regions.size() > 0) {
 
