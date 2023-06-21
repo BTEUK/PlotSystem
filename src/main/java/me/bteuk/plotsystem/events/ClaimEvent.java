@@ -1,12 +1,14 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.utils.User;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -26,6 +28,15 @@ public class ClaimEvent {
 
                 Bukkit.getLogger().warning("Player " + uuid + " is not on the server the event was sent to!");
                 return;
+
+            }
+
+            //Make sure the player has permission to claim plots, else they must complete the tutorial first.
+            if (!p.hasPermission("uknet.plots.claim.*")) {
+
+                p.sendMessage(Utils.error("You need applicant to claim a plot, you can get this by completing a tutorial.")
+                        .append(Utils.error("Click here to teleport to the tutorial!"))
+                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + PlotSystem.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='TUTORIAL';"))));
 
             }
 
