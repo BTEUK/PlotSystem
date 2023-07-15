@@ -1,7 +1,6 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
@@ -35,8 +34,8 @@ public class ClaimEvent {
             if (!p.hasPermission("uknet.plots.claim.*")) {
 
                 p.sendMessage(Utils.error("You need applicant to claim a plot, you can get this by completing a tutorial.")
-                        .append(Utils.error("Click here to teleport to the tutorial!"))
-                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + PlotSystem.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='TUTORIAL';"))));
+                        .append(Utils.error("Click here to open the tutorial menu!"))
+                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/nav tutorials")));
 
             }
 
