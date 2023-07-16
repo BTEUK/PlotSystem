@@ -31,8 +31,8 @@ public class EditBook implements Listener {
 	@EventHandler
 	public void onBookEdit(PlayerEditBookEvent e) {
 
-		//Check if the player equals the reviewer, else cancel.
-		if (!e.getPlayer().equals(review.getU().player)) {
+		//If the player is not the same as the reviewer return.
+		if (!review.isSamePlayer(e.getPlayer())) {
 			return;
 		}
 		
