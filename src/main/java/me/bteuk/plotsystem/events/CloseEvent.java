@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -11,6 +13,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class CloseEvent {
 
@@ -36,20 +40,25 @@ public class CloseEvent {
                 //Get worlds of plot and save location.
                 String save_world = config.getString("save_world");
                 if (save_world == null) {
-                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                     return;
                 }
 
                 World copyWorld = Bukkit.getWorld(location);
                 World pasteWorld = Bukkit.getWorld(save_world);
 
+                assert(copyWorld != null);
+
                 int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the zone bounds.
-                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
-
-                if (copyVector == null) {
+                List<BlockVector2> copyVector;
+                try {
+                    copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
+                } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                    e.printStackTrace();
                     return;
                 }
 
@@ -65,7 +74,13 @@ public class CloseEvent {
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
-                    WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    try {
+                        WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    } catch (RegionManagerNotFoundException e) {
+                        PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                        e.printStackTrace();
+                        return;
+                    }
 
                     //Remove all members of zone in database.
                     plotSQL.update("DELETE FROM zone_members WHERE id=" + zone + ";");
@@ -77,7 +92,7 @@ public class CloseEvent {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
 
                     //Log plot removal to console.
-                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has been closed.");
+                    LOGGER.info("Zone " + zone + " has been closed.");
                 });
             }
         }

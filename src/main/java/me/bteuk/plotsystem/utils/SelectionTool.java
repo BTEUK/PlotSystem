@@ -6,7 +6,6 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
-import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -17,6 +16,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class SelectionTool extends WGCreatePlot {
 
@@ -42,20 +43,20 @@ public class SelectionTool extends WGCreatePlot {
     public int size;
     public int difficulty;
 
-    public BlockData outlineBlock = Material.LIGHT_BLUE_CONCRETE.createBlockData();
-    public BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
-    public BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
-    public BlockData redConc = Material.RED_CONCRETE.createBlockData();
+    public final BlockData outlineBlock = Material.LIGHT_BLUE_CONCRETE.createBlockData();
+    public final BlockData limeConc = Material.LIME_CONCRETE.createBlockData();
+    public final BlockData yellowConc = Material.YELLOW_CONCRETE.createBlockData();
+    public final BlockData redConc = Material.RED_CONCRETE.createBlockData();
 
     //PlotSQL
     private final PlotSQL plotSQL;
 
-    //PlotOutline
-    private final PlotOutline plotOutline;
-
     //Zones settings.
     public int hours;
     public boolean is_public;
+
+    //Outlines
+    private final Outlines outlines;
 
     //Constructor, sets up the basics of the selection tool, including default values fo size and difficulty.
     public SelectionTool(User u, PlotSQL plotSQL) {
@@ -71,7 +72,7 @@ public class SelectionTool extends WGCreatePlot {
         hours = 2;
         is_public = false;
 
-        plotOutline = new PlotOutline();
+        outlines = PlotSystem.getInstance().getOutlines();
 
     }
 
@@ -88,11 +89,33 @@ public class SelectionTool extends WGCreatePlot {
         hours = 2;
         is_public = false;
 
+        //Remove outline blocks based on the previous selection.
+        clearOutlines();
+
         vector.clear();
 
-        //Replace blocks back to original state.
-        plotOutline.revertBlocks(u.player);
+    }
 
+    //Remove old outlines based on the vector.
+    private void clearOutlines() {
+
+        //Remove outline blocks based on the previous selection.
+        if (vector.size() == 1) {
+
+            //Remove the single point.
+            outlines.removePoint(u.player, vector.get(0));
+
+        } else if (vector.size() == 2) {
+
+            //Remove the line.
+            outlines.removeLine(u.player, vector.get(0), vector.get(1));
+
+        } else if (vector.size() > 2) {
+
+            //Remove the outline.
+            outlines.removeOutline(u.player, vector);
+
+        }
     }
 
     //Starts a new selection with the selection tool, represents left-clicking.
@@ -109,7 +132,7 @@ public class SelectionTool extends WGCreatePlot {
         vector.add(bv2);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
-                () -> plotOutline.sendBlockChange(u.player, bv2, outlineBlock),1L);
+                () -> outlines.addPoint(u.player, bv2, outlineBlock),1L);
 
         //Set the location.
         this.location = location;
@@ -131,19 +154,19 @@ public class SelectionTool extends WGCreatePlot {
 
         } else {
 
-            vector.add(bv2);
-
             //Clear previous selection outline.
-            plotOutline.revertBlocks(u.player);
+            clearOutlines();
+
+            vector.add(bv2);
 
             //Create new outline.
             //Adding a point already means at least 2 points, so we can ignore the 1 point case.
             if (vector.size() == 2) {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
-                        () -> plotOutline.createLine(u.player, vector.get(0), vector.get(1), outlineBlock),1L);
+                        () -> outlines.addLine(u.player, vector.get(0), vector.get(1), outlineBlock),1L);
             } else {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(PlotSystem.getInstance(),
-                        () -> plotOutline.createOutline(u.player, vector, outlineBlock, true),1L);
+                        () -> outlines.addOutline(u.player, vector, outlineBlock),1L);
             }
 
             return true;
@@ -257,15 +280,15 @@ public class SelectionTool extends WGCreatePlot {
                     .append(Component.text(PlotValues.difficultyName(difficulty), NamedTextColor.DARK_AQUA))
                     .append(Utils.success(" and size "))
                     .append(Component.text(PlotValues.sizeName(size), NamedTextColor.DARK_AQUA)));
-            PlotSystem.getInstance().getLogger().info("Plot created with ID " + plotID +
+            LOGGER.info("Plot created with ID " + plotID +
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
                     " and size " + PlotValues.sizeName(size));
 
             //Clear previous blocks.
-            plotOutline.previousBlocks.clear();
+            clearOutlines();
 
             //Change plot outline to blockType of plot, rather than of selection.
-            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints(String.valueOf(plotID), world), difficultyMaterial(difficulty), false);
+            outlines.addOutline(vector, world, difficultyMaterial(difficulty));
 
         }
     }
@@ -298,14 +321,14 @@ public class SelectionTool extends WGCreatePlot {
                     .append(Utils.success(", it will expire at "))
                     .append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA))
                     .append(Utils.success(", this can be extended in the Zone Menu.")));
-            PlotSystem.getInstance().getLogger().info("Zone created with ID " + plotID +
+            LOGGER.info("Zone created with ID " + plotID +
                     ", it will expire at " + Time.getDateTime(expiration));
 
             //Clear previous blocks.
-            plotOutline.previousBlocks.clear();
+            clearOutlines();
 
             //Change plot outline to blockType of plot, rather than of selection.
-            plotOutline.createOutline(u.player, WorldGuardFunctions.getPoints("z" + plotID, world), Material.PURPLE_CONCRETE.createBlockData(), false);
+            outlines.addOutline(vector, world, Material.PURPLE_CONCRETE.createBlockData());
 
         }
     }

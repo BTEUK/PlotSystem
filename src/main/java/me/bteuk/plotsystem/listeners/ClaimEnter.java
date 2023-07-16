@@ -21,10 +21,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class ClaimEnter implements Listener {
 
-    PlotSQL plotSQL;
-    GlobalSQL globalSQL;
+    final PlotSQL plotSQL;
+    final GlobalSQL globalSQL;
 
     public ClaimEnter(PlotSystem plugin, PlotSQL plotSQL, GlobalSQL globalSQl) {
 
@@ -76,7 +78,7 @@ public class ClaimEnter implements Listener {
         //Iterate through the regions, which should be at most 1.
         //If there is more than 1 region, throw an error.
         if (applicableRegionSet.size() > 1) {
-            PlotSystem.getInstance().getLogger().severe("The player " + u.player.getName() + " is standing in more than 1 region, this should not be possible!");
+            LOGGER.severe("The player " + u.player.getName() + " is standing in more than 1 region, this should not be possible!");
             return;
         }
 
@@ -105,7 +107,7 @@ public class ClaimEnter implements Listener {
                     }
                 } catch (NumberFormatException e) {
 
-                    PlotSystem.getInstance().getLogger().warning("ApplicableRegionSet found a region that is not a plot or zone, the region name is " + regionName);
+                    LOGGER.warning("ApplicableRegionSet found a region that is not a plot or zone, the region name is " + regionName);
 
                 }
             }

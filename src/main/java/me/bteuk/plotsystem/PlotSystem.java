@@ -3,12 +3,18 @@ package me.bteuk.plotsystem;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.listeners.*;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -23,6 +29,9 @@ import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
 public class PlotSystem extends JavaPlugin {
+
+    //Logger
+    public static Logger LOGGER;
 
     //SQL Classes.
     public GlobalSQL globalSQL;
@@ -46,8 +55,14 @@ public class PlotSystem extends JavaPlugin {
     //Listeners
     public ClaimEnter claimEnter;
 
+    //Outline manager.
+    @Getter @Setter
+    private Outlines outlines;
+
     @Override
     public void onEnable() {
+
+        LOGGER = getLogger();
 
         //Config Setup
         PlotSystem.instance = this;
@@ -57,8 +72,8 @@ public class PlotSystem extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            getLogger().warning("The config must be configured before the plugin can be enabled!");
-            getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            LOGGER.warning("The config must be configured before the plugin can be enabled!");
+            LOGGER.warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
             return;
 
         }
@@ -77,7 +92,7 @@ public class PlotSystem extends JavaPlugin {
 
         } catch (SQLException /*| IOException*/ e) {
             e.printStackTrace();
-            getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            LOGGER.severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -91,30 +106,21 @@ public class PlotSystem extends JavaPlugin {
             //Save world name is in config.
             //This implies first launch with plugin.
             if (!Multiverse.hasWorld(config.getString("save_world"))) {
-
                 //Create save world.
                 if (!Multiverse.createVoidWorld(config.getString("save_world"))) {
 
-                    getLogger().warning("Failed to create save world!");
+                    LOGGER.warning("Failed to create save world!");
 
                 }
-
-                //Enable plugin.
-                getLogger().info("Enabling Plugin");
-                enablePlugin();
-
-            } else {
-
-                //Save world has already been created, enable plugin.
-                getLogger().info("Enabling Plugin");
-                enablePlugin();
-
-
             }
+
+            LOGGER.info("Enabling Plugin");
+            enablePlugin();
+
         } else {
 
             //If the server is not in the database the network plugin was not successful.
-            getLogger().warning("Server is not in database, check that the Network plugin is working correctly.");
+            LOGGER.warning("Server is not in database, check that the Network plugin is working correctly.");
 
         }
     }
@@ -135,8 +141,11 @@ public class PlotSystem extends JavaPlugin {
         meta2.displayName(Utils.title("Building Menu"));
         gui.setItemMeta(meta2);
 
+        //Outlines, this will be accessed from other classes, so it must have a getter and setter.
+        outlines = new Outlines();
+
         //Setup Timers
-        timers = new Timers(this, globalSQL, plotSQL);
+        timers = new Timers(this, globalSQL);
         timers.startTimers();
 
         //Create bungeecord channel
@@ -159,7 +168,7 @@ public class PlotSystem extends JavaPlugin {
 
         //Create instance of claim command,
         //as it is used to check whether a person is able to claim the plot they're standing in.
-        ClaimCommand claimCommand = new ClaimCommand(plotSQL);
+        ClaimCommand claimCommand = new ClaimCommand();
 
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
@@ -187,7 +196,11 @@ public class PlotSystem extends JavaPlugin {
                     PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
                     //Remove the reviewer from the plot.
-                    WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+                    try {
+                        WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+                    } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
                     //Set status back to submitted.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
@@ -202,7 +215,7 @@ public class PlotSystem extends JavaPlugin {
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
-        getLogger().info("Disabled PublicBuilds");
+        LOGGER.info("Disabled PublicBuilds");
     }
 
     //Creates the mysql connection.

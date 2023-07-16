@@ -5,6 +5,8 @@ import java.util.List;
 
 import me.bteuk.network.utils.Time;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -14,6 +16,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.sk89q.worldedit.math.BlockVector2;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class Inactive {
 
@@ -41,7 +45,7 @@ public class Inactive {
             return;
         }
 
-        PlotSystem.getInstance().getLogger().info("Found " + inactivePlots.size() + " inactive plots, clearing them.");
+        LOGGER.info("Found " + inactivePlots.size() + " inactive plots, clearing them.");
 
         //Iterate through all inactive plots and cancel them.
         for (int plot : inactivePlots) {
@@ -52,7 +56,7 @@ public class Inactive {
             //Get worlds of plot and save location.
             String save_world = config.getString("save_world");
             if (save_world == null) {
-                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                 continue;
             }
 
@@ -63,9 +67,11 @@ public class Inactive {
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //Get the plot bounds.
-            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
-
-            if (pasteVector == null) {
+            List<BlockVector2> pasteVector;
+            try {
+                pasteVector = WorldGuardFunctions.getPoints(String.valueOf(plot), pasteWorld);
+            } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                e.printStackTrace();
                 continue;
             }
 
@@ -76,12 +82,18 @@ public class Inactive {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
+            assert copyWorld != null;
+
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
-                WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                try {
+                    WorldGuardFunctions.clearMembers(String.valueOf(plot), pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 //Get the uuid of the plot owner.
                 String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
@@ -93,13 +105,12 @@ public class Inactive {
                 plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &c has been removed due to inactivity!');");
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");
 
                 //Log plot removal to console.
-                PlotSystem.getInstance().getLogger().info("Plot " + plot + " removed due to inactivity!");
+                LOGGER.info("Plot " + plot + " removed due to inactivity!");
 
             });
-
         }
     }
 
@@ -135,7 +146,7 @@ public class Inactive {
                 //Get worlds of plot and save location.
                 String save_world = config.getString("save_world");
                 if (save_world == null) {
-                    PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                    LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                     continue;
                 }
 
@@ -146,9 +157,11 @@ public class Inactive {
                 int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 //Get the zone bounds.
-                List<BlockVector2> copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
-
-                if (copyVector == null) {
+                List<BlockVector2> copyVector;
+                try {
+                    copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    e.printStackTrace();
                     continue;
                 }
 
@@ -159,12 +172,18 @@ public class Inactive {
                     pasteVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
                 }
 
+                assert copyWorld != null;
+
                 //Save the zone by copying from the building world to the save world.
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                     //Delete the worldguard region.
-                    WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    try {
+                        WorldGuardFunctions.delete("z" + zone, copyWorld);
+                    } catch (RegionManagerNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
                     //Get the uuid of the zone owner.
                     String uuid = plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zone + " AND is_owner=1;");
@@ -179,7 +198,7 @@ public class Inactive {
                     PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
 
                     //Log plot removal to console.
-                    PlotSystem.getInstance().getLogger().info("Zone " + zone + " has expired.");
+                    LOGGER.info("Zone " + zone + " has expired.");
 
                 });
             }

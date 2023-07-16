@@ -1,10 +1,12 @@
 package me.bteuk.plotsystem.utils;
 
+import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.sql.GlobalSQL;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import me.bteuk.plotsystem.reviewing.Review;
@@ -12,11 +14,11 @@ import me.bteuk.plotsystem.reviewing.Review;
 public class User {
 
     //Basic information about the player.
-    public Player player;
-    public String uuid;
-    public String name;
+    public final Player player;
+    public final String uuid;
+    public final String name;
 
-    public SelectionTool selectionTool;
+    public final SelectionTool selectionTool;
 
     public int inPlot = 0;
     public int inZone = 0;
@@ -31,6 +33,9 @@ public class User {
     public CreatePlotGui createPlotGui;
     public CreateZoneGui createZoneGui;
 
+    //Store the location of the player on interval, this allows the server to check when to update the outlines.
+    public Location lastLocation;
+
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         //Set sql
@@ -44,6 +49,11 @@ public class User {
 
         //Set selection tool, only players with the valid roles can use it.
         selectionTool = new SelectionTool(this, plotSQL);
+
+        //Set last location to current location.
+        lastLocation = player.getLocation();
+        //Set outlines for player.
+        PlotSystem.getInstance().getOutlines().addNearbyOutlines(player);
 
     }
 }

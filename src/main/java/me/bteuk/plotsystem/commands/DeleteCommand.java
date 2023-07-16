@@ -2,6 +2,8 @@ package me.bteuk.plotsystem.commands;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
@@ -15,6 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class DeleteCommand {
 
@@ -137,19 +141,24 @@ public class DeleteCommand {
         }
 
         //Delete plot.
-        if (WorldGuardFunctions.delete(args[2], world)) {
+        try {
+            if (WorldGuardFunctions.delete(args[2], world)) {
 
-            //Set plot to deleted in database.
-            plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
-            sender.sendMessage(Utils.success("Plot ")
-                    .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" deleted.")));
+                //Set plot to deleted in database.
+                plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
+                sender.sendMessage(Utils.success("Plot ")
+                        .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
+                        .append(Utils.success(" deleted.")));
 
-        } else {
+            } else {
 
-            sender.sendMessage(Utils.error("An error occured while deleting the plot."));
-            PlotSystem.getInstance().getLogger().warning("An error occured while deleting plot " + plotID + " from WorldGuard.");
+                sender.sendMessage(Utils.error("An error occured while deleting the plot."));
+                LOGGER.warning("An error occurred while deleting plot " + plotID + " from WorldGuard.");
 
+            }
+        } catch (RegionManagerNotFoundException e) {
+            sender.sendMessage(Utils.error("An error occurred while deleting the plot, please contact an admin."));
+            e.printStackTrace();
         }
     }
 
@@ -206,7 +215,7 @@ public class DeleteCommand {
             plotSQL.update("DELETE FROM location_data WHERE name='" + args[2] + "';");
             sender.sendMessage(Utils.success("Deleted location ")
                     .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
-            PlotSystem.getInstance().getLogger().info("Deleted location " + args[2] + ".");
+            LOGGER.info("Deleted location " + args[2] + ".");
 
             //Get regions from database.
             ArrayList<String> regions = plotSQL.getStringList("SELECT region FROM regions WHERE location='" + args[2] + "';");
@@ -224,7 +233,7 @@ public class DeleteCommand {
         } else {
 
             sender.sendMessage(Utils.error("An error occurred while deleting the world."));
-            PlotSystem.getInstance().getLogger().warning("An error occurred while deleting world " + args[2] + ".");
+            LOGGER.warning("An error occurred while deleting world " + args[2] + ".");
 
         }
     }

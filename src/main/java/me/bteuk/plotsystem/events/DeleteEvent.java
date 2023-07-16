@@ -3,6 +3,8 @@ package me.bteuk.plotsystem.events;
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class DeleteEvent {
 
@@ -36,7 +40,7 @@ public class DeleteEvent {
             //Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
-                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
+                LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
                 return;
             }
 
@@ -57,9 +61,12 @@ public class DeleteEvent {
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //Get the plot bounds.
-            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
-
-            if (pasteVector == null) {
+            List<BlockVector2> pasteVector;
+            try {
+                pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
+            } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
+                e.printStackTrace();
                 return;
             }
 
@@ -69,13 +76,18 @@ public class DeleteEvent {
             for (BlockVector2 bv : pasteVector) {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
-
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove all members from the worldguard plot.
-                WorldGuardFunctions.clearMembers(event[2], pasteWorld);
+                try {
+                    WorldGuardFunctions.clearMembers(event[2], pasteWorld);
+                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
+                    e.printStackTrace();
+                    return;
+                }
 
                 //Remove all members of plot in database.
                 PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
@@ -114,8 +126,8 @@ public class DeleteEvent {
             //Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
-                PlotSystem.getInstance().getLogger().warning("Save World is not defined in config, plot delete event has therefore failed!");
-                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
+                LOGGER.severe("Event details:" + Arrays.toString(event));
                 return;
             }
 
@@ -126,8 +138,8 @@ public class DeleteEvent {
             if (copyWorld == null || pasteWorld == null) {
 
                 //Send error to console.
-                PlotSystem.getInstance().getLogger().severe("Zone delete event failed!");
-                PlotSystem.getInstance().getLogger().severe("Event details:" + Arrays.toString(event));
+                LOGGER.severe("Zone delete event failed!");
+                LOGGER.severe("Event details:" + Arrays.toString(event));
                 return;
 
             }
@@ -136,7 +148,14 @@ public class DeleteEvent {
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //Get the zone bounds.
-            List<BlockVector2> pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
+            List<BlockVector2> pasteVector;
+            try {
+                pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
+            } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
+                e.printStackTrace();
+                return;
+            }
 
             if (pasteVector == null) {
                 return;
@@ -154,12 +173,18 @@ public class DeleteEvent {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
                 //Remove the zone from worldguard.
-                WorldGuardFunctions.delete("z" + event[2], pasteWorld);
+                try {
+                    WorldGuardFunctions.delete("z" + event[2], pasteWorld);
+                } catch (RegionManagerNotFoundException e) {
+                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
+                    e.printStackTrace();
+                    return;
+                }
 
-                //Remove all members of plot in database.
+                //Remove all members of zone in database.
                 PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
 
-                //Set plot status to unclaimed.
+                //Set zone status to closed.
                 PlotSystem.getInstance().plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.

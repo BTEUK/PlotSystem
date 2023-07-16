@@ -1,6 +1,8 @@
 package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
@@ -9,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class QuitServer implements Listener {
 
@@ -28,7 +32,7 @@ public class QuitServer implements Listener {
 
         //If no user was found print error in console.
         if (u == null) {
-            instance.getLogger().warning("Error: User " + e.getPlayer().getName() + " not found in the list of online users!");
+            LOGGER.warning("Error: User " + e.getPlayer().getName() + " not found in the list of online users!");
             return;
         }
 
@@ -38,7 +42,11 @@ public class QuitServer implements Listener {
             PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
 
             //Remove the reviewer from the plot.
-            WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+            try {
+                WorldGuardFunctions.removeMember(String.valueOf(u.review.plot), u.uuid, Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + u.review.plot + ";")));
+            } catch (RegionManagerNotFoundException | RegionNotFoundException ex) {
+                ex.printStackTrace();
+            }
 
             //Set status back to submitted.
             plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
@@ -60,6 +68,9 @@ public class QuitServer implements Listener {
         if (u.createZoneGui != null) {
             u.createZoneGui.delete();
         }
+
+        //Remove player from outlines.
+        PlotSystem.getInstance().getOutlines().removePlayer(e.getPlayer());
 
         //Remove user from list
         instance.removeUser(u);

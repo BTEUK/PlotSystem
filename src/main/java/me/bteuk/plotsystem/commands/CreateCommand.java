@@ -25,8 +25,11 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class CreateCommand {
 
@@ -116,31 +119,36 @@ public class CreateCommand {
         }
 
         //Check if they have enough args.
-        if (args.length < 7) {
+        if (args.length < 9) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
 
         int xmin;
+        int ymin;
         int zmin;
 
         int xmax;
+        int ymax;
         int zmax;
 
         //Check if the coordinates are actual numbers.
         try {
 
             xmin = Integer.parseInt(args[3]);
-            zmin = Integer.parseInt(args[4]);
+            ymin = Integer.parseInt(args[4]);
+            zmin = Integer.parseInt(args[5]);
 
-            xmax = Integer.parseInt(args[5]);
-            zmax = Integer.parseInt(args[6]);
+            xmax = Integer.parseInt(args[6]);
+            ymax = Integer.parseInt(args[7]);
+            zmax = Integer.parseInt(args[8]);
+
 
         } catch (NumberFormatException e) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>"));
+            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
@@ -180,10 +188,20 @@ public class CreateCommand {
         World copy = Bukkit.getWorld(saveWorld);
         World paste = Bukkit.getWorld(args[2]);
 
+        //Check that the worlds are not null, else delete the Multiverse world.
+        if (copy == null || paste == null) {
+
+            sender.sendMessage("An error occurred, please contact an admin.");
+            Multiverse.deleteWorld(args[2]);
+            return;
+
+        }
+
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
         sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
+
 
         //Create atomic boolean to query whether a region can be copied.
         AtomicBoolean isReady = new AtomicBoolean(true);
@@ -191,41 +209,44 @@ public class CreateCommand {
         //Create a list of regions to copy paste.
         ArrayList<CopyRegionFormat> regions = new ArrayList<>();
 
+        final int yMin = max(ymin, MIN_Y);
+        final int yMax = min(ymax, MAX_Y-1);
+
         for (int i = regionXMin; i <= regionXMax; i++) {
             for (int j = regionZMin; j <= regionZMax; j++) {
 
                 //Split the region into 4 equal segments of 256x256.
                 regions.add(new CopyRegionFormat(
                         copy, paste,
-                        BlockVector3.at(i * 512, MIN_Y, j * 512),
-                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 255),
-                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + zTransform))
+                        BlockVector3.at(i * 512, yMin, j * 512),
+                        BlockVector3.at(i * 512 + 255, yMax, j * 512 + 255),
+                        BlockVector3.at(i * 512 + xTransform, yMin, j * 512 + zTransform))
                 );
 
                 regions.add(new CopyRegionFormat(
                         copy, paste,
-                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512),
-                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 255),
-                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + zTransform))
+                        BlockVector3.at(i * 512 + 256, yMin, j * 512),
+                        BlockVector3.at(i * 512 + 511, yMax, j * 512 + 255),
+                        BlockVector3.at(i * 512 + 256 + xTransform, yMin, j * 512 + zTransform))
                 );
 
                 regions.add(new CopyRegionFormat(
                         copy, paste,
-                        BlockVector3.at(i * 512, MIN_Y, j * 512 + 256),
-                        BlockVector3.at(i * 512 + 255, MAX_Y-1, j * 512 + 511),
-                        BlockVector3.at(i * 512 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
+                        BlockVector3.at(i * 512, yMin, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 255, yMax, j * 512 + 511),
+                        BlockVector3.at(i * 512 + xTransform, yMin, j * 512 + 256 + zTransform))
                 );
 
                 regions.add(new CopyRegionFormat(
                         copy, paste,
-                        BlockVector3.at(i * 512 + 256, MIN_Y, j * 512 + 256),
-                        BlockVector3.at(i * 512 + 511, MAX_Y-1, j * 512 + 511),
-                        BlockVector3.at(i * 512 + 256 + xTransform, MIN_Y, j * 512 + 256 + zTransform))
+                        BlockVector3.at(i * 512 + 256, yMin, j * 512 + 256),
+                        BlockVector3.at(i * 512 + 511, yMax, j * 512 + 511),
+                        BlockVector3.at(i * 512 + 256 + xTransform, yMin, j * 512 + 256 + zTransform))
                 );
             }
         }
 
-        PlotSystem.getInstance().getLogger().info("Add segments to list, there are " + regions.size());
+        LOGGER.info("Add segments to list, there are " + regions.size());
         sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
 
         //Iterate until all regions are done.
@@ -249,7 +270,7 @@ public class CreateCommand {
                             sender.sendMessage(Utils.success("Segment copied, there are ")
                                     .append(Component.text(regions.size(), NamedTextColor.DARK_AQUA))
                                     .append(Utils.success(" remaining.")));
-                            PlotSystem.getInstance().getLogger().info("Segment copied, there are " + regions.size() + " remaining.");
+                            LOGGER.info("Segment copied, there are " + regions.size() + " remaining.");
                             isReady.set(true);
                         }
 
@@ -265,7 +286,7 @@ public class CreateCommand {
 
             int coordMax = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
-                    ((regionXMax * 512) + 511), MAX_Y-1, ((regionZMax * 512) + 511), 0, 0));
+                    ((regionXMax * 512) + 511), MAX_Y - 1, ((regionZMax * 512) + 511), 0, 0));
 
             //Add the location to the database.
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"

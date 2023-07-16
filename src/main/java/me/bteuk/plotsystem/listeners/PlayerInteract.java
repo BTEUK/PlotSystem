@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.listeners;
 
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
+import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 public class PlayerInteract implements Listener {
 
-    PlotSQL plotSQL;
+    final PlotSQL plotSQL;
 
     public PlayerInteract(PlotSystem plugin, PlotSQL plotSQL) {
 
@@ -68,11 +69,17 @@ public class PlayerInteract implements Listener {
                 }
 
                 //If the selected point is in an existing plot cancel.
-                if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
+                try {
+                    if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                    u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        return;
+
+                    }
+                } catch (RegionManagerNotFoundException ex) {
+                    u.player.sendMessage(Utils.error("An error occurred while processing the left click action, please contact an admin."));
+                    ex.printStackTrace();
                     return;
-
                 }
 
                 //Passed the checks, start a new selection at the clicked block.
@@ -104,11 +111,17 @@ public class PlayerInteract implements Listener {
                 }
 
                 //If the selected point is in an existing plot cancel.
-                if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
+                try {
+                    if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                    u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        return;
+
+                    }
+                } catch (RegionManagerNotFoundException ex) {
+                    u.player.sendMessage(Utils.error("An error occurred while processing the right click action, please contact an admin."));
+                    ex.printStackTrace();
                     return;
-
                 }
 
                 if (!u.selectionTool.addPoint(e.getClickedBlock())) {

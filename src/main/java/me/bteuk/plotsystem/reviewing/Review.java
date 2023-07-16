@@ -1,8 +1,8 @@
 package me.bteuk.plotsystem.reviewing;
 
+import lombok.Getter;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.utils.User;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,10 +15,11 @@ public class Review {
     private final ItemStack[] inventory;
 
     //User instance.
+    @Getter
     private final User u;
 
     //Review Gui and Listener.
-    public ReviewGui reviewGui;
+    public final ReviewGui reviewGui;
     private final ReviewHotbar hotbarListener;
 
     //Accept Gui and accept data.
@@ -31,9 +32,9 @@ public class Review {
     public final int plot;
 
     //Feedback book
-    public ItemStack book;
+    public final ItemStack book;
     public BookMeta bookMeta;
-    public EditBook editBook;
+    public final EditBook editBook;
 
     public Review(int plot, User u) {
 

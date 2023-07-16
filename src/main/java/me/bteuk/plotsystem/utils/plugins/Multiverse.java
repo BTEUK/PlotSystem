@@ -10,13 +10,14 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import me.bteuk.plotsystem.PlotSystem;
 import org.bukkit.*;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class Multiverse {
 
@@ -25,7 +26,7 @@ public class Multiverse {
         MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         if (core == null) {
-            PlotSystem.getInstance().getLogger().severe("Multiverse is a dependency of PlotSystem!");
+            LOGGER.severe("Multiverse is a dependency of PlotSystem!");
             return false;
         }
 
@@ -53,7 +54,7 @@ public class Multiverse {
         World world = Bukkit.getWorld(name);
 
         if (world == null) {
-            PlotSystem.getInstance().getLogger().warning("World is null!");
+            LOGGER.warning("World is null!");
             return false;
         }
 
@@ -72,7 +73,7 @@ public class Multiverse {
         RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
 
         if (regions == null) {
-            PlotSystem.getInstance().getLogger().warning("Regions is null!");
+            LOGGER.warning("Regions is null!");
             return false;
         }
 

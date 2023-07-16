@@ -5,7 +5,6 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,14 +15,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ClaimCommand implements CommandExecutor {
-
-    PlotSQL plotSQL;
-
-    public ClaimCommand(PlotSQL plotSQL) {
-
-        this.plotSQL = plotSQL;
-
-    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {

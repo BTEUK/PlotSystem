@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class ReviewHotbar implements Listener {
 
     //PlotSystem instance.
@@ -157,6 +159,9 @@ public class ReviewHotbar implements Listener {
         PlayerInteractEvent.getHandlerList().unregister(this);
         PlayerDropItemEvent.getHandlerList().unregister(this);
         PlayerSwapHandItemsEvent.getHandlerList().unregister(this);
+
+        //Send feedback in the console.
+        LOGGER.info("Reset reviewing hotbar and unregistered listeners");
 
     }
 
