@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
@@ -12,6 +13,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+
+import static me.bteuk.network.Tutorials.TUTORIAL_REQUIRED_MESSAGE;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
 
 public class ClaimEvent {
 
@@ -31,11 +35,11 @@ public class ClaimEvent {
             }
 
             //Make sure the player has permission to claim plots, else they must complete the tutorial first.
-            if (!p.hasPermission("uknet.plots.claim.*")) {
+            //Only checked if tutorials are enabled.
+            if (!(p.hasPermission("uknet.plots.claim.all") || p.hasPermission("uknet.plots.claim.easy")) && TUTORIALS) {
 
-                p.sendMessage(Utils.error("You need applicant to claim a plot, you can get this by completing a tutorial.")
-                        .append(Utils.error("Click here to open the tutorial menu!"))
-                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/nav tutorials")));
+                p.sendMessage(TUTORIAL_REQUIRED_MESSAGE);
+                return;
 
             }
 

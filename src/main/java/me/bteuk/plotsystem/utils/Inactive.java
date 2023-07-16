@@ -159,7 +159,7 @@ public class Inactive {
                 //Get the zone bounds.
                 List<BlockVector2> copyVector;
                 try {
-                    copyVector = WorldGuardFunctions.getPoints("z" + zone, pasteWorld);
+                    copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
                 } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
                     e.printStackTrace();
                     continue;

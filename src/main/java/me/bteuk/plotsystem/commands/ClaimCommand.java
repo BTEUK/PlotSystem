@@ -7,12 +7,16 @@ import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import static me.bteuk.network.Tutorials.TUTORIAL_REQUIRED_MESSAGE;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
 
 public class ClaimCommand implements CommandExecutor {
 
@@ -91,6 +95,15 @@ public class ClaimCommand implements CommandExecutor {
     }
 
     public static boolean hasClaimPermission(User u, NetworkUser user) {
+
+        //Make sure the player has permission to claim plots, else they must complete the tutorial first.
+        //Only checked if tutorials are enabled.
+        if (!(user.player.hasPermission("uknet.plots.claim.all") || user.player.hasPermission("uknet.plots.claim.easy")) && TUTORIALS) {
+
+            user.player.sendMessage(TUTORIAL_REQUIRED_MESSAGE);
+            return false;
+
+        }
 
         //Check if the player has permission to claim a plot of this difficulty.
         if (!user.player.hasPermission("uknet.plots.claim.all")) {
