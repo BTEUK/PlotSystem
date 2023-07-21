@@ -11,6 +11,7 @@ import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.Inactive;
 import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.User;
+import org.bukkit.Bukkit;
 
 public class Timers {
 
@@ -54,7 +55,7 @@ public class Timers {
     public void startTimers() {
 
         //1 tick timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for new server_events.
             if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='plotsystem';")) {
@@ -79,7 +80,7 @@ public class Timers {
 
         //1 second timer.
         //Update plot and zone outlines.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             for (User u : users) {
 
@@ -118,7 +119,7 @@ public class Timers {
 
         //1 hour timer.
         //Remove inactive plots.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
             Inactive.cancelInactivePlots();
             Inactive.closeExpiredZones();
         }, 1200L, 72000L);

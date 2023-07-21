@@ -108,7 +108,7 @@ public class ReviewHotbar implements Listener {
     private void timer() {
 
         //1 tick timer.
-        taskID = plotSystem.getServer().getScheduler().scheduleSyncRepeatingTask(plotSystem, () -> {
+        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plotSystem, () -> {
 
             //Get slot1 and slot2.
             slot1 = u.player.getInventory().getItem(0);
@@ -149,7 +149,7 @@ public class ReviewHotbar implements Listener {
     public void unregister() {
 
         //Stop timer.
-        plotSystem.getServer().getScheduler().cancelTask(taskID);
+        Bukkit.getScheduler().cancelTask(taskID);
 
         //Unregister listeners.
         PlayerEditBookEvent.getHandlerList().unregister(this);
