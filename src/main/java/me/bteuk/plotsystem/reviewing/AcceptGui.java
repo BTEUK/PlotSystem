@@ -294,19 +294,19 @@ public class AcceptGui extends Gui {
 
                         //Run the promotion on sync, since it has to execute a command through the console.
                         Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
-                            if (difficulty == 1 && role.equals("default")) {
+                            if (difficulty == 1 && role.equals("applicant")) {
                                 //Promote player to apprentice.
-                                Roles.promoteBuilder(plotOwner, "default", "apprentice");
+                                Roles.promoteBuilder(plotOwner, "applicant", "apprentice");
                             } else if (difficulty == 2) {
-                                if (role.equals("default")) {
+                                if (role.equals("applicant")) {
                                     //Promote player to jrbuilder.
-                                    Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
+                                    Roles.promoteBuilder(plotOwner, "applicant", "jrbuilder");
                                 } else if (role.equals("apprentice")) {
                                     Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
                                 }
                             } else if (difficulty == 3) {
                                 switch (role) {
-                                    case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
+                                    case "applicant" -> Roles.promoteBuilder(plotOwner, "applicant", "builder");
                                     case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
                                     case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
                                 }
