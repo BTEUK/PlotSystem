@@ -1,6 +1,7 @@
 package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
+import java.util.Set;
 
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -127,7 +128,12 @@ public class WorldEditor {
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(world).fastMode(true).checkMemory(false).limitUnlimited().changeSetNull().build()) {
 
+            //Get a list of chunks to make sure they're loaded.
+            Set<BlockVector2> chunks = region.getChunks();
+            chunks.forEach(c -> editSession.getWorld().checkLoadedChunk(c.toBlockVector3()));
+
             List<? extends Entity> entities = editSession.getEntities(region);
+
             final int[] count = {0};
             entities.forEach(e -> {
                 if (!e.getType().getId().equalsIgnoreCase("minecraft:player")) {
