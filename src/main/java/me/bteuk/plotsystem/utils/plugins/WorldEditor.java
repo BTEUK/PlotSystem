@@ -2,6 +2,7 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.World;
@@ -18,6 +19,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
 
@@ -49,6 +51,7 @@ public class WorldEditor {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(pasteWorld).fastMode(true).checkMemory(false).limitUnlimited().changeSetNull().build()) {
+
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
@@ -106,5 +109,42 @@ public class WorldEditor {
 
         return true;
 
+    }
+
+    /**
+     * Deletes all entities in the given region.
+     * @param vector the vector that represent the x,z bounds of the region
+     * @param bukkitWorld the world of the region
+     * @return true if successful
+     */
+    public static boolean deleteEntities(List<BlockVector2> vector, World bukkitWorld) {
+
+        //Get the world in worldEdit format
+        com.sk89q.worldedit.world.World world = new BukkitWorld(bukkitWorld);
+
+        Polygonal2DRegion region = new Polygonal2DRegion(world, vector, MIN_Y, MAX_Y - 1);
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(world).fastMode(true).checkMemory(false).limitUnlimited().changeSetNull().build()) {
+
+            List<? extends Entity> entities = editSession.getEntities(region);
+            final int[] count = {0};
+            entities.forEach(e -> {
+                if (!e.getType().getId().equalsIgnoreCase("minecraft:player")) {
+                    count[0]++;
+                    e.remove();
+                }
+            });
+            String ent = count[0] == 1 ? "entity" : "entities";
+            LOGGER.info(String.format("Deleted %d %s from the region!", count[0], ent));
+            editSession.flushQueue();
+
+        } catch (WorldEditException e) {
+            LOGGER.info("Unable to remove the entities in the region.");
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 }

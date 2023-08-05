@@ -69,6 +69,9 @@ public class CloseEvent {
                     pasteVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
                 }
 
+                //Remove entities in de existing region, except players.
+                WorldEditor.deleteEntities(pasteVector, pasteWorld);
+
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                     //Save the zone by copying from the building world to the save world.
                     WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
