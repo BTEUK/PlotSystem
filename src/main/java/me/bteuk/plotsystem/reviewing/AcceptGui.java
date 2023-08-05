@@ -253,9 +253,6 @@ public class AcceptGui extends Gui {
 
                     }
 
-                    //Remove entities in de existing region, except players.
-                    WorldEditor.deleteEntities(pasteVector, saveWorld);
-
                     //Update the world by copying the build world to the save world.
                     Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                         WorldEditor.updateWorld(copyVector, pasteVector, world, saveWorld);

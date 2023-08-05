@@ -77,9 +77,6 @@ public class DeleteEvent {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
-            //Remove entities in de existing region, except players.
-            WorldEditor.deleteEntities(pasteVector, pasteWorld);
-
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
@@ -171,9 +168,6 @@ public class DeleteEvent {
             for (BlockVector2 bv : pasteVector) {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
-
-            //Remove entities in de existing region, except players.
-            WorldEditor.deleteEntities(pasteVector, pasteWorld);
 
             //Revert zone to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {

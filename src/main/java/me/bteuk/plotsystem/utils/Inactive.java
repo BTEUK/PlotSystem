@@ -84,9 +84,6 @@ public class Inactive {
 
             assert copyWorld != null;
 
-            //Remove entities in de existing region, except players.
-            WorldEditor.deleteEntities(pasteVector, pasteWorld);
-
             //Revert plot to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
@@ -176,9 +173,6 @@ public class Inactive {
                 }
 
                 assert copyWorld != null;
-
-                //Remove entities in de existing region, except players.
-                WorldEditor.deleteEntities(pasteVector, pasteWorld);
 
                 //Save the zone by copying from the building world to the save world.
                 Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
