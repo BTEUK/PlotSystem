@@ -45,7 +45,6 @@ public class WorldEditor {
                     editSession, copyRegion, clipboard, copyRegion.getMinimumPoint()
             );
             forwardExtentCopy.setCopyingBiomes(true);
-            forwardExtentCopy.setCopyingEntities(true);
             // configure here
             Operations.complete(forwardExtentCopy);
         } catch (WorldEditException e) {
@@ -60,7 +59,6 @@ public class WorldEditor {
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
                     .copyBiomes(true)
-                    .copyEntities(true)
                     // configure here
                     .build();
             Operations.complete(operation);
