@@ -67,6 +67,11 @@ public class ReviewHotbar implements Listener {
             return;
         }
 
+        //Check if player equals the reviewer.
+        if (!e.getWhoClicked().equals(u.player)) {
+            return;
+        }
+
         User u = PlotSystem.getInstance().getUser((Player) e.getWhoClicked());
 
         //If item is review gui then open the gui.
@@ -90,6 +95,11 @@ public class ReviewHotbar implements Listener {
     public void interactEvent(PlayerInteractEvent e) {
 
         if (e.getPlayer().getOpenInventory().getType() != InventoryType.CRAFTING && e.getPlayer().getOpenInventory().getType() != InventoryType.CREATIVE) {
+            return;
+        }
+
+        //Check if player equals the reviewer.
+        if (!e.getPlayer().equals(u.player)) {
             return;
         }
 
