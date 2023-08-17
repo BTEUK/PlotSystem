@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
+import static me.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class ReviewEvent {
 
     public static void event(String uuid, String[] event) {
@@ -34,6 +36,18 @@ public class ReviewEvent {
             }
 
             User u = PlotSystem.getInstance().getUser(p);
+
+            //If user is null stop.
+            if (u == null) {
+                LOGGER.severe(String.format("User for player %s is null, this should not be possible!!!", p.getName()));
+                return;
+            }
+
+            //If the user is already reviewing, prevent this was happening.
+            if (u.review != null) {
+                u.player.sendMessage(Utils.error("You are already reviewing a plot, please complete this one first!"));
+                return;
+            }
 
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
