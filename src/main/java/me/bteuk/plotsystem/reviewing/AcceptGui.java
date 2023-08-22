@@ -27,8 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import static me.bteuk.network.utils.Constants.MAX_Y;
-import static me.bteuk.network.utils.Constants.MIN_Y;
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class AcceptGui extends Gui {
@@ -314,7 +312,8 @@ public class AcceptGui extends Gui {
                         });
 
                         //Close gui and clear review.
-                        user.review.closeReview();
+                        //Run it sync.
+                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> user.review.closeReview());
 
                     });
                 }
