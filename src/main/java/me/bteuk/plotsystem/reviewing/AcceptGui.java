@@ -295,7 +295,7 @@ public class AcceptGui extends Gui {
 
                         //Send a message to the plot owner letting them know their plot has been accepted.
                         //Compose the message to send, it is comma-separated.
-                        StringBuilder builder = new StringBuilder().append(plotOwner).append(",").append("accept").append(",").append(user.review.plot);
+                        StringBuilder builder = new StringBuilder().append(plotOwner).append(",").append("accepted").append(",").append(user.review.plot);
                         //If the player has been promoted, let them know.
                         if (newRole != null) {
                             builder.append(",").append(newRole);
