@@ -225,6 +225,10 @@ public class ReviewGui extends Gui {
                                     .append(Utils.success(" submitted plots.")), "uknet:reviewer");
                         }
 
+                        //Send a message to the plot owner letting them know their plot has been denied.
+                        //Compose the message to send, it is comma-separated.
+                        Network.getInstance().chat.broadcastMessage(Component.text(plotOwner + "," + "deny" + "," + user.review.plot), "discord_dm");
+
                         //Close review.
                         u.player.closeInventory();
                         user.review.closeReview();

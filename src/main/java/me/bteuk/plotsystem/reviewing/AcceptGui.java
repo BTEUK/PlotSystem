@@ -26,6 +26,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
 
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
@@ -285,35 +286,32 @@ public class AcceptGui extends Gui {
                                     .append(Utils.success(" submitted plots.")), "uknet:reviewer");
                         }
 
-                        //Promote plot owner if they should be.
+                        //Get the plot difficulty and player role.
                         int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
-
                         String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
 
-                        //Run the promotion on sync, since it has to execute a command through the console.
-                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
-                            if (difficulty == 1 && role.equals("default")) {
-                                //Promote player to apprentice.
-                                Roles.promoteBuilder(plotOwner, "default", "apprentice");
-                            } else if (difficulty == 2) {
-                                if (role.equals("default")) {
-                                    //Promote player to jrbuilder.
-                                    Roles.promoteBuilder(plotOwner, "default", "jrbuilder");
-                                } else if (role.equals("apprentice")) {
-                                    Roles.promoteBuilder(plotOwner, "apprentice", "jrbuilder");
-                                }
-                            } else if (difficulty == 3) {
-                                switch (role) {
-                                    case "default" -> Roles.promoteBuilder(plotOwner, "default", "builder");
-                                    case "apprentice" -> Roles.promoteBuilder(plotOwner, "apprentice", "builder");
-                                    case "jrbuilder" -> Roles.promoteBuilder(plotOwner, "jrbuilder", "builder");
-                                }
-                            }
-                        });
+                        //Calculate the role the player will be promoted to, if any.
+                        String newRole = getNewRole(difficulty, role);
 
-                        //Close gui and clear review.
-                        //Run it sync.
-                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> user.review.closeReview());
+                        //Send a message to the plot owner letting them know their plot has been accepted.
+                        //Compose the message to send, it is comma-separated.
+                        StringBuilder builder = new StringBuilder().append(plotOwner).append(",").append("accept").append(",").append(user.review.plot);
+                        //If the player has been promoted, let them know.
+                        if (newRole != null) {
+                            builder.append(",").append(newRole);
+                        }
+                        Network.getInstance().chat.broadcastMessage(Component.text(builder.toString()), "discord_dm");
+
+                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
+                            //Run the promotion on sync, since it has to execute a command through the console.
+                            if (newRole != null) {
+                                Roles.promoteBuilder(plotOwner, role, newRole);
+                            }
+
+                            //Close gui and clear review.
+                            //Run it sync.
+                            Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> user.review.closeReview());
+                        });
 
                     });
                 }
@@ -331,6 +329,29 @@ public class AcceptGui extends Gui {
 
                 }
         );
+    }
+
+    @Nullable
+    private static String getNewRole(int difficulty, String role) {
+        String newRole = null;
+        switch (difficulty) {
+            case 1 -> {
+                if (role.equals("applicant")) {
+                    newRole = "apprentice";
+                }
+            }
+            case 2 -> {
+                if (role.equals("applicant") || role.equals("apprentice")) {
+                    newRole = "jrbuilder";
+                }
+            }
+            case 3 -> {
+                if (role.equals("applicant") || role.equals("apprentice") || role.equals("jrbuilder")) {
+                    newRole = "builder";
+                }
+            }
+        }
+        return newRole;
     }
 
     public void refresh() {
