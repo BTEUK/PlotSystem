@@ -26,6 +26,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
@@ -298,9 +299,9 @@ public class AcceptGui extends Gui {
                         StringBuilder builder = new StringBuilder().append(plotOwner).append(",").append("accepted").append(",").append(user.review.plot);
                         //If the player has been promoted, let them know.
                         if (newRole != null) {
-                            builder.append(",").append(newRole);
+                            builder.append(",").append(Roles.roleMapping(newRole));
                         }
-                        Network.getInstance().chat.broadcastMessage(Component.text(builder.toString()), "discord_dm");
+                        Network.getInstance().chat.broadcastMessage(Component.text(builder.toString()), "uknet:discord_dm");
 
                         Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
                             //Run the promotion on sync, since it has to execute a command through the console.
