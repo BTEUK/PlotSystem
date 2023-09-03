@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import me.bteuk.plotsystem.PlotSystem;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.EditSession;
@@ -17,7 +19,11 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
 
@@ -48,6 +54,7 @@ public class WorldEditor {
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(pasteWorld).fastMode(true).checkMemory(false).limitUnlimited().changeSetNull().build()) {
+
             Operation operation = new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(pasteRegion.getMinimumPoint())
@@ -60,6 +67,12 @@ public class WorldEditor {
             e.printStackTrace();
             return false;
         }
+
+        //Remove all entities in both worlds.
+        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
+            deleteEntities(copy);
+            deleteEntities(paste);
+        });
 
         return true;
     }
@@ -104,5 +117,23 @@ public class WorldEditor {
 
         return true;
 
+    }
+
+    /**
+     * Deletes all entities in the given world
+     *
+     * @param world the world
+     */
+    public static void deleteEntities(World world) {
+
+        @NotNull List<Entity> entities = world.getEntities();
+        final int[] count = {0};
+        entities.forEach(entity -> {
+            if (!entity.getType().equals(EntityType.PLAYER)) {
+                count[0]++;
+                entity.remove();
+            }
+        });
+        LOGGER.info(String.format("Removed %d entities from world %s", count[0], world.getName()));
     }
 }
