@@ -22,13 +22,14 @@ import com.sk89q.worldedit.math.BlockVector2;
 
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import static me.bteuk.network.utils.Constants.MAX_Y;
-import static me.bteuk.network.utils.Constants.MIN_Y;
+import javax.annotation.Nullable;
+
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class AcceptGui extends Gui {
@@ -337,6 +338,29 @@ public class AcceptGui extends Gui {
         clearGui();
         createGui();
 
+    }
+
+    @Nullable
+    private static String getNewRole(int difficulty, String role) {
+        String newRole = null;
+        switch (difficulty) {
+            case 1 -> {
+                if (role.equals("applicant")) {
+                    newRole = "apprentice";
+                }
+            }
+            case 2 -> {
+                if (role.equals("applicant") || role.equals("apprentice")) {
+                    newRole = "jrbuilder";
+                }
+            }
+            case 3 -> {
+                if (role.equals("applicant") || role.equals("apprentice") || role.equals("jrbuilder")) {
+                    newRole = "builder";
+                }
+            }
+        }
+        return newRole;
     }
 
     public double accuracyMultiplier() {
