@@ -93,6 +93,9 @@ public class DeleteEvent {
                 //Remove all members of plot in database.
                 PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
 
+                //Remove the submitted plot if it is currently submitted.
+                plotSQL.update("DELETE FROM plot_submissions WHERE id=" + id + ";");
+
                 //Set plot status to unclaimed.
                 PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
 
