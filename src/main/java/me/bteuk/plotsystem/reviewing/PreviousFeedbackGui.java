@@ -33,7 +33,7 @@ public class PreviousFeedbackGui extends Gui {
         plotSQL = Network.getInstance().getPlotSQL();
 
         //Get global sql.
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 
