@@ -3,13 +3,13 @@ package me.bteuk.plotsystem.commands;
 import com.sk89q.worldedit.math.BlockVector3;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
-import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.CopyRegionFormat;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
@@ -252,7 +252,7 @@ public class CreateCommand {
         //Iterate until all regions are done.
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
 
-            while (regions.size() > 0) {
+            while (!regions.isEmpty()) {
 
                 if (isReady.get()) {
 

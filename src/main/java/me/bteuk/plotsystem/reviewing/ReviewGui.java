@@ -3,13 +3,13 @@ package me.bteuk.plotsystem.reviewing;
 import com.sk89q.worldedit.math.BlockVector2;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.exceptions.WorldNotFoundException;
-import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -45,8 +45,8 @@ public class ReviewGui extends Gui {
 
         this.user = user;
 
-        globalSQL = PlotSystem.getInstance().globalSQL;
-        plotSQL = PlotSystem.getInstance().plotSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
+        plotSQL = Network.getInstance().getPlotSQL();
 
         this.plotID = plotID;
 
@@ -90,7 +90,7 @@ public class ReviewGui extends Gui {
                         List<BlockVector2> vector = WorldGuardFunctions.getPointsTransformedToSaveWorld(String.valueOf(user.review.plot), world);
 
                         //Get the plot difficulty.
-                        int difficulty = PlotSystem.getInstance().plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
+                        int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";");
 
                         //Draw the outline.
                         PlotSystem.getInstance().getOutlines().addOutline(u.player, vector, difficultyMaterial(difficulty).createBlockData());
@@ -212,7 +212,7 @@ public class ReviewGui extends Gui {
                                 .append(Utils.success(" has been denied.")));
 
                         //Get number of submitted plots.
-                        int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+                        int plot_count = plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
                         //Send message to reviewers that a plot has been reviewed.
                         if (plot_count == 1) {

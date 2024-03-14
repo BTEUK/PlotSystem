@@ -1,17 +1,17 @@
 package me.bteuk.plotsystem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.sk89q.worldguard.WorldGuard;
+import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.plotsystem.events.EventManager;
-import me.bteuk.plotsystem.sql.GlobalSQL;
 
 import me.bteuk.plotsystem.utils.Inactive;
 import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
+
+import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class Timers {
 
@@ -28,12 +28,14 @@ public class Timers {
     private final GlobalSQL globalSQL;
 
     //Server events
-    private HashMap<String, String> events;
+    private ArrayList<String[]> events;
 
     //Outlines.
     private final Outlines outlines;
 
     final WorldGuard wg;
+
+    private boolean isBusy = false;
 
     public Timers(PlotSystem instance, GlobalSQL globalSQL) {
 
@@ -44,7 +46,7 @@ public class Timers {
 
         SERVER_NAME = PlotSystem.SERVER_NAME;
 
-        events = new HashMap<>();
+        events = new ArrayList<>();
 
         wg = WorldGuard.getInstance();
 
@@ -60,20 +62,31 @@ public class Timers {
             //Check for new server_events.
             if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='plotsystem';")) {
 
-                //Get events for this server.
-                events.clear();
-                events = globalSQL.getEvents(SERVER_NAME, events);
+                //If events is not empty, skip this iteration.
+                //Additionally isBusy needs to be false, implying that the server is not still running a previous iteration.
+                if (events.isEmpty() && !isBusy) {
 
-                for (Map.Entry<String, String> entry : events.entrySet()) {
+                    isBusy = true;
 
-                    //Deal with events here.
+                    //Get events for this server.
+                    events = globalSQL.getEvents(SERVER_NAME, "plotsystem", events);
 
-                    //Split the event by word.
-                    String[] aEvent = entry.getValue().split(" ");
+                    for (String[] event : events) {
 
-                    //Send the event to the event handler.
-                    EventManager.event(entry.getKey(), aEvent);
+                        //Deal with events here.
+                        LOGGER.info("Event: " + event[1]);
 
+                        //Split the event by word.
+                        String[] aEvent = event[1].split(" ");
+
+                        //Send the event to the event handler.
+                        EventManager.event(event[0], aEvent);
+
+                    }
+
+                    //Clear events when done.
+                    events.clear();
+                    isBusy = false;
                 }
             }
         }, 0L, 1L);
@@ -84,13 +97,14 @@ public class Timers {
 
             for (User u : users) {
 
-                /*Check if the location of the player has changed by more than 50 blocks,
-                    or if the player has switched world.
-                   If either are true, recalculate the outlines.
-                   Else try to update the existing outlines,
-                    catch a nullpointerexception,
-                    this implies that the player has no outlines
-                    then also add the outlines anew.
+                /*
+                Check if the location of the player has changed by more than 50 blocks,
+                or if the player has switched world.
+                If either are true, recalculate the outlines.
+                Else try to update the existing outlines,
+                catch a nullpointerexception,
+                this implies that the player has no outlines
+                then also add the outlines anew.
                  */
                 if (!u.player.getWorld().equals(u.lastLocation.getWorld())) {
 

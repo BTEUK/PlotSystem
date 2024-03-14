@@ -1,11 +1,12 @@
 package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
@@ -29,7 +30,7 @@ public class DeleteEvent {
         if (event[1].equals("plot")) {
 
             //PlotSQL
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
@@ -65,7 +66,7 @@ public class DeleteEvent {
             try {
                 pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
             } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
+                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
                 e.printStackTrace();
                 return;
             }
@@ -85,19 +86,19 @@ public class DeleteEvent {
                 try {
                     WorldGuardFunctions.clearMembers(event[2], pasteWorld);
                 } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
                     e.printStackTrace();
                     return;
                 }
 
                 //Remove all members of plot in database.
-                PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
+                plotSQL.update("DELETE FROM plot_members WHERE id=" + id + ";");
 
                 //Remove the submitted plot if it is currently submitted.
                 plotSQL.update("DELETE FROM plot_submissions WHERE id=" + id + ";");
 
                 //Set plot status to unclaimed.
-                PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -112,14 +113,14 @@ public class DeleteEvent {
                 } else {
 
                     //Add the message to the database so it can be sent wherever they are currently.
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
                 }
             });
         } else if (event[1].equals("zone")) {
 
             //PlotSQL
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
@@ -156,7 +157,7 @@ public class DeleteEvent {
             try {
                 pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
             } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
+                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
                 e.printStackTrace();
                 return;
             }
@@ -180,16 +181,16 @@ public class DeleteEvent {
                 try {
                     WorldGuardFunctions.delete("z" + event[2], pasteWorld);
                 } catch (RegionManagerNotFoundException e) {
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
                     e.printStackTrace();
                     return;
                 }
 
                 //Remove all members of zone in database.
-                PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
+                plotSQL.update("DELETE FROM zone_members WHERE id=" + id + ";");
 
                 //Set zone status to closed.
-                PlotSystem.getInstance().plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
+                plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -204,7 +205,7 @@ public class DeleteEvent {
                 } else {
 
                     //Add the message to the database so it can be sent wherever they are currently.
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
 
                 }
             });

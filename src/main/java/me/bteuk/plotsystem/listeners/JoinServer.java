@@ -1,9 +1,9 @@
 package me.bteuk.plotsystem.listeners;
 
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.events.EventManager;
-import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

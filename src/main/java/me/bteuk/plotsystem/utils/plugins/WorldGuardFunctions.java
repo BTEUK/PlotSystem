@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
@@ -26,8 +28,6 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-
-import me.bteuk.plotsystem.sql.PlotSQL;
 
 public class WorldGuardFunctions {
 
@@ -101,7 +101,7 @@ public class WorldGuardFunctions {
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
         //To get the actual location we need to take the negative coordinate transform of the plot.
-        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + buildWorld.getName() + "';");
         int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + buildWorld.getName() + "';");
@@ -321,7 +321,7 @@ public class WorldGuardFunctions {
         List<BlockVector2> newVector = new ArrayList<>();
 
         //Get the negative coordinate transform.
-        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         int xTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world.getName() + "';");
         int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world.getName() + "';");

@@ -1,11 +1,12 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.reviewing.Review;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
@@ -53,7 +54,7 @@ public class ReviewEvent {
             int id = Integer.parseInt(event[2]);
 
             //Get plotsql.
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
             //Get world of plot.
             World world = Bukkit.getWorld(plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));

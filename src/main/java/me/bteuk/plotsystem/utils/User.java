@@ -1,11 +1,11 @@
 package me.bteuk.plotsystem.utils;
 
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.gui.ClaimGui;
 import me.bteuk.plotsystem.gui.CreatePlotGui;
 import me.bteuk.plotsystem.gui.CreateZoneGui;
-import me.bteuk.plotsystem.sql.PlotSQL;
-import me.bteuk.plotsystem.sql.GlobalSQL;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

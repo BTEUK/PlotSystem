@@ -7,13 +7,15 @@ import java.util.logging.Logger;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.commands.ClaimCommand;
 import me.bteuk.plotsystem.commands.PlotSystemCommand;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import me.bteuk.plotsystem.listeners.*;
-import me.bteuk.plotsystem.sql.GlobalSQL;
 import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -25,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.User;
 
 public class PlotSystem extends JavaPlugin {
@@ -78,23 +79,9 @@ public class PlotSystem extends JavaPlugin {
 
         }
 
-        //Setup MySQL
-        try {
-
-            //Global Database
-            String global_database = config.getString("database.global");
-            BasicDataSource global_dataSource = mysqlSetup(global_database);
-            globalSQL = new GlobalSQL(global_dataSource);
-
-            String plot_database = config.getString("database.plot");
-            BasicDataSource plot_dataSource = mysqlSetup(plot_database);
-            plotSQL = new PlotSQL(plot_dataSource);
-
-        } catch (SQLException /*| IOException*/ e) {
-            e.printStackTrace();
-            LOGGER.severe("Failed to connect to the database, please check that you have set the config values correctly.");
-            return;
-        }
+        // Set databases from Network dependency.
+        globalSQL = Network.getInstance().getGlobalSQL();
+        plotSQL = Network.getInstance().getPlotSQL();
 
         //Set the server name from config.
         SERVER_NAME = config.getString("server_name");

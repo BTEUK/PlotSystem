@@ -5,14 +5,14 @@ import java.util.List;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -150,8 +150,8 @@ public class AcceptGui extends Gui {
                 u -> {
 
                     //Get globalSQL and plotSQL.
-                    GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
-                    PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
+                    PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
                     //Get plot owner.
                     String plotOwner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + user.review.plot + " AND is_owner=1;");
@@ -225,7 +225,7 @@ public class AcceptGui extends Gui {
                     plotSQL.update("UPDATE plot_data SET status='completed' WHERE id=" + user.review.plot + ";");
 
                     //Remove submitted plot entry.
-                    PlotSystem.getInstance().plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
+                    plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
 
                     //Add points to player.
                     //By referencing network plugin.
@@ -275,7 +275,7 @@ public class AcceptGui extends Gui {
                                 .append(Utils.success(" accepted.")));
 
                         //Get number of submitted plots.
-                        int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+                        int plot_count = plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
                         //Send message to reviewers that a plot has been reviewed.
                         if (plot_count == 1) {

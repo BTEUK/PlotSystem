@@ -1,10 +1,10 @@
 package me.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

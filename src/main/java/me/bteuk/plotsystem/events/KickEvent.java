@@ -1,10 +1,11 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import me.bteuk.plotsystem.sql.GlobalSQL;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -19,8 +20,8 @@ public class KickEvent {
         //Events for retracting
         if (event[1].equals("plot")) {
 
-            GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
@@ -69,8 +70,8 @@ public class KickEvent {
             }
         } else if (event[1].equals("zone")) {
 
-            GlobalSQL globalSQL = PlotSystem.getInstance().globalSQL;
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);

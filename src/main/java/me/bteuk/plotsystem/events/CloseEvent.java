@@ -1,10 +1,11 @@
 package me.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import org.bukkit.Bukkit;
@@ -24,7 +25,7 @@ public class CloseEvent {
         if (event[1].equals("zone")) {
 
             //PlotSQL
-            PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+            PlotSQL plotSQL = Network.getInstance().getPlotSQL();
             FileConfiguration config = PlotSystem.getInstance().getConfig();
 
             //Convert the string id to int id.
@@ -57,7 +58,7 @@ public class CloseEvent {
                 try {
                     copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
                     e.printStackTrace();
                     return;
                 }
@@ -77,7 +78,7 @@ public class CloseEvent {
                     try {
                         WorldGuardFunctions.delete("z" + zone, copyWorld);
                     } catch (RegionManagerNotFoundException e) {
-                        PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
+                        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
                         e.printStackTrace();
                         return;
                     }
@@ -89,7 +90,7 @@ public class CloseEvent {
                     plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
                     //Add message for the plot owner to the database to notify them that their zone was closed.
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
 
                     //Log plot removal to console.
                     LOGGER.info("Zone " + zone + " has been closed.");

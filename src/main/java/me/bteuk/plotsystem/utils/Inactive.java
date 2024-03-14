@@ -3,11 +3,12 @@ package me.bteuk.plotsystem.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import me.bteuk.plotsystem.utils.plugins.WorldEditor;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
@@ -32,7 +33,7 @@ public class Inactive {
         long timeDif = time - timeCap;
 
         //Get plot sql.
-        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Get inactive plots.
         //Check if they are claimed (not submitted), the last enter time is greater than the inactivity time and the location is on this server.
@@ -105,7 +106,7 @@ public class Inactive {
                 plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");
+                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");
 
                 //Log plot removal to console.
                 LOGGER.info("Plot " + plot + " removed due to inactivity!");
@@ -123,7 +124,7 @@ public class Inactive {
         long time = Time.currentTime();
 
         //Get plot sql.
-        PlotSQL plotSQL = PlotSystem.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Get active zones that have expired.
         List<Integer> expiredZones = plotSQL.getIntList("SELECT id FROM zones WHERE status='open' AND expiration<" + time + ";");
@@ -195,7 +196,7 @@ public class Inactive {
                     plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
                     //Add message for the plot owner to the database to notify them that their zone was closed.
-                    PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
 
                     //Log plot removal to console.
                     LOGGER.info("Zone " + zone + " has expired.");

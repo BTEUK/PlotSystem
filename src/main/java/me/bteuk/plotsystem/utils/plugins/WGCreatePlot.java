@@ -2,8 +2,8 @@ package me.bteuk.plotsystem.utils.plugins;
 
 import java.util.List;
 
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.plotsystem.sql.PlotSQL;
 import org.bukkit.World;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
