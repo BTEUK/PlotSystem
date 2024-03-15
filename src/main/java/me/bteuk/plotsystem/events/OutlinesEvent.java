@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.events;
 
+import me.bteuk.network.utils.Utils;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
@@ -33,12 +34,16 @@ public class OutlinesEvent {
                 user.getSkipOutlines().remove(event[2]);
                 // Add the outlines back
                 PlotSystem.getInstance().getOutlines().addPlotOutlineForPlayer(event[2], p);
+                // Notify player.
+                p.sendMessage(Utils.success("Enabled outlines for plot " + event[2]));
             } else {
                 // Disable:
                 // Add the plot to the list of ignored outlines.
                 user.getSkipOutlines().add(event[2]);
                 // Remove the outline.
                 PlotSystem.getInstance().getOutlines().removePlotOutlineForPlayer(event[2], p);
+                // Notify player.
+                p.sendMessage(Utils.success("Disabled outlines for plot " + event[2]));
             }
         }
     }
