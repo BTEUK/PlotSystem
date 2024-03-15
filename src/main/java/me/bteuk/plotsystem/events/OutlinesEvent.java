@@ -26,23 +26,19 @@ public class OutlinesEvent {
         }
 
         //Events adding/removing outlines for a specific plot.
-        switch (event[1]) {
-            case "add" -> {
+        if (event[1].equals("toggle")) {// Check if the outlines are currently disabled.
+            if (user.getSkipOutlines().contains(event[2])) {
+                // Enable:
                 // Remove the plot from the list of ignored outlines.
                 user.getSkipOutlines().remove(event[2]);
                 // Add the outlines back
                 PlotSystem.getInstance().getOutlines().addPlotOutlineForPlayer(event[2], p);
-            }
-
-            case "remove" -> {
+            } else {
+                // Disable:
                 // Add the plot to the list of ignored outlines.
                 user.getSkipOutlines().add(event[2]);
                 // Remove the outline.
                 PlotSystem.getInstance().getOutlines().removePlotOutlineForPlayer(event[2], p);
-            }
-
-            default -> {
-                // Do nothing
             }
         }
     }
