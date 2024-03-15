@@ -22,6 +22,7 @@ public class EventManager {
             case "join" -> JoinEvent.event(uuid, event);
             case "kick" -> KickEvent.event(uuid, event);
             case "close" -> CloseEvent.event(uuid, event);
+            case "outlines" -> OutlinesEvent.event(uuid, event);
         }
     }
 }
