@@ -23,7 +23,5 @@ public class EventManager {
             case "kick" -> KickEvent.event(uuid, event);
             case "close" -> CloseEvent.event(uuid, event);
         }
-
     }
-
 }

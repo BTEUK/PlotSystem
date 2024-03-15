@@ -1,12 +1,9 @@
 package me.bteuk.plotsystem;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import lombok.Getter;
-import lombok.Setter;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
@@ -19,7 +16,6 @@ import me.bteuk.plotsystem.listeners.*;
 import me.bteuk.plotsystem.utils.Outlines;
 import me.bteuk.plotsystem.utils.plugins.Multiverse;
 import me.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -43,9 +39,13 @@ public class PlotSystem extends JavaPlugin {
     //Items
     public static ItemStack selectionTool;
 
+    //Returns an instance of the plugin.
+    @Getter
     static PlotSystem instance;
     static FileConfiguration config;
 
+    //Returns the User ArrayList.
+    @Getter
     private ArrayList<User> users;
 
     public static ItemStack gui;
@@ -57,7 +57,7 @@ public class PlotSystem extends JavaPlugin {
     public ClaimEnter claimEnter;
 
     //Outline manager.
-    @Getter @Setter
+    @Getter
     private Outlines outlines;
 
     @Override
@@ -205,68 +205,23 @@ public class PlotSystem extends JavaPlugin {
         LOGGER.info("Disabled PublicBuilds");
     }
 
-    //Creates the mysql connection.
-    private BasicDataSource mysqlSetup(String database) throws SQLException {
-
-        String host = config.getString("host");
-        int port = config.getInt("port");
-        String username = config.getString("username");
-        String password = config.getString("password");
-
-        BasicDataSource dataSource = new BasicDataSource();
-
-        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&useSSL=false&");
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-
-        testDataSource(dataSource);
-        return dataSource;
-
-    }
-
-    public void testDataSource(BasicDataSource dataSource) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            if (!connection.isValid(1000)) {
-                throw new SQLException("Could not establish database connection.");
-            }
-        }
-    }
-
-    //Returns an instance of the plugin.
-    public static PlotSystem getInstance() {
-        return instance;
-    }
-
-    //Returns the User ArrayList.
-    public ArrayList<User> getUsers() {
-        return users;
-    }
-
     //Returns the specific user based on Player instance.
     public User getUser(Player p) {
-
         for (User u : users) {
-
             if (u.player.equals(p)) {
                 return u;
             }
-
         }
-
         return null;
     }
 
     //Add user to list.
     public void addUser(User u) {
-
         users.add(u);
-
     }
 
     //Get user from player.
     public void removeUser(User u) {
-
         users.remove(u);
-
     }
 }

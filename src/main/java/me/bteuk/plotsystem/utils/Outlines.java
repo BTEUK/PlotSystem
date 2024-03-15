@@ -23,7 +23,7 @@ import static me.bteuk.network.utils.Constants.*;
 
 /**
  * This class deals with plot and zone outlines.
- * It will have method to refresh outlines.
+ * It will have methods to refresh outlines.
  */
 public class Outlines {
 
@@ -43,12 +43,13 @@ public class Outlines {
 
     //Add player
     public BlockLocations addPlayer(Player player) {
-        if (!outlineBlockLocations.containsKey(player)) {
-            BlockLocations bl = new BlockLocations(player);
-            outlineBlockLocations.put(player, bl);
-            return bl;
+        BlockLocations blockLocations = outlineBlockLocations.get(player);
+        if (blockLocations == null) {
+            blockLocations = new BlockLocations(player);
+            outlineBlockLocations.put(player, blockLocations);
+            return blockLocations;
         } else {
-            return outlineBlockLocations.get(player);
+            return blockLocations;
         }
     }
 
@@ -57,18 +58,59 @@ public class Outlines {
         outlineBlockLocations.remove(player);
     }
 
-
-    //Reloads the outlines for a specific player.
-    public void refreshOutlinesForPlayer(Player player) throws NullPointerException {
-
-        outlineBlockLocations.get(player).drawOutlines();
-
+    public void addPlotOutlineForPlayer(String plotID, Player player) {
+        BlockLocations blockLocations =  outlineBlockLocations.get(player);
+        if (blockLocations != null) {
+            RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(player.getWorld()));
+            if (regions == null) {
+                return;
+            }
+            ProtectedRegion region = regions.getRegion(plotID);
+            if (region == null) {
+                return;
+            }
+            //Get plot difficulty.
+            int intPlotID = tryParse(plotID);
+            if (intPlotID != 0) {
+                int difficulty = PlotSystem.getInstance().plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + intPlotID + ";");
+                blockLocations.addOutline(region, difficultyMaterial(difficulty));
+            }
+        }
     }
 
-    //Get all outlines near the player, remove all existing outlines from the object, but don't bother removing the blocks.
-    //This method assumed the actual regions have not changed,
-    // only that the player has moved position sufficiently that new outlines need to be drawn.
-    public void addNearbyOutlines(Player player) {
+    public void removePlotOutlineForPlayer(String plotID, Player player) {
+        BlockLocations blockLocations =  outlineBlockLocations.get(player);
+        if (blockLocations != null) {
+            RegionManager regions = wg.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(player.getWorld()));
+            if (regions == null) {
+                return;
+            }
+            ProtectedRegion region = regions.getRegion(plotID);
+            if (region == null) {
+                return;
+            }
+            blockLocations.removeOutline(region);
+        }
+    }
+
+
+    /**
+     * Refresh outlines for a specific player.
+     * @param player the player to refresh the outlines for
+     * @throws NullPointerException if the player has no outlines
+     */
+    public void refreshOutlinesForPlayer(Player player) {
+        outlineBlockLocations.get(player).drawOutlines();
+    }
+
+    /**
+     * Get all outlines near the player, remove all existing outlines from the object, but don't bother removing the blocks.
+     * This method assumed the actual regions have not changed,
+     * only that the player has moved position sufficiently that new outlines need to be drawn.
+     * @param user the user to add outlines for.
+     */
+    public void addNearbyOutlines(User user) {
+        Player player = user.player;
 
         //If the player does not have a key, add it.
         BlockLocations locations;
@@ -98,6 +140,10 @@ public class Outlines {
 
         //Iterate through the regions and add the outlines.
         for (ProtectedRegion protectedRegion : set) {
+            // Skip if this region is to be ignored for the player.
+            if (user.getSkipOutlines().contains(protectedRegion.getId())) {
+                continue;
+            }
 
             int plotID = tryParse(protectedRegion.getId());
 
