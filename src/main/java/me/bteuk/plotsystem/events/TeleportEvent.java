@@ -1,8 +1,10 @@
 package me.bteuk.plotsystem.events;
 
+import io.papermc.lib.PaperLib;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.PlotStatus;
 import me.bteuk.plotsystem.PlotSystem;
 import me.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import me.bteuk.plotsystem.exceptions.RegionNotFoundException;
@@ -21,18 +23,17 @@ public class TeleportEvent {
 
     public static void event(String uuid, String[] event) {
 
-        //Events for teleporting
+        // Events for teleporting
+        // TODO: Allow teleporting to completed plots.
         if (event[1].equals("plot")) {
 
             //Get the user.
             Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
             if (p == null) {
-
                 //Send warning to console if player can't be found.
                 Bukkit.getLogger().warning(("Attempting to teleport player with uuid " + uuid + " but they are not on this server."));
                 return;
-
             }
 
             User u = PlotSystem.getInstance().getUser(p);
@@ -40,8 +41,8 @@ public class TeleportEvent {
             //Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
-            //Teleport to specific plot id.
-            //Get the server of the plot.
+            // Teleport to specific plot id.
+            // Get the server of the plot.
             String server = u.plotSQL.getString("SELECT server FROM location_data WHERE name='"
                     + u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
                     + "';");
@@ -53,15 +54,35 @@ public class TeleportEvent {
                 //Get world of plot.
                 World world = Bukkit.getWorld(u.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";"));
 
-                //Get location of plot and teleport the player there.
-                try {
-                    Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
-                    u.player.teleport(l);
-                } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                    p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
-                    e.printStackTrace();
-                }
+                // Get the plot status
+                PlotStatus status = PlotStatus.fromDatabaseValue(u.plotSQL.getString("SELECT status FROM plot_data WHERE id=" + id + ";"));
+                if (status == PlotStatus.COMPLETED) {
+                    // Use the plot corners to get the location of the plot, since it no longer exists as a WorldGuard region.
+                    int[][] corners = u.plotSQL.getPlotCorners(id);
+                    int sumX = 0;
+                    int sumZ = 0;
 
+                    //Find the centre.
+                    for (int[] corner : corners) {
+
+                        sumX += corner[0];
+                        sumZ += corner[1];
+
+                    }
+                    double x = sumX / (double) corners.length;
+                    double z = sumZ / (double) corners.length;
+                    Location l = new Location(world, x, Utils.getHighestYAt(world, (int) x, (int) z), z);
+                    PaperLib.teleportAsync(u.player, l);
+                } else {
+                    //Get location of plot and teleport the player there.
+                    try {
+                        Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
+                        PaperLib.teleportAsync(u.player, l);
+                    } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
+                        p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
+                        e.printStackTrace();
+                    }
+                }
             } else {
 
                 //Set the server join event.
