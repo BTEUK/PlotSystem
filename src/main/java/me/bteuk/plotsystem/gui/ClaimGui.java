@@ -118,6 +118,8 @@ public class ClaimGui extends Gui {
                                         eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
                                                 .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
                                                 .append(Utils.success(", good luck building.")));
+                                        // Send link to plot in Google Maps.
+                                        eUser.player.performCommand("ll");
                                         Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
 
                                     } else {

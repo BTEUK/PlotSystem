@@ -1,5 +1,6 @@
 package me.bteuk.plotsystem.events;
 
+import io.papermc.lib.PaperLib;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
@@ -16,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static me.bteuk.plotsystem.PlotSystem.LOGGER;
 
@@ -79,7 +81,11 @@ public class ReviewEvent {
                 //Teleport the reviewer to the plot.
                 try {
                     Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
-                    p.teleport(l);
+                    CompletableFuture<Boolean> teleport = PaperLib.teleportAsync(p, l);
+                    teleport.whenComplete((bool, throwable) -> {
+                        // Send link to plot in Google Maps once teleport is complete.
+                        p.performCommand("ll");
+                    });
                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
                     u.player.sendMessage(Component.text("Unable to teleport you to the plot, please contact an admin to report this issue."));
                     e.printStackTrace();
