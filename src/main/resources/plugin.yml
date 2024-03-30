@@ -1,6 +1,6 @@
 name: PlotSystem
 version: '${project.version}'
-main: me.bteuk.plotsystem.PlotSystem
+main: net.bteuk.plotsystem.PlotSystem
 description: Plot System for UKnet
 depend: [ WorldGuard, WorldEdit, LuckPerms, Multiverse-Core , Network , VoidGen ]
 api-version: 1.18
