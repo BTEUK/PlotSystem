@@ -1,8 +1,5 @@
 package net.bteuk.plotsystem;
 
-import java.util.ArrayList;
-import java.util.logging.Logger;
-
 import lombok.Getter;
 import net.bteuk.network.Network;
 import net.bteuk.network.sql.GlobalSQL;
@@ -10,25 +7,28 @@ import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.commands.ClaimCommand;
 import net.bteuk.plotsystem.commands.PlotSystemCommand;
+import net.bteuk.plotsystem.commands.ToggleOutlines;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
-import net.bteuk.plotsystem.listeners.*;
 import net.bteuk.plotsystem.listeners.ClaimEnter;
 import net.bteuk.plotsystem.listeners.CloseInventory;
-import net.bteuk.plotsystem.listeners.QuitServer;
-import net.bteuk.plotsystem.utils.Outlines;
-import net.bteuk.plotsystem.utils.plugins.Multiverse;
-import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.bteuk.plotsystem.listeners.JoinServer;
 import net.bteuk.plotsystem.listeners.PlayerInteract;
-import org.bukkit.*;
+import net.bteuk.plotsystem.listeners.QuitServer;
+import net.bteuk.plotsystem.utils.Outlines;
+import net.bteuk.plotsystem.utils.User;
+import net.bteuk.plotsystem.utils.plugins.Multiverse;
+import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.bteuk.plotsystem.utils.User;
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class PlotSystem extends JavaPlugin {
 
@@ -165,6 +165,7 @@ public class PlotSystem extends JavaPlugin {
         //Commands
         getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
         getCommand("claim").setExecutor(claimCommand);
+        new ToggleOutlines(this);
 
     }
 

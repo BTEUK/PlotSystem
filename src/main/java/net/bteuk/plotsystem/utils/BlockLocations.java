@@ -12,7 +12,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-import static java.lang.Math.*;
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 
 //A list of block locations, can be altered in bulk.
 public class BlockLocations {
@@ -100,6 +102,17 @@ public class BlockLocations {
                 }
             }
         }
+    }
+
+    /**
+     * Remove all outlines and set them to air.
+     */
+    public void removeOutlines() {
+        for (BlockLocation loc : locations) {
+            BlockLocation bl = new BlockLocation(loc.getX(), loc.getZ(), Material.AIR.createBlockData());
+            drawBlock(bl);
+        }
+        locations.clear();
     }
 
     //Add a point.

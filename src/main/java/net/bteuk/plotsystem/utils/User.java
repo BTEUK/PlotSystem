@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.plotsystem.PlotSystem;
@@ -42,6 +43,11 @@ public class User {
     // Skip outlines for these plots.
     @Getter
     private final List<String> skipOutlines = new ArrayList<>();
+
+    // Disable outlines for all plots and zones.
+    @Getter
+    @Setter
+    private boolean disableOutlines;
 
     public User(Player player, GlobalSQL globalSQL, PlotSQL plotSQL) {
 

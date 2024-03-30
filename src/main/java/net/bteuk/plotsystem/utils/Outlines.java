@@ -93,6 +93,13 @@ public class Outlines {
         }
     }
 
+    public void removeOutlinesForPlayer(Player player) {
+        BlockLocations blockLocations =  outlineBlockLocations.get(player);
+        if (blockLocations != null) {
+            blockLocations.removeOutlines();
+        }
+    }
+
 
     /**
      * Refresh outlines for a specific player.
@@ -141,7 +148,7 @@ public class Outlines {
         //Iterate through the regions and add the outlines.
         for (ProtectedRegion protectedRegion : set) {
             // Skip if this region is to be ignored for the player.
-            if (user.getSkipOutlines().contains(protectedRegion.getId())) {
+            if (user.isDisableOutlines() || user.getSkipOutlines().contains(protectedRegion.getId())) {
                 continue;
             }
 
