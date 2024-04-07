@@ -6,7 +6,7 @@
 
     <groupId>net.bteuk</groupId>
     <artifactId>PlotSystem</artifactId>
-    <version>1.3.4</version>
+    <version>1.4.0</version>
     <packaging>jar</packaging>
 
     <name>PlotSystem</name>
@@ -83,6 +83,10 @@
         <repository>
             <id>OnARandomBox</id>
             <url>https://repo.onarandombox.com/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>codemc-repo</id>

@@ -103,7 +103,7 @@ public class ClaimCommand implements CommandExecutor {
         }
 
         // Check if the plot is on this server.
-        if (!u.plotSQL.hasRow("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.id=" + plot + " ld.server='" + SERVER_NAME + "';")) {
+        if (!u.plotSQL.hasRow("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.id=" + plot + " AND ld.server='" + SERVER_NAME + "';")) {
             u.player.sendMessage(Utils.error("This plot is on another server, unable to claim it from here."));
             return false;
         }
