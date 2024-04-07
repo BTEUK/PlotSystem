@@ -12,16 +12,21 @@ import java.util.List;
  */
 public class PlotHelper {
 
-    public PlotHelper(PlotSQL plotSQL, List<PlotHologram> holograms) {
-        setPlotSQL(plotSQL);
-        setHolograms(holograms);
-    }
-
     @Setter
     private static PlotSQL plotSQL;
 
     @Setter
     private static List<PlotHologram> holograms;
+
+    /**
+     * Initialise the plot helper by setting the relevant variables.
+     * @param plotSQL   {@link PlotSQL}
+     * @param holograms list of {@link PlotHologram}
+     */
+    public static void init(PlotSQL plotSQL, List<PlotHologram> holograms) {
+        setPlotSQL(plotSQL);
+        setHolograms(holograms);
+    }
 
     /**
      * Update the status of a plot, will update any relevant holograms.

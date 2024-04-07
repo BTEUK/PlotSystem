@@ -16,6 +16,7 @@ import net.bteuk.plotsystem.listeners.JoinServer;
 import net.bteuk.plotsystem.listeners.PlayerInteract;
 import net.bteuk.plotsystem.listeners.QuitServer;
 import net.bteuk.plotsystem.utils.Outlines;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.PlotHologram;
 import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.Multiverse;
@@ -125,8 +126,8 @@ public class PlotSystem extends JavaPlugin {
     //Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
-        // Initialise the plothelper.
-        Pl
+        // Initialise the plot helper.
+        PlotHelper.init(plotSQL, holograms);
 
         //General Setup
         //Create list of users.
