@@ -5,6 +5,7 @@ import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.gui.ClaimGui;
+import net.bteuk.plotsystem.utils.ParseUtils;
 import net.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static net.bteuk.network.sql.Tutorials.TUTORIAL_REQUIRED_MESSAGE;
+import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
 
 public class ClaimCommand implements CommandExecutor {
@@ -33,8 +35,18 @@ public class ClaimCommand implements CommandExecutor {
         //Get the user.
         User u = PlotSystem.getInstance().getUser(p);
 
+        int plot = 0;
+        boolean inPlot = false;
+        if (args.length > 0) {
+            plot = ParseUtils.toInt(args[0]);
+        }
+        if (plot == 0) {
+            plot = u.inPlot;
+            inPlot = true;
+        }
+
         //If the plot is valid open the claim plot gui.
-        if (validPlot(u)) {
+        if (validPlot(u, plot, inPlot)) {
 
             NetworkUser user = Network.getInstance().getUser(u.player);
 
@@ -43,7 +55,7 @@ public class ClaimCommand implements CommandExecutor {
             }
 
             //Open claim gui.
-            u.claimGui = new ClaimGui(u);
+            u.claimGui = new ClaimGui(u, plot);
             u.claimGui.open(user);
 
         }
@@ -52,41 +64,48 @@ public class ClaimCommand implements CommandExecutor {
 
     }
 
-    public boolean validPlot(User u) {
+    public boolean validPlot(User u, int plot, boolean inPlot) {
 
-        //If the player is not in a plot tell them.
-        if (u.inPlot == 0) {
-
-            u.player.sendMessage(Utils.error("You are not in a plot!"));
+        // If the player is not in a plot tell them.
+        if (plot == 0) {
+            if (inPlot) {
+                u.player.sendMessage(Utils.error("You are not standing in a plot."));
+            } else {
+                u.player.sendMessage(Utils.error("This is not a valid plot."));
+            }
             return false;
-
         }
 
-        //If the plot is already claimed tell them.
-        //If they are the owner or a member tell them.
-        if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
+        // If the plot is already claimed tell them.
+        // If they are the owner or a member tell them.
+        if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
             u.player.sendMessage(Utils.error("You are already the owner of this plot!"));
             return false;
 
-        } else if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=0;")) {
+        } else if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=0;")) {
 
             u.player.sendMessage(Utils.error("You are already a member of this plot!"));
             return false;
 
-        } else if (u.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + u.inPlot + " AND status='claimed';")) {
+        } else if (u.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plot + " AND status='claimed';")) {
 
             u.player.sendMessage(Utils.error("This plot is already claimed!"));
             return false;
 
         }
 
-        //Check if you do not already have the maximum number of plots.
+        // Check if you do not already have the maximum number of plots.
         if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + u.uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
             u.player.sendMessage(Utils.error("You have reached the maximum number of plots."));
             return false;
+        }
 
+        // Check if the plot is on this server.
+        if (!u.plotSQL.hasRow("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.id=" + plot + " ld.server='" + SERVER_NAME + "';")) {
+            u.player.sendMessage(Utils.error("This plot is on another server, unable to claim it from here."));
+            return false;
         }
 
         //Checks passed, return true.

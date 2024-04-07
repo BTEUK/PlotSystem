@@ -87,7 +87,7 @@ public class ClaimEvent {
             }
 
             u.player.closeInventory();
-            u.claimGui = new ClaimGui(u);
+            u.claimGui = new ClaimGui(u, u.inPlot);
             u.claimGui.open(user);
 
         }

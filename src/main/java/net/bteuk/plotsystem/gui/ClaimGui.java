@@ -24,11 +24,14 @@ public class ClaimGui extends Gui {
 
     private final User user;
 
-    public ClaimGui(User user) {
+    private final int plot;
+
+    public ClaimGui(User user, int plot) {
 
         super(27, Component.text("Claim Plot", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.user = user;
+        this.plot = plot;
 
         createGui();
 
@@ -36,13 +39,13 @@ public class ClaimGui extends Gui {
 
     private void createGui() {
 
-        setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")), 1,
                 Utils.title("Plot Size"),
-                Utils.line(PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + user.inPlot + ";")))));
+                Utils.line(PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")))));
 
-        setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")), 1,
+        setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")), 1,
                 Utils.title("Plot Difficulty"),
-                Utils.line(PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.inPlot + ";")))));
+                Utils.line(PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")))));
 
         setItem(22, Utils.createItem(Material.ENDER_EYE, 1,
                         Utils.title("View Plot in Google Maps"),
@@ -54,7 +57,7 @@ public class ClaimGui extends Gui {
                     u.player.closeInventory();
 
                     //Get corners of the plot.
-                    int[][] corners = user.plotSQL.getPlotCorners(user.inPlot);
+                    int[][] corners = user.plotSQL.getPlotCorners(plot);
 
                     int sumX = 0;
                     int sumZ = 0;
@@ -72,9 +75,9 @@ public class ClaimGui extends Gui {
 
                     //Subtract the coordinate transform to make the coordinates in the real location.
                     x -= user.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" +
-                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.inPlot + ";") + "';");
+                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';");
                     z -= user.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" +
-                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + user.inPlot + ";") + "';");
+                            user.plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';");
 
                     //Convert to irl coordinates.
 
@@ -105,29 +108,29 @@ public class ClaimGui extends Gui {
                     u.player.closeInventory();
 
                     //Check if the plot is not already claimed, since it may happen that the gui is spammed.
-                    if (eUser.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + eUser.inPlot + " AND status='unclaimed';")) {
+                    if (eUser.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plot + " AND status='unclaimed';")) {
 
                         //If the plot status can be updated, add the player as plot owner.
-                        if (PlotHelper.updatePlotStatus(eUser.inPlot, PlotStatus.CLAIMED)) {
+                        if (PlotHelper.updatePlotStatus(plot, PlotStatus.CLAIMED)) {
 
                             //If the player can't be given owner, set the plot status back to unclaimed.
-                            if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + eUser.inPlot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
+                            if (eUser.plotSQL.update("INSERT INTO plot_members(id,uuid,is_owner,last_enter) VALUES(" + plot + ",'" + eUser.uuid + "',1," + Time.currentTime() + ");")) {
 
                                 //Add player to worldguard region.
                                 try {
-                                    if (WorldGuardFunctions.addMember(String.valueOf(eUser.inPlot), eUser.uuid, eUser.player.getWorld())) {
+                                    if (WorldGuardFunctions.addMember(String.valueOf(plot), eUser.uuid, eUser.player.getWorld())) {
 
                                         eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
-                                                .append(Component.text(eUser.inPlot, NamedTextColor.DARK_AQUA))
+                                                .append(Component.text(plot, NamedTextColor.DARK_AQUA))
                                                 .append(Utils.success(", good luck building.")));
                                         // Send link to plot in Google Maps.
                                         eUser.player.performCommand("ll");
-                                        Bukkit.getLogger().info("Plot " + eUser.inPlot + " successfully claimed by " + eUser.name);
+                                        Bukkit.getLogger().info("Plot " + plot + " successfully claimed by " + eUser.name);
 
                                     } else {
 
                                         eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                                        Bukkit.getLogger().warning("Plot " + eUser.inPlot + " was claimed but they were not added to the worldguard region.");
+                                        Bukkit.getLogger().warning("Plot " + plot + " was claimed but they were not added to the worldguard region.");
 
                                     }
                                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
@@ -138,16 +141,16 @@ public class ClaimGui extends Gui {
                             } else {
 
                                 eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                                Bukkit.getLogger().warning("Plot owner insert failed for plot " + eUser.inPlot);
+                                Bukkit.getLogger().warning("Plot owner insert failed for plot " + plot);
 
                                 //Attempt to set plot back to unclaimed
-                                if (PlotHelper.updatePlotStatus(eUser.inPlot, PlotStatus.UNCLAIMED)) {
+                                if (PlotHelper.updatePlotStatus(plot, PlotStatus.UNCLAIMED)) {
 
-                                    Bukkit.getLogger().warning("Plot " + eUser.inPlot + " has been set back to unclaimed.");
+                                    Bukkit.getLogger().warning("Plot " + plot + " has been set back to unclaimed.");
 
                                 } else {
 
-                                    Bukkit.getLogger().severe("Plot " + eUser.inPlot + " is set to claimed but has no owner!");
+                                    Bukkit.getLogger().severe("Plot " + plot + " is set to claimed but has no owner!");
 
                                 }
                             }
@@ -155,7 +158,7 @@ public class ClaimGui extends Gui {
                         } else {
 
                             eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
-                            Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + eUser.inPlot);
+                            Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + plot);
 
                         }
                     } else {

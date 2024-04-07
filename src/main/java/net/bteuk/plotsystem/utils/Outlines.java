@@ -47,10 +47,8 @@ public class Outlines {
         if (blockLocations == null) {
             blockLocations = new BlockLocations(player);
             outlineBlockLocations.put(player, blockLocations);
-            return blockLocations;
-        } else {
-            return blockLocations;
         }
+        return blockLocations;
     }
 
     //Remove player
@@ -70,7 +68,7 @@ public class Outlines {
                 return;
             }
             //Get plot difficulty.
-            int intPlotID = tryParse(plotID);
+            int intPlotID = ParseUtils.toInt(plotID);
             if (intPlotID != 0) {
                 int difficulty = PlotSystem.getInstance().plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + intPlotID + ";");
                 blockLocations.addOutline(region, difficultyMaterial(difficulty));
@@ -152,7 +150,7 @@ public class Outlines {
                 continue;
             }
 
-            int plotID = tryParse(protectedRegion.getId());
+            int plotID = ParseUtils.toInt(protectedRegion.getId());
 
             //If plotID is 0, then it's a zone.
             if (plotID == 0) {
@@ -353,13 +351,5 @@ public class Outlines {
             case 3 -> Material.RED_CONCRETE.createBlockData();
             default -> null;
         };
-    }
-
-    public int tryParse(String text) {
-        try {
-            return Integer.parseInt(text);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
     }
 }

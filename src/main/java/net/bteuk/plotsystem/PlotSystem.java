@@ -12,6 +12,7 @@ import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import net.bteuk.plotsystem.listeners.ClaimEnter;
 import net.bteuk.plotsystem.listeners.CloseInventory;
+import net.bteuk.plotsystem.listeners.HologramClickEvent;
 import net.bteuk.plotsystem.listeners.JoinServer;
 import net.bteuk.plotsystem.listeners.PlayerInteract;
 import net.bteuk.plotsystem.listeners.QuitServer;
@@ -128,6 +129,9 @@ public class PlotSystem extends JavaPlugin {
 
         // Initialise the plot helper.
         PlotHelper.init(plotSQL, holograms);
+
+        // Register hologram click event.
+        new HologramClickEvent(this);
 
         //General Setup
         //Create list of users.

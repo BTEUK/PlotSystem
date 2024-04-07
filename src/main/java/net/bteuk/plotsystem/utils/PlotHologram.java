@@ -119,16 +119,16 @@ public class PlotHologram {
                 holograms.put(PlotHologramType.ALL, createUnclaimedHologram());
             } else if (plotStatus == PlotStatus.CLAIMED || plotStatus == PlotStatus.SUBMITTED || plotStatus == PlotStatus.REVIEWING) {
                 // Create a hologram for the plot owner.
-                holograms.put(PlotHologramType.OWNER, createClaimedHologram("&fYou are the owner of the plot"));
-                holograms.put(PlotHologramType.MEMBER, createClaimedHologram("&fYou are a member of the plot"));
+                holograms.put(PlotHologramType.OWNER, createClaimedHologram("&fYou are the owner of the plot", "OWNER"));
+                holograms.put(PlotHologramType.MEMBER, createClaimedHologram("&fYou are a member of the plot", "MEMBER"));
                 // Create a hologram for the reviewers.
                 if (plotStatus == PlotStatus.SUBMITTED) {
-                    holograms.put(PlotHologramType.REVIEWER, createClaimedHologram("&fThis plot is submitted"));
+                    holograms.put(PlotHologramType.REVIEWER, createClaimedHologram("&fThis plot is submitted", "SUBMITTED"));
                 } else if (plotStatus == PlotStatus.REVIEWING) {
-                    holograms.put(PlotHologramType.REVIEWER, createClaimedHologram("&fYou are reviewing this plot"));
+                    holograms.put(PlotHologramType.REVIEWER, createClaimedHologram("&fYou are reviewing this plot", "REVIEWER"));
                 }
                 // Create a hologram for the remaining players.
-                holograms.put(PlotHologramType.ALL, createClaimedHologram("&fThis plot is claimed"));
+                holograms.put(PlotHologramType.ALL, createClaimedHologram("&fThis plot is claimed", "ALL"));
             }
         }
     }
@@ -137,14 +137,14 @@ public class PlotHologram {
         List<String> text = hologramTitle();
         text.add("&fThis plot is unclaimed");
         text.add("&fClick to claim this plot");
-        return Holograms.createHologram(String.valueOf(plot), location, text);
+        return Holograms.createHologram(plot + ",UNCLAIMED", location, text);
     }
 
-    private Hologram createClaimedHologram(String line2) {
+    private Hologram createClaimedHologram(String line2, String type) {
         List<String> text = hologramTitle();
         text.add(line2);
         text.add("&fClick to open the plot info");
-        return Holograms.createHologram(String.valueOf(plot), location, text);
+        return Holograms.createHologram(plot + "," + type, location, text);
     }
 
     private List<String> hologramTitle() {
