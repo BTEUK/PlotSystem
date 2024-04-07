@@ -16,6 +16,7 @@ import net.bteuk.plotsystem.listeners.JoinServer;
 import net.bteuk.plotsystem.listeners.PlayerInteract;
 import net.bteuk.plotsystem.listeners.QuitServer;
 import net.bteuk.plotsystem.utils.Outlines;
+import net.bteuk.plotsystem.utils.PlotHologram;
 import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.Multiverse;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -28,6 +29,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class PlotSystem extends JavaPlugin {
@@ -64,6 +66,9 @@ public class PlotSystem extends JavaPlugin {
     //Outline manager.
     @Getter
     private Outlines outlines;
+
+    @Getter
+    private List<PlotHologram> holograms = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -120,12 +125,15 @@ public class PlotSystem extends JavaPlugin {
     //Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
+        // Initialise the plothelper.
+        Pl
+
         //General Setup
         //Create list of users.
         users = new ArrayList<>();
 
-        //Remove all plots 'under review'
-        plotSQL.update("UPDATE plot_data SET status='submitted' WHERE status='reviewing'");
+        //Remove all plots 'under review' on this server.
+        plotSQL.update("UPDATE plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location SET pd.status='submitted' WHERE pd.status='reviewing' AND ld.server='" + SERVER_NAME + "';");
 
         //Create gui item
         gui = new ItemStack(Material.NETHER_STAR);
@@ -167,8 +175,10 @@ public class PlotSystem extends JavaPlugin {
         getCommand("claim").setExecutor(claimCommand);
         new ToggleOutlines(this);
 
+        // Get all active plots (unclaimed, claimed, submitted, reviewing) and add holograms.
+        List<Integer> active_plots = plotSQL.getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.status IN ('unclaimed','claimed','submitted','reviewing') AND ld.server='" + SERVER_NAME + "';");
+        active_plots.forEach(plot -> holograms.add(new PlotHologram(plot)));
     }
-
 
     public void onDisable() {
 

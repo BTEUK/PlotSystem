@@ -7,10 +7,14 @@ import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.enums.PlotStatus;
+import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import net.bteuk.plotsystem.exceptions.WorldNotFoundException;
-import net.bteuk.plotsystem.PlotSystem;
+import net.bteuk.plotsystem.utils.PlotHelper;
+import net.bteuk.plotsystem.utils.User;
+import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,9 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-
-import net.bteuk.plotsystem.utils.User;
-import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 import java.util.List;
 
@@ -183,10 +184,6 @@ public class ReviewGui extends Gui {
                         globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
                                 "','&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
 
-
-                        //Set status of plot back to claimed.
-                        plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
-
                         //Remove submitted plot entry.
                         plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
 
@@ -194,7 +191,7 @@ public class ReviewGui extends Gui {
                         plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + user.review.plot + ";");
 
                         //Set status of plot back to claimed.
-                        plotSQL.update("UPDATE plot_data SET status='claimed' WHERE id=" + user.review.plot + ";");
+                        PlotHelper.updatePlotStatus(user.review.plot, PlotStatus.CLAIMED);
 
                         //Remove the reviewer from the plot.
                         try {
@@ -279,7 +276,7 @@ public class ReviewGui extends Gui {
 
 
                     //Set the plot back to submitted.
-                    plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + user.review.plot + ";");
+                    PlotHelper.updatePlotStatus(user.review.plot, PlotStatus.SUBMITTED);
 
                     //Send feedback.
                     u.player.sendMessage(Utils.success("Cancelled reviewing of plot ")

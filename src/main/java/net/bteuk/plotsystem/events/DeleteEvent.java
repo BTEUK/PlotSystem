@@ -4,9 +4,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
@@ -96,7 +98,7 @@ public class DeleteEvent {
                 plotSQL.update("DELETE FROM plot_submissions WHERE id=" + id + ";");
 
                 //Set plot status to unclaimed.
-                plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + id + ";");
+                PlotHelper.updatePlotStatus(id, PlotStatus.UNCLAIMED);
 
                 //Send message to plot owner.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));

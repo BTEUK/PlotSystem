@@ -3,8 +3,10 @@ package net.bteuk.plotsystem.commands;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.Multiverse;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -143,8 +145,8 @@ public class DeleteCommand {
         try {
             if (WorldGuardFunctions.delete(String.valueOf(plotID), world)) {
 
-                //Set plot to deleted in database.
-                plotSQL.update("UPDATE plot_data SET status='deleted' WHERE id=" + plotID + ";");
+                //Set plot to deleted.
+                PlotHelper.updatePlotStatus(plotID, PlotStatus.DELETED);
                 sender.sendMessage(Utils.success("Plot ")
                         .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
                         .append(Utils.success(" deleted.")));

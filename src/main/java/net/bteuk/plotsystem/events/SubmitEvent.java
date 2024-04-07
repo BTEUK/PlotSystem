@@ -3,7 +3,9 @@ package net.bteuk.plotsystem.events;
 import net.bteuk.network.Network;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -60,7 +62,7 @@ public class SubmitEvent {
                 if (PlotSystem.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + id + " AND status='claimed';")) {
 
                     //Set plot status to submitted.
-                    PlotSystem.getInstance().plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + id + ";");
+                    PlotHelper.updatePlotStatus(id, PlotStatus.SUBMITTED);
 
                     //Create new submitted plot key.
                     PlotSystem.getInstance().plotSQL.update("INSERT INTO plot_submissions(id,submit_time,last_query) VALUES(" + id + "," + Time.currentTime() + "," + Time.currentTime() + ");");

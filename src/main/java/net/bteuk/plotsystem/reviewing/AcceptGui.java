@@ -1,8 +1,6 @@
 package net.bteuk.plotsystem.reviewing;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.sql.GlobalSQL;
@@ -10,25 +8,25 @@ import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
+import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.WorldEditor;
+import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
-import com.sk89q.worldedit.math.BlockVector2;
-
-import net.bteuk.plotsystem.utils.User;
-import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.bteuk.plotsystem.PlotSystem.LOGGER;
 
@@ -222,7 +220,7 @@ public class AcceptGui extends Gui {
                     plotSQL.update("DELETE FROM plot_members WHERE id=" + user.review.plot + ";");
 
                     //Set plot to completed.
-                    plotSQL.update("UPDATE plot_data SET status='completed' WHERE id=" + user.review.plot + ";");
+                    PlotHelper.updatePlotStatus(user.review.plot, PlotStatus.COMPLETED);
 
                     //Remove submitted plot entry.
                     plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");

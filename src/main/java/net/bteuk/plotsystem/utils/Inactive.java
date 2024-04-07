@@ -1,22 +1,21 @@
 package net.bteuk.plotsystem.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import net.bteuk.plotsystem.utils.plugins.WorldEditor;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.sk89q.worldedit.math.BlockVector2;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Inactive {
 
@@ -101,7 +100,7 @@ public class Inactive {
                 plotSQL.update("DELETE FROM plot_members WHERE id=" + plot + ";");
 
                 //Set plot status to unclaimed.
-                plotSQL.update("UPDATE plot_data SET status='unclaimed' WHERE id=" + plot + ";");
+                PlotHelper.updatePlotStatus(plot, PlotStatus.UNCLAIMED);
 
                 //Add message for the plot owner to the database to notify them that their plot was removed.
                 Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");

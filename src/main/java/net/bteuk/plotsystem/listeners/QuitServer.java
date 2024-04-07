@@ -2,9 +2,11 @@ package net.bteuk.plotsystem.listeners;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.sql.PlotSQL;
+import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.User;
 
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
@@ -48,7 +50,7 @@ public class QuitServer implements Listener {
             }
 
             //Set status back to submitted.
-            plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
+            PlotHelper.updatePlotStatus(u.review.plot, PlotStatus.SUBMITTED);
 
             //Close review.
             u.review.closeReview();

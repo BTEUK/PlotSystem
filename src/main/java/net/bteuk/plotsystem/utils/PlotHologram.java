@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.utils;
 
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import lombok.Getter;
 import net.bteuk.network.Network;
 import net.bteuk.network.utils.Holograms;
 import net.bteuk.network.utils.enums.PlotStatus;
@@ -19,6 +20,7 @@ import java.util.Map;
  */
 public class PlotHologram {
 
+    @Getter
     private final int plot;
 
     private PlotStatus plotStatus;
@@ -80,6 +82,14 @@ public class PlotHologram {
                 entry.getValue().setHidePlayer(p);
             }
         }
+    }
+
+    /**
+     * Check if no holograms exist.
+     * @return true, if no holograms exist
+     */
+    public boolean isEmpty() {
+        return holograms.isEmpty();
     }
 
     /**
