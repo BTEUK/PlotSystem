@@ -44,6 +44,13 @@ public class PlotHologram {
     }
 
     /**
+     * Update the hologram locations by removing and adding them back.
+     */
+    public void updateLocation() {
+        updateHologram();
+    }
+
+    /**
      * Set the visibility of this hologram for all players.
      */
     public void setHologramVisibility() {

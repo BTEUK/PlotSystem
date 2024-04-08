@@ -1,11 +1,5 @@
 package net.bteuk.plotsystem.utils.plugins;
 
-import java.util.List;
-
-import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
-import org.bukkit.World;
-
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.WorldGuard;
@@ -13,7 +7,15 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
+import net.bteuk.network.Network;
+import net.bteuk.network.sql.PlotSQL;
+import net.bteuk.network.utils.Utils;
+import net.bteuk.plotsystem.PlotSystem;
+import net.bteuk.plotsystem.utils.PlotHologram;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 import static net.bteuk.network.utils.Constants.MAX_Y;
 import static net.bteuk.network.utils.Constants.MIN_Y;
@@ -55,8 +57,20 @@ public class WGCreatePlot {
 
         }
 
+        // Create a coordinate id for the current player location if in the plot.
+        int coordinate_id = 0;
+        if (region.contains(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ())) {
+            coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(p.getLocation());
+        } else {
+            p.sendMessage(Utils.error("Unable to add plot marker since you are not in the plot."));
+            p.sendMessage(Utils.error("To set the marker, go to the plot and run /ps movemarker " + plotID));
+        }
+
         //Create an entry in the database for the plot.
-        plotID = plotSQL.createPlot(size, difficulty, location);
+        plotID = plotSQL.createPlot(size, difficulty, location, coordinate_id);
+
+        // Load the hologram for this plot.
+        PlotSystem.getInstance().getHolograms().add(new PlotHologram(plotID));
 
         //Create the region with valid name.
         region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, MIN_Y, (MAX_Y-1));
