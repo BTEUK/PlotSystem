@@ -10,8 +10,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import net.bteuk.network.Network;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
-import net.bteuk.plotsystem.PlotSystem;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.PlotHologram;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -60,7 +61,9 @@ public class WGCreatePlot {
         // Create a coordinate id for the current player location if in the plot.
         int coordinate_id = 0;
         if (region.contains(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ())) {
-            coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(p.getLocation());
+            Location l = p.getLocation().clone();
+            l.setY(l.getY() + 2); /* Increase the y elevation by 2 so the hologram is not at the player's feet */
+            coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(l);
         } else {
             p.sendMessage(Utils.error("Unable to add plot marker since you are not in the plot."));
             p.sendMessage(Utils.error("To set the marker, go to the plot and run /ps movemarker " + plotID));
@@ -70,7 +73,7 @@ public class WGCreatePlot {
         plotID = plotSQL.createPlot(size, difficulty, location, coordinate_id);
 
         // Load the hologram for this plot.
-        PlotSystem.getInstance().getHolograms().add(new PlotHologram(plotID));
+        PlotHelper.addPlotHologram(new PlotHologram(plotID));
 
         //Create the region with valid name.
         region = new ProtectedPolygonalRegion(String.valueOf(plotID), vector, MIN_Y, (MAX_Y-1));

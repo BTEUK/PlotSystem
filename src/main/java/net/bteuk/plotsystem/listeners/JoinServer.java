@@ -4,6 +4,7 @@ import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.events.EventManager;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -42,7 +43,7 @@ public class JoinServer implements Listener {
         instance.addUser(u);
 
         // Add the player to relevant holograms.
-        instance.getHolograms().forEach(hologram -> hologram.setHologramVisibilityForPlayer(e.getPlayer()));
+        PlotHelper.addPlayer(e.getPlayer());
 
         //If the player has a join event, execute it.
         //Delay by 1 second for all plugins to run their join events.

@@ -69,9 +69,6 @@ public class PlotSystem extends JavaPlugin {
     @Getter
     private Outlines outlines;
 
-    @Getter
-    private List<PlotHologram> holograms = new ArrayList<>();
-
     @Override
     public void onEnable() {
 
@@ -127,11 +124,11 @@ public class PlotSystem extends JavaPlugin {
     //Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
-        // Initialise the plot helper.
-        PlotHelper.init(plotSQL, holograms);
-
         // Register hologram click event.
         new HologramClickEvent(this);
+
+        // Initialise the plot helper.
+        PlotHelper.init(plotSQL);
 
         //General Setup
         //Create list of users.
@@ -182,7 +179,7 @@ public class PlotSystem extends JavaPlugin {
 
         // Get all active plots (unclaimed, claimed, submitted, reviewing) and add holograms.
         List<Integer> active_plots = plotSQL.getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.status IN ('unclaimed','claimed','submitted','reviewing') AND ld.server='" + SERVER_NAME + "';");
-        active_plots.forEach(plot -> holograms.add(new PlotHologram(plot)));
+        active_plots.forEach(plot -> PlotHelper.addPlotHologram(new PlotHologram(plot)));
     }
 
     public void onDisable() {

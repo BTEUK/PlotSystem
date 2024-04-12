@@ -6,10 +6,12 @@ import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.ParseUtils;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.PlotHologram;
 import net.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -169,20 +171,22 @@ public class PlotSystemCommand implements CommandExecutor {
 
             // Get the coordinate of the marker.
             int coordinate_id = Network.getInstance().getPlotSQL().getInt("SELECT coordinate_id FROM plot_data WHERE id=" + plot + ";");
+            Location l = p.getLocation().clone();
+            l.setY(l.getY() + 2);
 
             if (coordinate_id == 0) {
                 // Create a new coordinate id and add it to the plot data.
-                coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(p.getLocation());
+                coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(l);
                 Network.getInstance().getPlotSQL().update("UPDATE plot_data SET coordinate_id=" + coordinate_id + " WHERE id=" + plot + ";");
                 // Add the hologram.
-                PlotSystem.getInstance().getHolograms().add(new PlotHologram(plot));
-                p.sendMessage(Utils.error("Added marker to plot " + plot));
+                PlotHelper.addPlotHologram(new PlotHologram(plot));
+                p.sendMessage(Utils.success("Added marker to plot " + plot));
             } else {
                 // Update the existing coordinate location.
-                Network.getInstance().getGlobalSQL().updateCoordinate(coordinate_id, p.getLocation());
+                Network.getInstance().getGlobalSQL().updateCoordinate(coordinate_id, l);
                 // Update the hologram.
-                PlotSystem.getInstance().getHolograms().stream().filter(plotHologram -> plotHologram.getPlot() == plot).forEach(PlotHologram::updateLocation);
-                p.sendMessage(Utils.error("Moved marker of plot " + plot));
+                PlotHelper.updatePlotHologram(plot);
+                p.sendMessage(Utils.success("Moved marker of plot " + plot));
             }
 
         } else {

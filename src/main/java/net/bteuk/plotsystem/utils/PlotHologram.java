@@ -54,6 +54,8 @@ public class PlotHologram {
      * Set the visibility of this hologram for all players.
      */
     public void setHologramVisibility() {
+        // Set default visibility to false.
+        holograms.values().forEach(hologram -> hologram.setDefaultVisibleState(false));
         Bukkit.getOnlinePlayers().forEach(this::setHologramVisibilityForPlayer);
     }
 
@@ -86,7 +88,7 @@ public class PlotHologram {
             if (entry.getKey() == showType) {
                 entry.getValue().setShowPlayer(p);
             } else {
-                entry.getValue().setHidePlayer(p);
+                entry.getValue().removeShowPlayer(p);
             }
         }
     }
@@ -144,14 +146,14 @@ public class PlotHologram {
         List<String> text = hologramTitle();
         text.add("&fThis plot is unclaimed");
         text.add("&fClick to claim this plot");
-        return Holograms.createHologram(plot + ",UNCLAIMED", location, text);
+        return Holograms.createHologram(plot + "_UNCLAIMED", location, text);
     }
 
     private Hologram createClaimedHologram(String line2, String type) {
         List<String> text = hologramTitle();
         text.add(line2);
         text.add("&fClick to open the plot info");
-        return Holograms.createHologram(plot + "," + type, location, text);
+        return Holograms.createHologram(plot + "_" + type, location, text);
     }
 
     private List<String> hologramTitle() {
@@ -167,8 +169,7 @@ public class PlotHologram {
         // Remove existing holograms.
         holograms.values().forEach(Hologram::delete);
         holograms.clear();
-        createHolograms();
-        setHologramVisibility();
+        createHologram();
     }
 
     private enum PlotHologramType {
