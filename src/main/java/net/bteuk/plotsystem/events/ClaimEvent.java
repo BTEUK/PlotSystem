@@ -82,7 +82,7 @@ public class ClaimEvent {
             NetworkUser user = Network.getInstance().getUser(u.player);
 
             //Check if the player has permission to claim a plot of this difficulty.
-            if (!ClaimCommand.hasClaimPermission(u, user)) {
+            if (!ClaimCommand.hasClaimPermission(u, user, u.inPlot)) {
                 return;
             }
 

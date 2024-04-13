@@ -168,13 +168,9 @@ public class PlotSystem extends JavaPlugin {
         //Deals with tracking where players are in relation to plots.
         claimEnter = new ClaimEnter(this, plotSQL, globalSQL);
 
-        //Create instance of claim command,
-        //as it is used to check whether a person is able to claim the plot they're standing in.
-        ClaimCommand claimCommand = new ClaimCommand();
-
         //Commands
-        getCommand("plotsystem").setExecutor(new PlotSystemCommand(globalSQL, plotSQL));
-        getCommand("claim").setExecutor(claimCommand);
+        new PlotSystemCommand(this, globalSQL, plotSQL);
+        new ClaimCommand(this, plotSQL);
         new ToggleOutlines(this);
 
         // Get all active plots (unclaimed, claimed, submitted, reviewing) and add holograms.
@@ -207,7 +203,7 @@ public class PlotSystem extends JavaPlugin {
                         e.printStackTrace();
                     }
 
-                    //Set status back to submitted.
+                    //Set status back to 'submitted'.
                     plotSQL.update("UPDATE plot_data SET status='submitted' WHERE id=" + u.review.plot + ";");
 
                     //Close review.

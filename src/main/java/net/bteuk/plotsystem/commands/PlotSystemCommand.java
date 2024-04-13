@@ -1,6 +1,8 @@
 package net.bteuk.plotsystem.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
+import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
@@ -13,23 +15,27 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PlotSystemCommand implements CommandExecutor {
+import java.util.Arrays;
 
-    //SQL
-    final PlotSQL plotSQL;
-    final GlobalSQL globalSQL;
+public class PlotSystemCommand extends AbstractCommand {
+
+    private final PlotSystem instance;
+    private final PlotSQL plotSQL;
+    private final GlobalSQL globalSQL;
 
 
-    public PlotSystemCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {
+    public PlotSystemCommand(PlotSystem instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
+        super(instance, "plotsystem");
 
+        this.instance = instance;
         this.plotSQL = plotSQL;
         this.globalSQL = globalSQL;
 
+        command.setTabCompleter(new FixedArgSelector(Arrays.asList("create", "selectiontool", "delete", "help", "setalias", "movemarker"), 0));
     }
 
     @Override
