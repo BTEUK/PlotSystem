@@ -4,6 +4,7 @@ import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -52,6 +53,9 @@ public class LeaveEvent {
 
             //If the player is on this server send them a message.
             if (p != null) {
+
+                // Update the hologram since they are on the server.
+                PlotHelper.updatePlotHologram(id);
 
                 p.sendMessage(Utils.success("You have left Plot ")
                         .append(Component.text(id, NamedTextColor.DARK_AQUA)));

@@ -7,6 +7,7 @@ import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
+import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -63,6 +64,11 @@ public class JoinEvent {
                 Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" +
                         plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;") + "','&3" +
                         Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined your plot &3" + id + "');");
+
+                // If the player is on the server, update the hologram.
+                if (p != null) {
+                    PlotHelper.updatePlotHologram(id);
+                }
 
             }
 
