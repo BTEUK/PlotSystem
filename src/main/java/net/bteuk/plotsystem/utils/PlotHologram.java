@@ -55,7 +55,11 @@ public class PlotHologram {
      */
     public void setHologramVisibility() {
         // Set default visibility to false.
-        holograms.values().forEach(hologram -> hologram.setDefaultVisibleState(false));
+        holograms.values().forEach(hologram -> {
+            if (hologram != null) {
+                hologram.setDefaultVisibleState(false);
+            }
+        });
         Bukkit.getOnlinePlayers().forEach(this::setHologramVisibilityForPlayer);
     }
 
@@ -95,6 +99,7 @@ public class PlotHologram {
 
     /**
      * Check if no holograms exist.
+     *
      * @return true, if no holograms exist
      */
     public boolean isEmpty() {
@@ -152,8 +157,7 @@ public class PlotHologram {
     private Hologram createClaimedHologram(String line2, String type) {
         List<String> text = hologramTitle();
         text.add(line2);
-        text.add("&fClick above the text");
-        text.add("&fto open the plot info");
+        text.add("&fClick to open the plot info");
         return Holograms.createHologram(plot + "_" + type, location, text);
     }
 

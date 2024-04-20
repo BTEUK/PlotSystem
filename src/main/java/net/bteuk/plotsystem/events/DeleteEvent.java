@@ -100,6 +100,7 @@ public class DeleteEvent {
                 plotSQL.update("DELETE FROM plot_submissions WHERE id=" + id + ";");
 
                 //Set plot status to unclaimed.
+                PlotStatus currentStatus = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + id + ";"));
                 PlotHelper.updatePlotStatus(id, PlotStatus.UNCLAIMED);
 
                 //Send message to plot owner.
@@ -117,6 +118,23 @@ public class DeleteEvent {
                     //Add the message to the database so it can be sent wherever they are currently.
                     Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
 
+                }
+
+                // If the plot was submitted, before deleting, send a message to reviewers letting them know it's no longer submitted.
+                if (currentStatus == PlotStatus.SUBMITTED) {
+                    //Get number of submitted plots.
+                    int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+
+                    //Send message to reviewers that a plot submission has been retracted.
+                    if (plot_count == 1) {
+                        Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been deleted, there is ")
+                                .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" submitted plot.")), "uknet:reviewer");
+                    } else {
+                        Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been deleted, there are ")
+                                .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" submitted plots.")), "uknet:reviewer");
+                    }
                 }
             });
         } else if (event[1].equals("zone")) {
