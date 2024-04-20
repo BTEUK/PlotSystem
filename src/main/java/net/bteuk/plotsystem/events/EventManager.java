@@ -1,14 +1,14 @@
 package net.bteuk.plotsystem.events;
 
-import org.bukkit.Bukkit;
-
 import java.util.Arrays;
+
+import static net.bteuk.plotsystem.PlotSystem.LOGGER;
 
 public class EventManager {
 
     public static void event(String uuid, String[] event) {
 
-        Bukkit.getLogger().info("Event: " + Arrays.toString(event));
+        LOGGER.info("Event: " + Arrays.toString(event));
 
         //Start the execution process by looking at the event message structure.
         switch (event[0]) {

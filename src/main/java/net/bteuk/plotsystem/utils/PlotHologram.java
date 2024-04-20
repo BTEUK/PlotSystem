@@ -152,7 +152,8 @@ public class PlotHologram {
     private Hologram createClaimedHologram(String line2, String type) {
         List<String> text = hologramTitle();
         text.add(line2);
-        text.add("&fClick to open the plot info");
+        text.add("&fClick above the text");
+        text.add("&fto open the plot info");
         return Holograms.createHologram(plot + "_" + type, location, text);
     }
 

@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static net.bteuk.plotsystem.PlotSystem.LOGGER;
+
 public class ReviewEvent {
 
     public static void event(String uuid, String[] event) {
@@ -42,7 +44,7 @@ public class ReviewEvent {
 
             //If user is null stop.
             if (u == null) {
-                PlotSystem.LOGGER.severe(String.format("User for player %s is null, this should not be possible!!!", p.getName()));
+                LOGGER.severe(String.format("User for player %s is null, this should not be possible!!!", p.getName()));
                 return;
             }
 

@@ -116,7 +116,7 @@ public class PlotSystem extends JavaPlugin {
         } else {
 
             //If the server is not in the database the network plugin was not successful.
-            LOGGER.warning("Server is not in database, check that the Network plugin is working correctly.");
+            LOGGER.severe("Server is not in database, check that the Network plugin is working correctly.");
 
         }
     }
