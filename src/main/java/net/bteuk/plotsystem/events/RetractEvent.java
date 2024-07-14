@@ -1,12 +1,11 @@
 package net.bteuk.plotsystem.events;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.PlotHelper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -61,15 +60,10 @@ public class RetractEvent {
             int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
             //Send message to reviewers that a plot submission has been retracted.
-            if (plot_count == 1) {
-                Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been retracted, there is ")
-                        .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" submitted plot.")), "uknet:reviewer");
-            } else {
-                Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been retracted, there are ")
-                        .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" submitted plots.")), "uknet:reviewer");
-            }
+            ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+                    ChatUtils.success("A submitted plot has been retracted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+            );
+            Network.getInstance().getChat().sendSocketMesage(chatMessage);
         }
     }
 }

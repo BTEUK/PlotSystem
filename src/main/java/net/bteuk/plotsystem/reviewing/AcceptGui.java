@@ -3,8 +3,12 @@ package net.bteuk.plotsystem.reviewing;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.dto.DiscordDirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
+import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
@@ -173,6 +177,7 @@ public class AcceptGui extends Gui {
 
                     //Set bookID to 0 if it has not been edited.
                     int bookID = 0;
+                    List<String> pages = new ArrayList<>();
 
                     //Close inventory.
                     u.player.closeInventory();
@@ -189,7 +194,9 @@ public class AcceptGui extends Gui {
                         int i = 1;
 
                         for (Component text : book) {
-                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + PlainTextComponentSerializer.plainText().serialize(text).replace("'", "\\'") + "');"))) {
+                            String page = PlainTextComponentSerializer.plainText().serialize(text);
+                            pages.add(page);
+                            if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + page.replace("'", "\\'") + "');"))) {
                                 u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
                                 return;
                             }
@@ -276,43 +283,40 @@ public class AcceptGui extends Gui {
                         int plot_count = plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
                         //Send message to reviewers that a plot has been reviewed.
-                        if (plot_count == 1) {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
-                                    .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" submitted plot.")), "uknet:reviewer");
-                        } else {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
-                                    .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" submitted plots.")), "uknet:reviewer");
-                        }
+                        ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+                        );
+                        Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
                         //Get the plot difficulty and player role.
                         int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
-                        String role = globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + plotOwner + "';");
+                        String builderRole = Roles.builderRole(plotOwner).join();
 
                         //Calculate the role the player will be promoted to, if any.
-                        String newRole = getNewRole(difficulty, role);
+                        String newRole = getNewRole(difficulty, builderRole);
 
                         //Send a message to the plot owner letting them know their plot has been accepted.
-                        //Compose the message to send, it is comma-separated.
-                        StringBuilder builder = new StringBuilder().append(plotOwner).append(",").append("accepted").append(",").append(user.review.plot);
-                        //If the player has been promoted, let them know.
+                        String discordMessage = "Plot " + user.review.plot + " has been accepted.";
                         if (newRole != null) {
-                            builder.append(",").append(Roles.roleMapping(newRole));
-                        }
-                        Network.getInstance().chat.broadcastMessage(Component.text(builder.toString()), "uknet:discord_dm");
-
-                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> {
-                            //Run the promotion on sync, since it has to execute a command through the console.
-                            if (newRole != null) {
-                                Roles.promoteBuilder(plotOwner, role, newRole);
+                            Role role = Roles.getRoles().stream().filter(r -> r.getId().equals(newRole)).findFirst().orElse(null);
+                            if (role != null) {
+                                discordMessage += "\nYou have been promoted to **" + role.getName() + "**";
                             }
+                        }
+                        if (!pages.isEmpty()) {
+                            discordMessage += "\nFeedback: " + String.join(" ", pages);
+                        }
+                        DiscordDirectMessage discordDirectMessage = new DiscordDirectMessage(plotOwner, discordMessage);
+                        Network.getInstance().getChat().sendSocketMesage(discordDirectMessage);
 
-                            //Close gui and clear review.
-                            //Run it sync.
-                            Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> user.review.closeReview());
-                        });
+                        // Add the new role and remove the old one.
+                        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';");
+                        Roles.alterRole(plotOwner, name, newRole, false, true);
+                        Roles.alterRole(plotOwner, name, builderRole, true, false);
 
+                        //Close gui and clear review.
+                        //Run it sync.
+                        Bukkit.getScheduler().runTask(PlotSystem.getInstance(), () -> user.review.closeReview());
                     });
                 }
         );
