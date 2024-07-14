@@ -1,9 +1,9 @@
 package net.bteuk.plotsystem.events;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
@@ -48,7 +48,7 @@ public class JoinEvent {
                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
                     if (p != null) {
 
-                        p.sendMessage(Utils.error("An error occurred while adding you to the plot, please contact an admin."));
+                        p.sendMessage(ChatUtils.error("An error occurred while adding you to the plot, please contact an admin."));
 
                     } else {
 
@@ -103,7 +103,7 @@ public class JoinEvent {
             } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
                 if (p != null) {
 
-                    p.sendMessage(Utils.error("An error occurred while adding you to the zone, please contact an admin."));
+                    p.sendMessage(ChatUtils.error("An error occurred while adding you to the zone, please contact an admin."));
 
                 } else {
 

@@ -1,6 +1,6 @@
 package net.bteuk.plotsystem.commands;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.User;
 import org.apache.commons.lang3.StringUtils;
@@ -33,14 +33,14 @@ public class ToggleOutlines implements CommandExecutor {
 
         // Get the user.
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(Utils.error("This command can only be used by players."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
             return true;
         }
 
         User u = instance.getUser(p);
 
         if (u == null) {
-            p.sendMessage(Utils.error("An error has occurred, please rejoin and contact your server admin."));
+            p.sendMessage(ChatUtils.error("An error has occurred, please rejoin and contact your server admin."));
             return true;
         }
 
@@ -48,11 +48,11 @@ public class ToggleOutlines implements CommandExecutor {
             // Enable outlines.
             u.setDisableOutlines(false);
             instance.getOutlines().addNearbyOutlines(u);
-            p.sendMessage(Utils.success("Enabled outlines"));
+            p.sendMessage(ChatUtils.success("Enabled outlines"));
         } else {
             // Disable outlines.
             u.setDisableOutlines(true);
-            p.sendMessage(Utils.success("Disabled outlines for this session"));
+            p.sendMessage(ChatUtils.success("Disabled outlines for this session"));
 
             // Remove existing outlines.
             instance.getOutlines().removeOutlinesForPlayer(p);

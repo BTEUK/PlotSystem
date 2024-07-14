@@ -1,6 +1,6 @@
 package net.bteuk.plotsystem.events;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
@@ -57,7 +57,7 @@ public class LeaveEvent {
                 // Update the hologram since they are on the server.
                 PlotHelper.updatePlotHologram(id);
 
-                p.sendMessage(Utils.success("You have left Plot ")
+                p.sendMessage(ChatUtils.success("You have left Plot ")
                         .append(Component.text(id, NamedTextColor.DARK_AQUA)));
 
             } else {
@@ -100,7 +100,7 @@ public class LeaveEvent {
             //If the player is on this server send them a message.
             if (p != null) {
 
-                p.sendMessage(Utils.success("You have left Zone ")
+                p.sendMessage(ChatUtils.success("You have left Zone ")
                         .append(Component.text(id, NamedTextColor.DARK_AQUA)));
 
             } else {

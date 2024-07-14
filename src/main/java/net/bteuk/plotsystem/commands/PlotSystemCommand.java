@@ -3,9 +3,9 @@ package net.bteuk.plotsystem.commands;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.ParseUtils;
 import net.bteuk.plotsystem.utils.PlotHelper;
@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 public class PlotSystemCommand extends AbstractCommand {
 
-    private final PlotSystem instance;
     private final PlotSQL plotSQL;
     private final GlobalSQL globalSQL;
 
@@ -31,7 +30,6 @@ public class PlotSystemCommand extends AbstractCommand {
     public PlotSystemCommand(PlotSystem instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
         super(instance, "plotsystem");
 
-        this.instance = instance;
         this.plotSQL = plotSQL;
         this.globalSQL = globalSQL;
 
@@ -44,7 +42,7 @@ public class PlotSystemCommand extends AbstractCommand {
         //If there are no arguments return.
         if (args.length == 0) {
 
-            sender.sendMessage(Utils.error("/plotsystem help"));
+            sender.sendMessage(ChatUtils.error("/plotsystem help"));
             return true;
 
         }
@@ -66,11 +64,11 @@ public class PlotSystemCommand extends AbstractCommand {
                 if (args.length == 3) {
                     setAlias(sender, args[1], args[2]);
                 } else {
-                    sender.sendMessage(Utils.error("/plotsystem setalias [location] [alias]"));
+                    sender.sendMessage(ChatUtils.error("/plotsystem setalias [location] [alias]"));
                 }
             }
             case "movemarker" -> moveHologram(sender, args);
-            default -> sender.sendMessage(Utils.error("/plotsystem help"));
+            default -> sender.sendMessage(ChatUtils.error("/plotsystem help"));
 
         }
 
@@ -82,11 +80,11 @@ public class PlotSystemCommand extends AbstractCommand {
 
         sender.sendMessage(Component.text("/plotsystem setalias [location] [alias]", NamedTextColor.GRAY));
         sender.sendMessage(Component.text("/plotsystem selectiontool ", NamedTextColor.GRAY)
-                .append(Utils.line("- Get the selection tool to create plots.")));
+                .append(ChatUtils.line("- Get the selection tool to create plots.")));
         sender.sendMessage(Component.text("/plotsystem create plot ", NamedTextColor.GRAY)
-                .append(Utils.line("- Create a plot for your current selection.")));
+                .append(ChatUtils.line("- Create a plot for your current selection.")));
         sender.sendMessage(Component.text("/plotsystem delete plot <plotID> ", NamedTextColor.GRAY)
-                .append(Utils.line("- Delete an unclaimed plot.")));
+                .append(ChatUtils.line("- Delete an unclaimed plot.")));
         sender.sendMessage(Component.text("/plotsystem create location [name] <Xmin> <Zmin> <Xmax> <Zmax>", NamedTextColor.GRAY));
         sender.sendMessage(Component.text("/plotsystem delete location [name]", NamedTextColor.GRAY));
 
@@ -97,7 +95,7 @@ public class PlotSystemCommand extends AbstractCommand {
         //Check if the sender is a player.
         if (!(sender instanceof Player)) {
 
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return;
 
         }
@@ -108,7 +106,7 @@ public class PlotSystemCommand extends AbstractCommand {
         //Check if the user has permission.
         if (!u.player.hasPermission("uknet.plots.select")) {
 
-            u.player.sendMessage(Utils.error("You do not have permission to do this."));
+            u.player.sendMessage(ChatUtils.error("You do not have permission to do this."));
             return;
 
         }
@@ -122,7 +120,7 @@ public class PlotSystemCommand extends AbstractCommand {
 
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.plots.setalias")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return;
             }
         }
@@ -130,34 +128,34 @@ public class PlotSystemCommand extends AbstractCommand {
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + location + "';")) {
 
             plotSQL.update("UPDATE location_data SET alias='" + alias.replace("'", "\\'") + "' WHERE name='" + location + "';");
-            sender.sendMessage(Utils.success("Set alias of location ")
+            sender.sendMessage(ChatUtils.success("Set alias of location ")
                     .append(Component.text(location, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to "))
+                    .append(ChatUtils.success(" to "))
                     .append(Component.text(alias, NamedTextColor.DARK_AQUA)));
 
         } else {
-            sender.sendMessage(Utils.error("The location ")
+            sender.sendMessage(ChatUtils.error("The location ")
                     .append(Component.text(location, NamedTextColor.DARK_RED))
-                    .append(Utils.error(" does not exist.")));
+                    .append(ChatUtils.error(" does not exist.")));
         }
     }
 
     private void moveHologram(CommandSender sender, String[] args) {
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.plots.movemarker")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return;
             }
 
             if (args.length < 2) {
-                p.sendMessage(Utils.error("/plotsystem movemarker <plotID>"));
+                p.sendMessage(ChatUtils.error("/plotsystem movemarker <plotID>"));
                 return;
             }
 
             int plot = ParseUtils.toInt(args[1]);
 
             if (plot == 0) {
-                p.sendMessage(Utils.error("/plotsystem movemarker <plotID>"));
+                p.sendMessage(ChatUtils.error("/plotsystem movemarker <plotID>"));
                 return;
             }
 
@@ -165,13 +163,13 @@ public class PlotSystemCommand extends AbstractCommand {
             User u = PlotSystem.getInstance().getUser(p);
 
             if (u == null) {
-                p.sendMessage(Utils.error("An error occurred, please rejoin."));
+                p.sendMessage(ChatUtils.error("An error occurred, please rejoin."));
                 return;
             }
 
             // Check if the player is in the same world as the plot.
             if (u.inPlot != plot) {
-                p.sendMessage(Utils.error("You must be standing in the plot to move the marker."));
+                p.sendMessage(ChatUtils.error("You must be standing in the plot to move the marker."));
                 return;
             }
 
@@ -186,17 +184,17 @@ public class PlotSystemCommand extends AbstractCommand {
                 Network.getInstance().getPlotSQL().update("UPDATE plot_data SET coordinate_id=" + coordinate_id + " WHERE id=" + plot + ";");
                 // Add the hologram.
                 PlotHelper.addPlotHologram(new PlotHologram(plot));
-                p.sendMessage(Utils.success("Added marker to plot " + plot));
+                p.sendMessage(ChatUtils.success("Added marker to plot " + plot));
             } else {
                 // Update the existing coordinate location.
                 Network.getInstance().getGlobalSQL().updateCoordinate(coordinate_id, l);
                 // Update the hologram.
                 PlotHelper.updatePlotHologram(plot);
-                p.sendMessage(Utils.success("Moved marker of plot " + plot));
+                p.sendMessage(ChatUtils.success("Moved marker of plot " + plot));
             }
 
         } else {
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
         }
     }
 }

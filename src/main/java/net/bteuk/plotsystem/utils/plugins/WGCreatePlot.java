@@ -8,8 +8,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.PlotHologram;
 import org.bukkit.Location;
@@ -53,7 +53,7 @@ public class WGCreatePlot {
         ApplicableRegionSet set = regions.getApplicableRegions(region);
         if (set.size() > 0) {
 
-            p.sendMessage(Utils.error("Your selection overlaps with an existing plot or zone."));
+            p.sendMessage(ChatUtils.error("Your selection overlaps with an existing plot or zone."));
             return false;
 
         }
@@ -65,8 +65,8 @@ public class WGCreatePlot {
             l.setY(l.getY() + 2); /* Increase the y elevation by 2 so the hologram is not at the player's feet */
             coordinate_id = Network.getInstance().getGlobalSQL().addCoordinate(l);
         } else {
-            p.sendMessage(Utils.error("Unable to add plot marker since you are not in the plot."));
-            p.sendMessage(Utils.error("To set the marker, go to the plot and run /ps movemarker " + plotID));
+            p.sendMessage(ChatUtils.error("Unable to add plot marker since you are not in the plot."));
+            p.sendMessage(ChatUtils.error("To set the marker, go to the plot and run /ps movemarker " + plotID));
         }
 
         //Create an entry in the database for the plot.
@@ -113,7 +113,7 @@ public class WGCreatePlot {
         ApplicableRegionSet set = regions.getApplicableRegions(region);
         if (set.size() > 0) {
 
-            p.sendMessage(Utils.error("Your selection overlaps with an existing plot or zone."));
+            p.sendMessage(ChatUtils.error("Your selection overlaps with an existing plot or zone."));
             return false;
 
         }

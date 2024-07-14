@@ -69,7 +69,7 @@ public class AcceptGui extends Gui {
                     if (accuracy < i) {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
-                                        Utils.title("Accuracy: " + i)),
+                                        ChatUtils.title("Accuracy: " + i)),
 
                                 u -> {
 
@@ -85,7 +85,7 @@ public class AcceptGui extends Gui {
                     } else {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                        Utils.title("Accuracy: " + i)),
+                                        ChatUtils.title("Accuracy: " + i)),
 
                                 u -> {
 
@@ -109,7 +109,7 @@ public class AcceptGui extends Gui {
                     if (quality < i) {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.RED_CONCRETE, 1,
-                                        Utils.title("Quality: " + i)),
+                                        ChatUtils.title("Quality: " + i)),
 
                                 u -> {
 
@@ -126,7 +126,7 @@ public class AcceptGui extends Gui {
                     } else {
 
                         setItem((j * 9) + i + 10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                        Utils.title("Quality: " + i)),
+                                        ChatUtils.title("Quality: " + i)),
 
                                 u -> {
 
@@ -146,8 +146,8 @@ public class AcceptGui extends Gui {
         }
 
         setItem(4, Utils.createItem(Material.EMERALD, 1,
-                        Utils.title("Accept Plot"),
-                        Utils.line("Click to accept the plot with the current settings.")),
+                        ChatUtils.title("Accept Plot"),
+                        ChatUtils.line("Click to accept the plot with the current settings.")),
 
                 u -> {
 
@@ -197,7 +197,7 @@ public class AcceptGui extends Gui {
                             String page = PlainTextComponentSerializer.plainText().serialize(text);
                             pages.add(page);
                             if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + page.replace("'", "\\'") + "');"))) {
-                                u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
+                                u.player.sendMessage(ChatUtils.error("An error occurred, please notify an admin."));
                                 return;
                             }
                             i++;
@@ -246,7 +246,7 @@ public class AcceptGui extends Gui {
                     try {
                         copyVector = WorldGuardFunctions.getPoints(String.valueOf(user.review.plot), world);
                     } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                        u.player.sendMessage(Utils.error("An error occurred in the plot accepting process, please contact an admin."));
+                        u.player.sendMessage(ChatUtils.error("An error occurred in the plot accepting process, please contact an admin."));
                         e.printStackTrace();
                         return;
                     }
@@ -269,15 +269,15 @@ public class AcceptGui extends Gui {
                         try {
                             WorldGuardFunctions.delete(String.valueOf(user.review.plot), world);
                         } catch (RegionManagerNotFoundException e) {
-                            u.player.sendMessage(Utils.error("An error occurred while removing the plot, please contact an admin."));
+                            u.player.sendMessage(ChatUtils.error("An error occurred while removing the plot, please contact an admin."));
                             e.printStackTrace();
                             return;
                         }
 
                         //Send feedback in chat and console.
-                        u.player.sendMessage(Utils.success("Plot ")
+                        u.player.sendMessage(ChatUtils.success("Plot ")
                                 .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" accepted.")));
+                                .append(ChatUtils.success(" accepted.")));
 
                         //Get number of submitted plots.
                         int plot_count = plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
@@ -322,8 +322,8 @@ public class AcceptGui extends Gui {
         );
 
         setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.title("Return"),
-                        Utils.line("Go back to the review menu.")),
+                        ChatUtils.title("Return"),
+                        ChatUtils.line("Go back to the review menu.")),
 
                 u -> {
 

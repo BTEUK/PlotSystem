@@ -5,7 +5,6 @@ import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
@@ -111,9 +110,9 @@ public class DeleteEvent {
                 //If the player is on this server send them a message.
                 if (p != null) {
 
-                    p.sendMessage(Utils.success("Plot ")
+                    p.sendMessage(ChatUtils.success("Plot ")
                             .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" deleted")));
+                            .append(ChatUtils.success(" deleted")));
 
                 } else {
 
@@ -213,9 +212,9 @@ public class DeleteEvent {
                 //If the player is on this server send them a message.
                 if (p != null) {
 
-                    p.sendMessage(Utils.success("Zone ")
+                    p.sendMessage(ChatUtils.success("Zone ")
                             .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" deleted")));
+                            .append(ChatUtils.success(" deleted")));
 
                 } else {
 

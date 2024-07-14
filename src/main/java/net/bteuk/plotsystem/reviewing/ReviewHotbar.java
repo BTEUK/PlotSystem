@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.reviewing;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
@@ -47,7 +48,7 @@ public class ReviewHotbar implements Listener {
         this.u = u;
 
         //Create review gui item.
-        reviewGuiItem = Utils.createItem(Material.EMERALD,1, Utils.title("Review Menu"), Utils.line("Click to open review menu."));
+        reviewGuiItem = Utils.createItem(Material.EMERALD,1, ChatUtils.title("Review Menu"), ChatUtils.line("Click to open review menu."));
 
         //Register listeners.
         Bukkit.getServer().getPluginManager().registerEvents(this, plotSystem);

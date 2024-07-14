@@ -5,10 +5,10 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
@@ -119,7 +119,7 @@ public class ClaimEnter implements Listener {
                 if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + ";")) {
 
                     u.player.sendActionBar(
-                            Utils.success("You have left plot ")
+                            ChatUtils.success("You have left plot ")
                                     .append(Component.text(u.inPlot, NamedTextColor.DARK_AQUA)));
 
                 } else {
@@ -128,16 +128,16 @@ public class ClaimEnter implements Listener {
                     if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
                         u.player.sendActionBar(
-                                Utils.success("You have left your plot."));
+                                ChatUtils.success("You have left your plot."));
 
                     } else {
 
                         //If you are not an owner or member send the relevant message.
                         u.player.sendActionBar(
-                                Utils.success("You have left ")
+                                ChatUtils.success("You have left ")
                                         .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
                                                 plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + u.inPlot + " AND is_owner=1;") + "';") + "'s", NamedTextColor.DARK_AQUA))
-                                        .append(Utils.success(" plot.")));
+                                        .append(ChatUtils.success(" plot.")));
 
                     }
                 }
@@ -146,7 +146,7 @@ public class ClaimEnter implements Listener {
 
                 //Show zone leave message.
                 u.player.sendActionBar(
-                        Utils.success("You have left zone ")
+                        ChatUtils.success("You have left zone ")
                                 .append(Component.text(u.inZone, NamedTextColor.DARK_AQUA)));
 
             }
@@ -173,9 +173,9 @@ public class ClaimEnter implements Listener {
             if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + ";")) {
 
                 u.player.sendActionBar(
-                        Utils.success("You have entered plot ")
+                        ChatUtils.success("You have entered plot ")
                                 .append(Component.text(u.inPlot, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(", it is unclaimed.")));
+                                .append(ChatUtils.success(", it is unclaimed.")));
 
             } else {
 
@@ -184,27 +184,27 @@ public class ClaimEnter implements Listener {
 
                     plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.sendActionBar(
-                            Utils.success("You have entered plot ")
+                            ChatUtils.success("You have entered plot ")
                                     .append(Component.text(u.inPlot, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(", you are the owner of this plot.")));
+                                    .append(ChatUtils.success(", you are the owner of this plot.")));
 
                     //If you are a member of the plot send the relevant message.
                 } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=0;")) {
 
                     plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.sendActionBar(
-                            Utils.success("You have entered plot ")
+                            ChatUtils.success("You have entered plot ")
                                     .append(Component.text(u.inPlot, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(", you are a member of this plot.")));
+                                    .append(ChatUtils.success(", you are a member of this plot.")));
 
                 } else {
 
                     //If you are not an owner or member send the relevant message.
                     u.player.sendActionBar(
-                            Utils.success("You have entered ")
+                            ChatUtils.success("You have entered ")
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid = '" +
                                             plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;") + "';") + "'s", NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" plot.")));
+                                    .append(ChatUtils.success(" plot.")));
 
                 }
             }
@@ -234,14 +234,14 @@ public class ClaimEnter implements Listener {
             if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zone + " AND is_public=1;")) {
 
                 u.player.sendActionBar(
-                        Utils.success("You have entered zone ")
+                        ChatUtils.success("You have entered zone ")
                                 .append(Component.text(zone, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(", it is public.")));
+                                .append(ChatUtils.success(", it is public.")));
 
             } else {
 
                 u.player.sendActionBar(
-                        Utils.success("You have entered zone ")
+                        ChatUtils.success("You have entered zone ")
                                 .append(Component.text(zone, NamedTextColor.DARK_AQUA)));
 
             }
