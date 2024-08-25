@@ -68,7 +68,7 @@ public class SubmitEvent {
 
                     //Send message to reviewers that a plot has been submitted.
                     ChatMessage chatMessage = new ChatMessage("reviewer", "server",
-                            ChatUtils.success("A plot has been submitted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+                            ChatUtils.success("A plot has been submitted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
                     );
                     Network.getInstance().getChat().sendSocketMesage(chatMessage);
 

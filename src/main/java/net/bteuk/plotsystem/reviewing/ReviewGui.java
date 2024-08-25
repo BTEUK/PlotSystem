@@ -192,7 +192,7 @@ public class ReviewGui extends Gui {
                         //Send message to plot owner.
                         DirectMessage directMessage = new DirectMessage("global", plotOwner, "server",
                                 ChatUtils.error("Plot %s has been denied, feedback has been provided in the plot menu.", String.valueOf(user.review.plot))
-                                        .append(ChatUtils.error("Click here to view the feedback!")
+                                        .append(ChatUtils.error("\nClick here to view the feedback!")
                                                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/plot feedback %d", user.review.plot)))), true);
                         Network.getInstance().getChat().sendSocketMesage(directMessage);
 
@@ -223,7 +223,7 @@ public class ReviewGui extends Gui {
 
                         // Send message to reviewers that a plot has been reviewed.
                         ChatMessage chatMessage = new ChatMessage("reviewer", "server",
-                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
                         );
                         Network.getInstance().getChat().sendSocketMesage(chatMessage);
 

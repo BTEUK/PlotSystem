@@ -138,16 +138,16 @@ public class DeleteEvent {
             });
         } else if (event[1].equals("zone")) {
 
-            //PlotSQL
+            // PlotSQL
             PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
-            //Convert the string id to int id.
+            // Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
-            //Get location which is the world.
+            // Get location which is the world.
             String location = plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";");
 
-            //Get worlds of plot and save location.
+            // Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
                 LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
@@ -155,7 +155,7 @@ public class DeleteEvent {
             }
 
             World copyWorld = Bukkit.getWorld(save_world);
-            //Location name is the same as the world name.
+            // Location name is the same as the world name.
             World pasteWorld = Bukkit.getWorld(location);
 
             if (copyWorld == null || pasteWorld == null) {
@@ -169,7 +169,7 @@ public class DeleteEvent {
             int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
-            //Get the zone bounds.
+            // Get the zone bounds.
             List<BlockVector2> pasteVector;
             try {
                 pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
@@ -184,14 +184,14 @@ public class DeleteEvent {
                 return;
             }
 
-            //Create the copyVector by transforming the points in the paste vector with the negative transform.
-            //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+            // Create the copyVector by transforming the points in the paste vector with the negative transform.
+            // The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
             List<BlockVector2> copyVector = new ArrayList<>();
             for (BlockVector2 bv : pasteVector) {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
-            //Revert zone to original state.
+            // Revert zone to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 

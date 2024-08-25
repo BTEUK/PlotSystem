@@ -7,7 +7,6 @@ import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordDirectMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
@@ -284,7 +283,7 @@ public class AcceptGui extends Gui {
 
                         //Send message to reviewers that a plot has been reviewed.
                         ChatMessage chatMessage = new ChatMessage("reviewer", "server",
-                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
                         );
                         Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
