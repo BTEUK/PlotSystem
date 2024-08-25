@@ -4,6 +4,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordDirectMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
@@ -151,8 +152,6 @@ public class AcceptGui extends Gui {
 
                 u -> {
 
-                    //Get globalSQL and plotSQL.
-                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
                     PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
                     //Get plot owner.
@@ -220,8 +219,9 @@ public class AcceptGui extends Gui {
                     }
 
                     //Send message to plot owner.
-                    globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
-                            "','&aPlot " + user.review.plot + " has been accepted.');");
+                    DirectMessage directMessage = new DirectMessage("global", plotOwner, "server",
+                            ChatUtils.success("Plot %s has been accepted.", String.valueOf(user.review.plot)), true);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                     //Remove plot members.
                     plotSQL.update("DELETE FROM plot_members WHERE id=" + user.review.plot + ";");

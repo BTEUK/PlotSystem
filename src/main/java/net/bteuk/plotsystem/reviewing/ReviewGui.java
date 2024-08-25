@@ -4,6 +4,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordDirectMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
@@ -19,6 +20,7 @@ import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -188,8 +190,11 @@ public class ReviewGui extends Gui {
                             "," + Time.currentTime() + ");")) {
 
                         //Send message to plot owner.
-                        globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
-                                "','&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
+                        DirectMessage directMessage = new DirectMessage("global", plotOwner, "server",
+                                ChatUtils.error("Plot %s has been denied, feedback has been provided in the plot menu.", String.valueOf(user.review.plot))
+                                        .append(ChatUtils.error("Click here to view the feedback!")
+                                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/plot feedback %d", user.review.plot)))), true);
+                        Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                         //Remove submitted plot entry.
                         plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
