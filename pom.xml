@@ -117,7 +117,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>Network</artifactId>
-            <version>7b655e404f</version>
+            <version>349a3f2749</version>
             <scope>provided</scope>
         </dependency>
 
@@ -158,12 +158,6 @@
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
             <version>4.3.11</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.bteuk.network</groupId>
-            <artifactId>Network</artifactId>
-            <version>1.5.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

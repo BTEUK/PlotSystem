@@ -57,7 +57,7 @@ public class JoinEvent {
 
                 //Send a message to the plot owner.
                 DirectMessage directMessage = new DirectMessage("global", plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + id + " AND is_owner=1;"), "server",
-                        ChatUtils.error("%s has joined your plot %s", Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"), String.valueOf(id)), false);
+                        ChatUtils.success("%s has joined your plot %s", Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"), String.valueOf(id)), false);
                 Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                 // If the player is on the server, update the hologram.

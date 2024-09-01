@@ -131,7 +131,7 @@ public class DeleteEvent {
 
                     //Send message to reviewers that a plot submission has been deleted.
                     ChatMessage chatMessage = new ChatMessage("reviewer", "server",
-                            ChatUtils.success("A submitted plot has been deleted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted plots.", String.valueOf(plot_count))
+                            ChatUtils.success("A submitted plot has been deleted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
                     );
                     Network.getInstance().getChat().sendSocketMesage(chatMessage);
                 }
