@@ -2,9 +2,9 @@ package net.bteuk.plotsystem;
 
 import lombok.Getter;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.commands.ClaimCommand;
 import net.bteuk.plotsystem.commands.PlotSystemCommand;
 import net.bteuk.plotsystem.commands.ToggleOutlines;
@@ -140,7 +140,7 @@ public class PlotSystem extends JavaPlugin {
         //Create gui item
         gui = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta2 = gui.getItemMeta();
-        meta2.displayName(Utils.title("Building Menu"));
+        meta2.displayName(ChatUtils.title("Building Menu"));
         gui.setItemMeta(meta2);
 
         //Outlines, this will be accessed from other classes, so it must have a getter and setter.
@@ -156,7 +156,7 @@ public class PlotSystem extends JavaPlugin {
         //Create selection tool item
         selectionTool = new ItemStack(Material.BLAZE_ROD);
         ItemMeta meta = selectionTool.getItemMeta();
-        meta.displayName(Utils.success("Selection Tool"));
+        meta.displayName(ChatUtils.success("Selection Tool"));
         selectionTool.setItemMeta(meta);
 
         //Listeners

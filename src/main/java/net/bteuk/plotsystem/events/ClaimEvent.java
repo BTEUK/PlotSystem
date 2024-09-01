@@ -1,8 +1,8 @@
 package net.bteuk.plotsystem.events;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.commands.ClaimCommand;
 import net.bteuk.plotsystem.gui.ClaimGui;
@@ -46,7 +46,7 @@ public class ClaimEvent {
             //If the player is not in a plot tell them.
             if (u.inPlot == 0) {
 
-                p.sendMessage(Utils.error("You are not in a plot!"));
+                p.sendMessage(ChatUtils.error("You are not in a plot!"));
                 return;
 
             }
@@ -55,17 +55,17 @@ public class ClaimEvent {
             //If they are the owner or a member tell them.
             if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
-                p.sendMessage(Utils.error("You are already the owner of this plot!"));
+                p.sendMessage(ChatUtils.error("You are already the owner of this plot!"));
                 return;
 
             } else if (u.plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + u.inPlot + " AND uuid='" + u.player.getUniqueId() + "' AND is_owner=0;")) {
 
-                p.sendMessage(Utils.error("You are already a member of this plot!"));
+                p.sendMessage(ChatUtils.error("You are already a member of this plot!"));
                 return;
 
             } else if (u.plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + u.inPlot + " AND status='claimed';")) {
 
-                p.sendMessage(Utils.error("This plot is already claimed!"));
+                p.sendMessage(ChatUtils.error("This plot is already claimed!"));
                 return;
 
             }
@@ -73,7 +73,7 @@ public class ClaimEvent {
             //Check if you do not already have the maximum number of plots.
             if (u.plotSQL.getInt("SELECT count(id) FROM plot_members WHERE uuid='" + uuid + "';") >= PlotSystem.getInstance().getConfig().getInt("plot_maximum")) {
 
-                p.sendMessage(Utils.error("You have reached the maximum number of plots."));
+                p.sendMessage(ChatUtils.error("You have reached the maximum number of plots."));
                 return;
 
             }

@@ -2,6 +2,7 @@ package net.bteuk.plotsystem.events;
 
 import io.papermc.lib.PaperLib;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
@@ -79,7 +80,7 @@ public class TeleportEvent {
                         Location l = WorldGuardFunctions.getCurrentLocation(event[2], world);
                         PaperLib.teleportAsync(u.player, l);
                     } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                        p.sendMessage(Utils.error("You could not be teleported to the plot, please notify an admin."));
+                        p.sendMessage(ChatUtils.error("You could not be teleported to the plot, please notify an admin."));
                         e.printStackTrace();
                     }
                 }
@@ -129,7 +130,7 @@ public class TeleportEvent {
                     Location l = WorldGuardFunctions.getCurrentLocation(zoneName, world);
                     u.player.teleport(l);
                 } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                    p.sendMessage(Utils.error("You could not be teleported to the zone, please notify an admin."));
+                    p.sendMessage(ChatUtils.error("You could not be teleported to the zone, please notify an admin."));
                     e.printStackTrace();
                 }
 

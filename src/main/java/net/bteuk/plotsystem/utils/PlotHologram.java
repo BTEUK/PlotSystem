@@ -89,10 +89,12 @@ public class PlotHologram {
             }
         }
         for (Map.Entry<PlotHologramType, Hologram> entry : holograms.entrySet()) {
-            if (entry.getKey() == showType) {
-                entry.getValue().setShowPlayer(p);
-            } else {
-                entry.getValue().removeShowPlayer(p);
+            if (entry.getValue() != null) {
+                if (entry.getKey() == showType) {
+                    entry.getValue().setShowPlayer(p);
+                } else {
+                    entry.getValue().removeShowPlayer(p);
+                }
             }
         }
     }

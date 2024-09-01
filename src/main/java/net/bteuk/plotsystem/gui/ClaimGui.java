@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.gui;
 
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
@@ -40,16 +41,16 @@ public class ClaimGui extends Gui {
     private void createGui() {
 
         setItem(20, Utils.createItem(PlotValues.sizeMaterial(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")), 1,
-                Utils.title("Plot Size"),
-                Utils.line(PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")))));
+                ChatUtils.title("Plot Size"),
+                ChatUtils.line(PlotValues.sizeName(user.plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")))));
 
         setItem(24, Utils.createItem(PlotValues.difficultyMaterial(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")), 1,
-                Utils.title("Plot Difficulty"),
-                Utils.line(PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")))));
+                ChatUtils.title("Plot Difficulty"),
+                ChatUtils.line(PlotValues.difficultyName(user.plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")))));
 
         setItem(22, Utils.createItem(Material.ENDER_EYE, 1,
-                        Utils.title("View Plot in Google Maps"),
-                        Utils.line("Click to open a link to this plot in google maps.")),
+                        ChatUtils.title("View Plot in Google Maps"),
+                        ChatUtils.line("Click to open a link to this plot in google maps.")),
                 u ->
 
                 {
@@ -87,7 +88,7 @@ public class ClaimGui extends Gui {
                         double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
 
                         //Generate link to google maps.
-                        Component message = Utils.success("Click here to open the plot in Google Maps.");
+                        Component message = ChatUtils.success("Click here to open the plot in Google Maps.");
                         message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
                         u.player.sendMessage(message);
 
@@ -98,8 +99,8 @@ public class ClaimGui extends Gui {
                 });
 
         setItem(4, Utils.createItem(Material.EMERALD, 1,
-                        Utils.title("Claim Plot"),
-                        Utils.line("Click to claim the plot and start building.")),
+                        ChatUtils.title("Claim Plot"),
+                        ChatUtils.line("Click to claim the plot and start building.")),
                 u ->
 
                 {
@@ -120,27 +121,27 @@ public class ClaimGui extends Gui {
                                 try {
                                     if (WorldGuardFunctions.addMember(String.valueOf(plot), eUser.uuid, eUser.player.getWorld())) {
 
-                                        eUser.player.sendMessage(Utils.success("Successfully claimed plot ")
+                                        eUser.player.sendMessage(ChatUtils.success("Successfully claimed plot ")
                                                 .append(Component.text(plot, NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", good luck building.")));
+                                                .append(ChatUtils.success(", good luck building.")));
                                         // Send link to plot in Google Maps.
                                         eUser.player.performCommand("ll");
                                         Bukkit.getLogger().info("Plot " + plot + " successfully claimed by " + eUser.name);
 
                                     } else {
 
-                                        eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
+                                        eUser.player.sendMessage(ChatUtils.error("An error occurred while claiming the plot."));
                                         Bukkit.getLogger().warning("Plot " + plot + " was claimed but they were not added to the worldguard region.");
 
                                     }
                                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                                    eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot, please notify an admin."));
+                                    eUser.player.sendMessage(ChatUtils.error("An error occurred while claiming the plot, please notify an admin."));
                                     e.printStackTrace();
                                 }
 
                             } else {
 
-                                eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
+                                eUser.player.sendMessage(ChatUtils.error("An error occurred while claiming the plot."));
                                 Bukkit.getLogger().warning("Plot owner insert failed for plot " + plot);
 
                                 //Attempt to set plot back to unclaimed
@@ -157,13 +158,13 @@ public class ClaimGui extends Gui {
 
                         } else {
 
-                            eUser.player.sendMessage(Utils.error("An error occurred while claiming the plot."));
+                            eUser.player.sendMessage(ChatUtils.error("An error occurred while claiming the plot."));
                             Bukkit.getLogger().warning("Status could not be changed to claimed for plot " + plot);
 
                         }
                     } else {
 
-                        eUser.player.sendMessage(Utils.error("This plot is already claimed, it could be due to clicking the claim button multiple times."));
+                        eUser.player.sendMessage(ChatUtils.error("This plot is already claimed, it could be due to clicking the claim button multiple times."));
 
                     }
 

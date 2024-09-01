@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.gui;
 
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.User;
@@ -28,8 +29,8 @@ public class CreateZoneGui extends Gui {
 
         //Create zone.
         setItem(13, Utils.createItem(Material.DIAMOND, 1,
-                        Utils.title("Create Zone"),
-                        Utils.line("Click create a new zone with the settings selected.")),
+                        ChatUtils.title("Create Zone"),
+                        ChatUtils.line("Click create a new zone with the settings selected.")),
                 u ->
 
                 {
@@ -48,10 +49,10 @@ public class CreateZoneGui extends Gui {
         if (user.selectionTool.is_public) {
 
             setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
-                            Utils.title("Set the zone to private."),
-                            Utils.line("Click to make the zone private."),
-                            Utils.line("A private zone means the owner has"),
-                            Utils.line("to invite members for them to build.")),
+                            ChatUtils.title("Set the zone to private."),
+                            ChatUtils.line("Click to make the zone private."),
+                            ChatUtils.line("A private zone means the owner has"),
+                            ChatUtils.line("to invite members for them to build.")),
                     u ->
 
                     {
@@ -68,10 +69,10 @@ public class CreateZoneGui extends Gui {
         } else {
 
             setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
-                            Utils.title("Set the zone to public."),
-                            Utils.line("Click to make the zone public."),
-                            Utils.line("A public zone allows JrBuilder+"),
-                            Utils.line("to join without having to request.")),
+                            ChatUtils.title("Set the zone to public."),
+                            ChatUtils.line("Click to make the zone public."),
+                            ChatUtils.line("A public zone allows JrBuilder+"),
+                            ChatUtils.line("to join without having to request.")),
                     u ->
 
                     {
@@ -89,10 +90,10 @@ public class CreateZoneGui extends Gui {
 
         //Set expiration time.
         setItem(15, Utils.createItem(Material.CLOCK, user.selectionTool.hours,
-                        Utils.title("Set the zone expiration time."),
-                        Utils.line("Click to cycle through expiration times."),
-                        Utils.line("The current time is " + user.selectionTool.hours + " hours."),
-                        Utils.line("The expiration time can be extended later.")),
+                        ChatUtils.title("Set the zone expiration time."),
+                        ChatUtils.line("Click to cycle through expiration times."),
+                        ChatUtils.line("The current time is " + user.selectionTool.hours + " hours."),
+                        ChatUtils.line("The expiration time can be extended later.")),
                 u ->
 
                 {

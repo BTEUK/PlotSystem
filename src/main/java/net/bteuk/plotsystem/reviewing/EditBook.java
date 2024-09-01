@@ -1,7 +1,7 @@
 package net.bteuk.plotsystem.reviewing;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -41,7 +41,7 @@ public class EditBook implements Listener {
 			review.reviewGui.open(Network.getInstance().getUser(e.getPlayer()));
 		}
 		
-		if (Objects.equals(e.getNewBookMeta().displayName(), Utils.success("Feedback"))) {
+		if (Objects.equals(e.getNewBookMeta().displayName(), ChatUtils.success("Feedback"))) {
 
 			//Save editing of book.
 			review.bookMeta = e.getNewBookMeta();

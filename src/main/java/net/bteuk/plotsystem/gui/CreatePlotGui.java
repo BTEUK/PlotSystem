@@ -1,6 +1,7 @@
 package net.bteuk.plotsystem.gui;
 
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.PlotValues;
@@ -29,8 +30,8 @@ public class CreatePlotGui extends Gui {
 
         //Choose plot size.
         setItem(11, Utils.createItem(PlotValues.sizeMaterial(user.selectionTool.size), 1,
-                        Utils.title(PlotValues.sizeName(user.selectionTool.size)),
-                        Utils.line("Click to cycle through sizes.")),
+                        ChatUtils.title(PlotValues.sizeName(user.selectionTool.size)),
+                        ChatUtils.line("Click to cycle through sizes.")),
                 u ->
 
                 {
@@ -58,8 +59,8 @@ public class CreatePlotGui extends Gui {
 
         //Choose plot difficulty.
         setItem(15, Utils.createItem(PlotValues.difficultyMaterial(user.selectionTool.difficulty), 1,
-                        Utils.title(PlotValues.difficultyName(user.selectionTool.difficulty)),
-                        Utils.line("Click to cycle through different difficulties.")),
+                        ChatUtils.title(PlotValues.difficultyName(user.selectionTool.difficulty)),
+                        ChatUtils.line("Click to cycle through different difficulties.")),
                 u ->
 
                 {
@@ -86,8 +87,8 @@ public class CreatePlotGui extends Gui {
 
         //Create plot.
         setItem(13, Utils.createItem(Material.DIAMOND, 1,
-                        Utils.title("Create Plot"),
-                        Utils.line("Click create a new plot with the settings selected.")),
+                        ChatUtils.title("Create Plot"),
+                        ChatUtils.line("Click create a new plot with the settings selected.")),
                 u ->
 
                 {

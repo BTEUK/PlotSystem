@@ -1,13 +1,13 @@
 package net.bteuk.plotsystem.events;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
 import net.bteuk.plotsystem.exceptions.RegionNotFoundException;
 import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -41,8 +41,10 @@ public class LeaveEvent {
             try {
                 WorldGuardFunctions.removeMember(event[2], uuid, world);
             } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while removing you from the plot, please contact an admin.');");
-                e.printStackTrace();
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("An error occurred while removing you from the plot, please contact an administrator."), false);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
+                return;
             }
 
             //Remove members from plot in database.
@@ -51,21 +53,15 @@ public class LeaveEvent {
             //Send message to plot owner.
             Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-            //If the player is on this server send them a message.
             if (p != null) {
-
                 // Update the hologram since they are on the server.
                 PlotHelper.updatePlotHologram(id);
-
-                p.sendMessage(Utils.success("You have left Plot ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA)));
-
-            } else {
-
-                //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cYou have left plot &4" + id + "');");
-
             }
+
+            DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                    ChatUtils.success("You have left Plot %s", String.valueOf(id)), true);
+            Network.getInstance().getChat().sendSocketMesage(directMessage);
+
         } else if (event[1].equals("zone")) {
 
             //Convert the string id to int id.
@@ -87,28 +83,18 @@ public class LeaveEvent {
             try {
                 WorldGuardFunctions.removeMember("z" + event[2], uuid, world);
             } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while removing you from the zone, please contact an admin.');");
-                e.printStackTrace();
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("An error occurred while removing you from the zone, please contact an administrator."), false);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
+                return;
             }
 
             //Remove members from zone in database.
             PlotSystem.getInstance().plotSQL.update("DELETE FROM zone_members WHERE id=" + id + " AND uuid='" + uuid + "';");
 
-            //Send message to plot owner.
-            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
-
-            //If the player is on this server send them a message.
-            if (p != null) {
-
-                p.sendMessage(Utils.success("You have left Zone ")
-                        .append(Component.text(id, NamedTextColor.DARK_AQUA)));
-
-            } else {
-
-                //Add the message to the database so it can be sent wherever they are currently.
-                PlotSystem.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have left Zone &3" + id + "');");
-
-            }
+            DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                    ChatUtils.success("You have left Zone %s", String.valueOf(id)), true);
+            Network.getInstance().getChat().sendSocketMesage(directMessage);
         }
     }
 }

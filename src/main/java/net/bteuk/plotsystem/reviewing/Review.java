@@ -1,9 +1,9 @@
 package net.bteuk.plotsystem.reviewing;
 
 import lombok.Getter;
-import net.bteuk.network.utils.Utils;
-import net.bteuk.plotsystem.utils.User;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
+import net.bteuk.plotsystem.utils.User;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +54,7 @@ public class Review {
         //Feedback book details.
         book = new ItemStack(Material.WRITABLE_BOOK);
         bookMeta = (BookMeta) book.getItemMeta();
-        bookMeta.displayName(Utils.success("Feedback"));
+        bookMeta.displayName(ChatUtils.success("Feedback"));
         book.setItemMeta(bookMeta);
         editBook = new EditBook(PlotSystem.getInstance(), this);
 

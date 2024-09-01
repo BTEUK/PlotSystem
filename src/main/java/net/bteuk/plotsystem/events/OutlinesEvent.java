@@ -1,6 +1,6 @@
 package net.bteuk.plotsystem.events;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.User;
 import org.bukkit.Bukkit;
@@ -35,7 +35,7 @@ public class OutlinesEvent {
                 // Add the outlines back
                 PlotSystem.getInstance().getOutlines().addPlotOutlineForPlayer(event[2], p);
                 // Notify player.
-                p.sendMessage(Utils.success("Enabled outlines for plot " + event[2]));
+                p.sendMessage(ChatUtils.success("Enabled outlines for plot " + event[2]));
             } else {
                 // Disable:
                 // Add the plot to the list of ignored outlines.
@@ -43,7 +43,7 @@ public class OutlinesEvent {
                 // Remove the outline.
                 PlotSystem.getInstance().getOutlines().removePlotOutlineForPlayer(event[2], p);
                 // Notify player.
-                p.sendMessage(Utils.success("Disabled outlines for plot " + event[2]));
+                p.sendMessage(ChatUtils.success("Disabled outlines for plot " + event[2]));
             }
         }
     }

@@ -2,8 +2,8 @@ package net.bteuk.plotsystem.events;
 
 import io.papermc.lib.PaperLib;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
@@ -50,7 +50,7 @@ public class ReviewEvent {
 
             //If the user is already reviewing, prevent this was happening.
             if (u.review != null) {
-                u.player.sendMessage(Utils.error("You are already reviewing a plot, please complete this one first!"));
+                u.player.sendMessage(ChatUtils.error("You are already reviewing a plot, please complete this one first!"));
                 return;
             }
 
@@ -95,7 +95,7 @@ public class ReviewEvent {
 
             } else {
 
-                p.sendMessage(Utils.error("The plot is no longer submitted."));
+                p.sendMessage(ChatUtils.error("The plot is no longer submitted."));
 
             }
         }

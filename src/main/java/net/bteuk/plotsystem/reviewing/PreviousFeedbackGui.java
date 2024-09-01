@@ -2,6 +2,7 @@ package net.bteuk.plotsystem.reviewing;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
@@ -65,9 +66,9 @@ public class PreviousFeedbackGui extends Gui {
             //Add player to gui.
             int finalI = i;
             setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
-                            Utils.title("Feedback for submission " + i),
-                            Utils.line("Click to view feedback for this submission."),
-                            Utils.line("Reviewed by ")
+                            ChatUtils.title("Feedback for submission " + i),
+                            ChatUtils.line("Click to view feedback for this submission."),
+                            ChatUtils.line("Reviewed by ")
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                             + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"), NamedTextColor.GRAY))),
 
@@ -79,8 +80,8 @@ public class PreviousFeedbackGui extends Gui {
                         u.player.closeInventory();
 
                         //Create book.
-                        Component title = Utils.title("Plot " + plotID + " Attempt " + finalI);
-                        Component author = Utils.line(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                        Component title = ChatUtils.title("Plot " + plotID + " Attempt " + finalI);
+                        Component author = ChatUtils.line(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                                 plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + "';"));
 
                         //Get pages of the book.
@@ -113,8 +114,8 @@ public class PreviousFeedbackGui extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.title("Return"),
-                        Utils.line("Go back to the review menu.")),
+                        ChatUtils.title("Return"),
+                        ChatUtils.line("Go back to the review menu.")),
 
                 u -> {
 

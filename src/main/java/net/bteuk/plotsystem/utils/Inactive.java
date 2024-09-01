@@ -2,6 +2,8 @@ package net.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.enums.PlotStatus;
@@ -102,8 +104,9 @@ public class Inactive {
                 //Set plot status to unclaimed.
                 PlotHelper.updatePlotStatus(plot, PlotStatus.UNCLAIMED);
 
-                //Add message for the plot owner to the database to notify them that their plot was removed.
-                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + plot + " &chas been removed due to inactivity!');");
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("Plot %s has been removed due to inactivity!", String.valueOf(plot)), true);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                 //Log plot removal to console.
                 PlotSystem.LOGGER.info("Plot " + plot + " removed due to inactivity!");
@@ -192,8 +195,9 @@ public class Inactive {
                     //Set the zone status to closed.
                     plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
-                    //Add message for the plot owner to the database to notify them that their zone was closed.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aZone &3" + zone + " &ahas expired, its content has been saved.');");
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.error("Zone %s has expired, its content has been saved.", String.valueOf(zone)), true);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                     //Log plot removal to console.
                     PlotSystem.LOGGER.info("Zone " + zone + " has expired.");

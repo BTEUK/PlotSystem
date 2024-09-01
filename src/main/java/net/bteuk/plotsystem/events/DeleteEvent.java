@@ -2,8 +2,10 @@ package net.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
@@ -68,8 +70,9 @@ public class DeleteEvent {
             try {
                 pasteVector = WorldGuardFunctions.getPoints(String.valueOf(id), pasteWorld);
             } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
-                e.printStackTrace();
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("An error occurred while deleting the plot, please contact an administrator."), false);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
                 return;
             }
 
@@ -88,8 +91,9 @@ public class DeleteEvent {
                 try {
                     WorldGuardFunctions.clearMembers(event[2], pasteWorld);
                 } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the plot, please contact an admin.');");
-                    e.printStackTrace();
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.error("An error occurred while deleting the plot, please contact an administrator."), false);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
                     return;
                 }
 
@@ -109,15 +113,15 @@ public class DeleteEvent {
                 //If the player is on this server send them a message.
                 if (p != null) {
 
-                    p.sendMessage(Utils.success("Plot ")
+                    p.sendMessage(ChatUtils.success("Plot ")
                             .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" deleted")));
+                            .append(ChatUtils.success(" deleted")));
 
                 } else {
 
-                    //Add the message to the database so it can be sent wherever they are currently.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cPlot &4" + id + "&cdeleted');");
-
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.error("Plot %s deleted", String.valueOf(id)), true);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
                 }
 
                 // If the plot was submitted, before deleting, send a message to reviewers letting them know it's no longer submitted.
@@ -125,30 +129,25 @@ public class DeleteEvent {
                     //Get number of submitted plots.
                     int plot_count = PlotSystem.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                    //Send message to reviewers that a plot submission has been retracted.
-                    if (plot_count == 1) {
-                        Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been deleted, there is ")
-                                .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" submitted plot.")), "uknet:reviewer");
-                    } else {
-                        Network.getInstance().chat.broadcastMessage(Utils.success("A submitted plot has been deleted, there are ")
-                                .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" submitted plots.")), "uknet:reviewer");
-                    }
+                    //Send message to reviewers that a plot submission has been deleted.
+                    ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+                            ChatUtils.success("A submitted plot has been deleted, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
+                    );
+                    Network.getInstance().getChat().sendSocketMesage(chatMessage);
                 }
             });
         } else if (event[1].equals("zone")) {
 
-            //PlotSQL
+            // PlotSQL
             PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
-            //Convert the string id to int id.
+            // Convert the string id to int id.
             int id = Integer.parseInt(event[2]);
 
-            //Get location which is the world.
+            // Get location which is the world.
             String location = plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";");
 
-            //Get worlds of plot and save location.
+            // Get worlds of plot and save location.
             String save_world = PlotSystem.getInstance().getConfig().getString("save_world");
             if (save_world == null) {
                 LOGGER.warning("Save World is not defined in config, plot delete event has therefore failed!");
@@ -156,7 +155,7 @@ public class DeleteEvent {
             }
 
             World copyWorld = Bukkit.getWorld(save_world);
-            //Location name is the same as the world name.
+            // Location name is the same as the world name.
             World pasteWorld = Bukkit.getWorld(location);
 
             if (copyWorld == null || pasteWorld == null) {
@@ -170,13 +169,14 @@ public class DeleteEvent {
             int minusXTransform = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
             int minusZTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
-            //Get the zone bounds.
+            // Get the zone bounds.
             List<BlockVector2> pasteVector;
             try {
                 pasteVector = WorldGuardFunctions.getPoints("z" + event[2], pasteWorld);
             } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
-                e.printStackTrace();
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("An error occurred while deleting the zone, please contact an administrator."), false);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
                 return;
             }
 
@@ -184,14 +184,14 @@ public class DeleteEvent {
                 return;
             }
 
-            //Create the copyVector by transforming the points in the paste vector with the negative transform.
-            //The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
+            // Create the copyVector by transforming the points in the paste vector with the negative transform.
+            // The negative transform is used because the coordinates by default are transformed from the save to the paste world, which in this case it reversed.
             List<BlockVector2> copyVector = new ArrayList<>();
             for (BlockVector2 bv : pasteVector) {
                 copyVector.add(BlockVector2.at(bv.getX() + minusXTransform, bv.getZ() + minusZTransform));
             }
 
-            //Revert zone to original state.
+            // Revert zone to original state.
             Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
                 WorldEditor.updateWorld(copyVector, pasteVector, copyWorld, pasteWorld);
 
@@ -199,8 +199,9 @@ public class DeleteEvent {
                 try {
                     WorldGuardFunctions.delete("z" + event[2], pasteWorld);
                 } catch (RegionManagerNotFoundException e) {
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while deleting the zone, please contact an admin.');");
-                    e.printStackTrace();
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.error("An error occurred while deleting the zone, please contact an administrator."), false);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
                     return;
                 }
 
@@ -210,22 +211,9 @@ public class DeleteEvent {
                 //Set zone status to closed.
                 plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + id + ";");
 
-                //Send message to plot owner.
-                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
-
-                //If the player is on this server send them a message.
-                if (p != null) {
-
-                    p.sendMessage(Utils.success("Zone ")
-                            .append(Component.text(id, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" deleted")));
-
-                } else {
-
-                    //Add the message to the database so it can be sent wherever they are currently.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&cZone &4" + id + "&cdeleted');");
-
-                }
+                DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                        ChatUtils.error("Zone %s deleted", String.valueOf(id)), true);
+                Network.getInstance().getChat().sendSocketMesage(directMessage);
             });
         }
     }

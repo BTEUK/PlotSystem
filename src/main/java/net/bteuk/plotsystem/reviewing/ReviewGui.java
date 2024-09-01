@@ -3,6 +3,10 @@ package net.bteuk.plotsystem.reviewing;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.DiscordDirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
@@ -16,6 +20,7 @@ import net.bteuk.plotsystem.utils.PlotHelper;
 import net.bteuk.plotsystem.utils.User;
 import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -24,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.bteuk.plotsystem.utils.PlotValues.difficultyMaterial;
@@ -64,13 +70,13 @@ public class ReviewGui extends Gui {
     private void createGui() {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.title("Plot Info"),
-                Utils.line("Plot ID: " + plotID),
-                Utils.line("Plot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';"))));
+                ChatUtils.title("Plot Info"),
+                ChatUtils.line("Plot ID: " + plotID),
+                ChatUtils.line("Plot Owner: " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';"))));
 
         setItem(12, Utils.createItem(Material.GRASS_BLOCK, 1,
-                        Utils.title("Before View"),
-                        Utils.line("Teleport to the plot before it was claimed.")),
+                        ChatUtils.title("Before View"),
+                        ChatUtils.line("Teleport to the plot before it was claimed.")),
                 u -> {
 
                     //Teleport to plot in original state.
@@ -80,7 +86,7 @@ public class ReviewGui extends Gui {
                         Location l = WorldGuardFunctions.getBeforeLocation(String.valueOf(user.review.plot), world);
                         u.player.teleport(l);
                     } catch (RegionManagerNotFoundException | RegionNotFoundException | WorldNotFoundException e) {
-                        u.player.sendMessage(Utils.error("Unable to teleport you to the before view of this plot, please contact an admin."));
+                        u.player.sendMessage(ChatUtils.error("Unable to teleport you to the before view of this plot, please contact an admin."));
                         e.printStackTrace();
                     }
 
@@ -106,8 +112,8 @@ public class ReviewGui extends Gui {
                 });
 
         setItem(14, Utils.createItem(Material.STONE_BRICKS, 1,
-                        Utils.title("Current View"),
-                        Utils.line("Teleport to the current view of the plot.")),
+                        ChatUtils.title("Current View"),
+                        ChatUtils.line("Teleport to the current view of the plot.")),
                 u -> {
 
                     //Teleport to plot in current state.
@@ -117,15 +123,15 @@ public class ReviewGui extends Gui {
                         Location l = WorldGuardFunctions.getCurrentLocation(String.valueOf(user.review.plot), world);
                         u.player.teleport(l);
                     } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                        u.player.sendMessage(Utils.error("Unable to teleport you to the this plot, please contact an admin."));
+                        u.player.sendMessage(ChatUtils.error("Unable to teleport you to the this plot, please contact an admin."));
                         e.printStackTrace();
                     }
 
                 });
 
         setItem(10, Utils.createItem(Material.LIME_CONCRETE, 1,
-                        Utils.title("Accept Plot"),
-                        Utils.line("Opens the accept gui.")),
+                        ChatUtils.title("Accept Plot"),
+                        ChatUtils.line("Opens the accept gui.")),
                 u -> {
 
                     //Open accept gui, create a new one if it is null.
@@ -142,8 +148,8 @@ public class ReviewGui extends Gui {
                 });
 
         setItem(16, Utils.createItem(Material.RED_CONCRETE, 1,
-                        Utils.title("Deny Plot"),
-                        Utils.line("Deny the plot and return it to the plot owner.")),
+                        ChatUtils.title("Deny Plot"),
+                        ChatUtils.line("Deny the plot and return it to the plot owner.")),
                 u -> {
 
                     //Close inventory.
@@ -152,13 +158,14 @@ public class ReviewGui extends Gui {
                     //Check if the feedback book has been edited.
                     if (!user.review.editBook.isEdited) {
 
-                        u.player.sendMessage(Utils.error("You must provide feedback to deny the plot."));
+                        u.player.sendMessage(ChatUtils.error("You must provide feedback to deny the plot."));
                         return;
 
                     }
 
                     //Get the feedback written in the book.
                     List<Component> book = user.review.bookMeta.pages();
+                    List<String> pages = new ArrayList<>();
                     //Create new book id.
                     int bookID = 1 + plotSQL.getInt("SELECT id FROM book_data ORDER BY id DESC;");
 
@@ -166,9 +173,11 @@ public class ReviewGui extends Gui {
                     int i = 1;
 
                     for (Component text : book) {
+                        String page = PlainTextComponentSerializer.plainText().serialize(text);
+                        pages.add(page);
                         //Add escape characters to '
-                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + PlainTextComponentSerializer.plainText().serialize(text).replace("'", "\\'") + "');"))) {
-                            u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
+                        if (!(plotSQL.update("INSERT INTO book_data(id,page,contents) VALUES(" + bookID + "," + i + ",'" + page.replace("'", "\\'") + "');"))) {
+                            u.player.sendMessage(ChatUtils.error("An error occurred, please notify an admin."));
                             return;
                         }
                         i++;
@@ -181,8 +190,11 @@ public class ReviewGui extends Gui {
                             "," + Time.currentTime() + ");")) {
 
                         //Send message to plot owner.
-                        globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + plotOwner +
-                                "','&cPlot " + user.review.plot + " has been denied, feedback has been provided in the plot menu.');");
+                        DirectMessage directMessage = new DirectMessage("global", plotOwner, "server",
+                                ChatUtils.error("Plot %s has been denied, feedback has been provided in the plot menu.", String.valueOf(user.review.plot))
+                                        .append(ChatUtils.error("\nClick here to view the feedback!")
+                                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/plot feedback %d", user.review.plot)))), true);
+                        Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                         //Remove submitted plot entry.
                         plotSQL.update("DELETE FROM plot_submissions WHERE id=" + user.review.plot + ";");
@@ -197,42 +209,36 @@ public class ReviewGui extends Gui {
                         try {
                             WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
                         } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
-
-                            u.player.sendMessage(Utils.error("Unable to remove you from the plot, please notify an admin."));
+                            u.player.sendMessage(ChatUtils.error("Unable to remove you from the plot, please notify an admin."));
                             e.printStackTrace();
-
                         }
 
                         //Send feedback.
-                        u.player.sendMessage(Utils.success("Plot ")
+                        u.player.sendMessage(ChatUtils.success("Plot ")
                                 .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" has been denied.")));
+                                .append(ChatUtils.success(" has been denied.")));
 
                         //Get number of submitted plots.
                         int plot_count = plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
 
-                        //Send message to reviewers that a plot has been reviewed.
-                        if (plot_count == 1) {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there is ")
-                                    .append(Component.text(1, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" submitted plot.")), "uknet:reviewer");
-                        } else {
-                            Network.getInstance().chat.broadcastMessage(Utils.success("A plot has been reviewed, there are ")
-                                    .append(Component.text(plot_count, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" submitted plots.")), "uknet:reviewer");
-                        }
+                        // Send message to reviewers that a plot has been reviewed.
+                        ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+                                ChatUtils.success("A plot has been reviewed, there " + (plot_count == 1 ? "is" : "are") + " %s submitted " + (plot_count == 1 ? "plot" : "plots") + ".", String.valueOf(plot_count))
+                        );
+                        Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
-                        //Send a message to the plot owner letting them know their plot has been denied.
-                        //Compose the message to send, it is comma-separated.
-                        Network.getInstance().chat.broadcastMessage(Component.text(plotOwner + "," + "denied" + "," + user.review.plot), "uknet:discord_dm");
+                        // Send a message to the plot owner letting them know their plot has been denied.
+                        String discordMessage = "Plot " + user.review.plot + " has been denied.\nFeedback: " + String.join(" ", pages);
+                        DiscordDirectMessage discordDirectMessage = new DiscordDirectMessage(plotOwner, discordMessage);
+                        Network.getInstance().getChat().sendSocketMesage(discordDirectMessage);
 
-                        //Close review.
+                        // Close review.
                         u.player.closeInventory();
                         user.review.closeReview();
 
                     } else {
 
-                        u.player.sendMessage(Utils.error("An error occurred, please notify an admin."));
+                        u.player.sendMessage(ChatUtils.error("An error occurred, please notify an admin."));
 
                     }
                 });
@@ -241,10 +247,10 @@ public class ReviewGui extends Gui {
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE uuid='" + plotOwner + "' AND id=" + plotID + ";")) {
 
             setItem(18, Utils.createItem(Material.LECTERN, 1,
-                            Utils.title("Previous Feedback"),
-                            Utils.line("Click to review previous"),
-                            Utils.line("feedback this player received"),
-                            Utils.line("while building this plot.")),
+                            ChatUtils.title("Previous Feedback"),
+                            ChatUtils.line("Click to review previous"),
+                            ChatUtils.line("feedback this player received"),
+                            ChatUtils.line("while building this plot.")),
                     u -> {
 
                         //Open the previous feedback menu.
@@ -260,8 +266,8 @@ public class ReviewGui extends Gui {
 
         //Cancel review.
         setItem(26, Utils.createItem(Material.BARRIER, 1,
-                        Utils.title("Cancel Review"),
-                        Utils.line("Stop reviewing this plot.")),
+                        ChatUtils.title("Cancel Review"),
+                        ChatUtils.line("Stop reviewing this plot.")),
                 u -> {
 
                     //Remove the reviewer from the plot.
@@ -269,7 +275,7 @@ public class ReviewGui extends Gui {
                         WorldGuardFunctions.removeMember(String.valueOf(user.review.plot), u.player.getUniqueId().toString(), world);
                     } catch (RegionNotFoundException | RegionManagerNotFoundException e) {
 
-                        u.player.sendMessage(Utils.error("Unable to remove you from the plot, please notify an admin."));
+                        u.player.sendMessage(ChatUtils.error("Unable to remove you from the plot, please notify an admin."));
                         e.printStackTrace();
 
                     }
@@ -279,7 +285,7 @@ public class ReviewGui extends Gui {
                     PlotHelper.updatePlotStatus(user.review.plot, PlotStatus.SUBMITTED);
 
                     //Send feedback.
-                    u.player.sendMessage(Utils.success("Cancelled reviewing of plot ")
+                    u.player.sendMessage(ChatUtils.success("Cancelled reviewing of plot ")
                             .append(Component.text(user.review.plot, NamedTextColor.DARK_AQUA)));
 
                     //Close review.

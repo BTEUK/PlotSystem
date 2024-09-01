@@ -1,9 +1,11 @@
 package net.bteuk.plotsystem.listeners;
 
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
+import net.bteuk.plotsystem.utils.User;
+import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -13,9 +15,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import net.bteuk.plotsystem.utils.User;
-import net.bteuk.plotsystem.utils.plugins.WorldGuardFunctions;
 
 import java.util.Objects;
 
@@ -50,7 +49,7 @@ public class PlayerInteract implements Listener {
             if (!u.player.hasPermission("uknet.plots.select")) {
 
                 e.setCancelled(true);
-                u.player.sendMessage(Utils.error("You do not have permission to use this tool!"));
+                u.player.sendMessage(ChatUtils.error("You do not have permission to use this tool!"));
                 return;
 
             }
@@ -63,7 +62,7 @@ public class PlayerInteract implements Listener {
                 //Check if they are in a world where plots are allowed to be created.
                 if (!plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + Objects.requireNonNull(e.getClickedBlock()).getWorld().getName() + "';")) {
 
-                    u.player.sendMessage(Utils.error("You can't create plots in this world!"));
+                    u.player.sendMessage(ChatUtils.error("You can't create plots in this world!"));
                     return;
 
                 }
@@ -72,21 +71,21 @@ public class PlayerInteract implements Listener {
                 try {
                     if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                        u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        u.player.sendMessage(ChatUtils.error("This point is in another plot!"));
                         return;
 
                     }
                 } catch (RegionManagerNotFoundException ex) {
-                    u.player.sendMessage(Utils.error("An error occurred while processing the left click action, please contact an admin."));
+                    u.player.sendMessage(ChatUtils.error("An error occurred while processing the left click action, please contact an admin."));
                     ex.printStackTrace();
                     return;
                 }
 
                 //Passed the checks, start a new selection at the clicked block.
                 u.selectionTool.startSelection(e.getClickedBlock(), e.getClickedBlock().getWorld().getName());
-                u.player.sendMessage(Utils.success("Started a new selection at ")
+                u.player.sendMessage(ChatUtils.success("Started a new selection at ")
                         .append(Component.text(e.getClickedBlock().getX(), NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(", "))
+                        .append(ChatUtils.success(", "))
                         .append(Component.text(e.getClickedBlock().getZ(), NamedTextColor.DARK_AQUA)));
 
                 //If the player right clicks then add a point to the existing selection.
@@ -97,7 +96,7 @@ public class PlayerInteract implements Listener {
                 //If the player hasn't selected their first point cancel.
                 if (u.selectionTool.size() == 0) {
 
-                    u.player.sendMessage(Utils.error("You must first start your selection by left-clicking."));
+                    u.player.sendMessage(ChatUtils.error("You must first start your selection by left-clicking."));
                     return;
 
                 }
@@ -105,7 +104,7 @@ public class PlayerInteract implements Listener {
                 //Check if they are making their plot in the same world as their first point.
                 if (!Objects.requireNonNull(e.getClickedBlock()).getWorld().equals(u.selectionTool.world())) {
 
-                    u.player.sendMessage(Utils.error("You already started a selection in a different world, please create a new selection first."));
+                    u.player.sendMessage(ChatUtils.error("You already started a selection in a different world, please create a new selection first."));
                     return;
 
                 }
@@ -114,12 +113,12 @@ public class PlayerInteract implements Listener {
                 try {
                     if (WorldGuardFunctions.inRegion(e.getClickedBlock())) {
 
-                        u.player.sendMessage(Utils.error("This point is in another plot!"));
+                        u.player.sendMessage(ChatUtils.error("This point is in another plot!"));
                         return;
 
                     }
                 } catch (RegionManagerNotFoundException ex) {
-                    u.player.sendMessage(Utils.error("An error occurred while processing the right click action, please contact an admin."));
+                    u.player.sendMessage(ChatUtils.error("An error occurred while processing the right click action, please contact an admin."));
                     ex.printStackTrace();
                     return;
                 }
@@ -130,9 +129,9 @@ public class PlayerInteract implements Listener {
 
                 }
 
-                u.player.sendMessage(Utils.success("Added point at ")
+                u.player.sendMessage(ChatUtils.success("Added point at ")
                         .append(Component.text(e.getClickedBlock().getX(), NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(", "))
+                        .append(ChatUtils.success(", "))
                         .append(Component.text(e.getClickedBlock().getZ(), NamedTextColor.DARK_AQUA)));
 
             }

@@ -1,9 +1,9 @@
 package net.bteuk.plotsystem.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.plugins.WGCreatePlot;
 import net.kyori.adventure.text.Component;
@@ -147,7 +147,7 @@ public class SelectionTool extends WGCreatePlot {
         //Send an error message to the player.
         if (bv2.distance(vector.get(0)) > 500) {
 
-            u.player.sendMessage(Utils.error("This point is over 500 blocks from the first point, please make the selection smaller."));
+            u.player.sendMessage(ChatUtils.error("This point is over 500 blocks from the first point, please make the selection smaller."));
             return false;
 
         } else {
@@ -184,14 +184,14 @@ public class SelectionTool extends WGCreatePlot {
             i.setItem(i.first(PlotSystem.selectionTool), i.getItemInMainHand());
             i.setItemInMainHand(PlotSystem.selectionTool);
 
-            u.player.sendMessage(Utils.success("Switched to selection tool from inventory."));
+            u.player.sendMessage(ChatUtils.success("Switched to selection tool from inventory."));
 
         } else {
 
             //If they don't have the selection tool already set it in their main hand.
             i.setItemInMainHand(PlotSystem.selectionTool);
 
-            u.player.sendMessage(Utils.success("Set selection tool to main hand."));
+            u.player.sendMessage(ChatUtils.success("Set selection tool to main hand."));
 
         }
     }
@@ -272,11 +272,11 @@ public class SelectionTool extends WGCreatePlot {
             }
 
             //Send feedback.
-            u.player.sendMessage(Utils.success("Plot created with ID ")
+            u.player.sendMessage(ChatUtils.success("Plot created with ID ")
                     .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", difficulty "))
+                    .append(ChatUtils.success(", difficulty "))
                     .append(Component.text(PlotValues.difficultyName(difficulty), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" and size "))
+                    .append(ChatUtils.success(" and size "))
                     .append(Component.text(PlotValues.sizeName(size), NamedTextColor.DARK_AQUA)));
             PlotSystem.LOGGER.info("Plot created with ID " + plotID +
                     ", difficulty " + PlotValues.difficultyName(difficulty) +
@@ -314,11 +314,11 @@ public class SelectionTool extends WGCreatePlot {
             }
 
             //Send feedback.
-            u.player.sendMessage(Utils.success("Zone created with ID ")
+            u.player.sendMessage(ChatUtils.success("Zone created with ID ")
                     .append(Component.text(plotID, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", it will expire at "))
+                    .append(ChatUtils.success(", it will expire at "))
                     .append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", this can be extended in the Zone Menu.")));
+                    .append(ChatUtils.success(", this can be extended in the Zone Menu.")));
             PlotSystem.LOGGER.info("Zone created with ID " + plotID +
                     ", it will expire at " + Time.getDateTime(expiration));
 

@@ -2,6 +2,8 @@ package net.bteuk.plotsystem.events;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.exceptions.RegionManagerNotFoundException;
@@ -58,8 +60,9 @@ public class CloseEvent {
                 try {
                     copyVector = WorldGuardFunctions.getPoints("z" + zone, copyWorld);
                 } catch (RegionManagerNotFoundException | RegionNotFoundException e) {
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
-                    e.printStackTrace();
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.error("An error occurred while closing the zone, please contact an administrator."), false);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
                     return;
                 }
 
@@ -78,8 +81,9 @@ public class CloseEvent {
                     try {
                         WorldGuardFunctions.delete("z" + zone, copyWorld);
                     } catch (RegionManagerNotFoundException e) {
-                        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('&cAn error occurred while closing the zone, please contact an admin.');");
-                        e.printStackTrace();
+                        DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                                ChatUtils.error("An error occurred while closing the zone, please contact an administrator."), false);
+                        Network.getInstance().getChat().sendSocketMesage(directMessage);
                         return;
                     }
 
@@ -89,8 +93,10 @@ public class CloseEvent {
                     //Set the zone status to closed.
                     plotSQL.update("UPDATE zones SET status='closed' WHERE id=" + zone + ";");
 
-                    //Add message for the plot owner to the database to notify them that their zone was closed.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aClosed Zone &3" + zone + "&a, its content has been saved.');");
+                    //Add message for the zone owner to the database to notify them that their zone was closed.
+                    DirectMessage directMessage = new DirectMessage("global", uuid, "server",
+                            ChatUtils.success("Closed zone %s, its content has been saved.", String.valueOf(zone)), true);
+                    Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                     //Log plot removal to console.
                     LOGGER.info("Zone " + zone + " has been closed.");

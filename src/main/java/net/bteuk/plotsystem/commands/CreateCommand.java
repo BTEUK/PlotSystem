@@ -3,10 +3,10 @@ package net.bteuk.plotsystem.commands;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.gui.CreatePlotGui;
 import net.bteuk.plotsystem.gui.CreateZoneGui;
@@ -47,7 +47,7 @@ public class CreateCommand {
 
         if (args.length < 2) {
 
-            sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
+            sender.sendMessage(ChatUtils.error("/plotsystem create [plot, location, zone]"));
             return;
 
         }
@@ -56,7 +56,7 @@ public class CreateCommand {
             case "plot" -> createPlot(sender);
             case "location" -> createLocation(sender, args);
             case "zone" -> createZone(sender);
-            default -> sender.sendMessage(Utils.error("/plotsystem create [plot, location, zone]"));
+            default -> sender.sendMessage(ChatUtils.error("/plotsystem create [plot, location, zone]"));
         }
 
 
@@ -67,7 +67,7 @@ public class CreateCommand {
         //Check if the sender is a player
         if (!(sender instanceof Player)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by players!"));
+            sender.sendMessage(ChatUtils.error("This command can only be used by players!"));
             return;
 
         }
@@ -78,7 +78,7 @@ public class CreateCommand {
         //Check if the user has permission to use this command
         if (!u.player.hasPermission("uknet.plots.create.plot")) {
 
-            u.player.sendMessage(Utils.error("You do not have permission to use this command!"));
+            u.player.sendMessage(ChatUtils.error("You do not have permission to use this command!"));
             return;
 
         }
@@ -86,7 +86,7 @@ public class CreateCommand {
         //Check if the plot is valid, meaning that at least 3 points are selected with the selection tool.
         if (u.selectionTool.size() < 3) {
 
-            u.player.sendMessage(Utils.error("You must select at least 3 points for a valid plot!"));
+            u.player.sendMessage(ChatUtils.error("You must select at least 3 points for a valid plot!"));
             return;
 
         }
@@ -112,7 +112,7 @@ public class CreateCommand {
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.plots.create.location")) {
 
-                p.sendMessage(Utils.error("You do not have permission to use this command!"));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command!"));
                 return;
 
             }
@@ -121,7 +121,7 @@ public class CreateCommand {
         //Check if they have enough args.
         if (args.length < 9) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
+            sender.sendMessage(ChatUtils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
@@ -148,7 +148,7 @@ public class CreateCommand {
 
         } catch (NumberFormatException e) {
 
-            sender.sendMessage(Utils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
+            sender.sendMessage(ChatUtils.error("/plotsystem create location [name] <Xmin> <Ymin> <Zmin> <Xmax> <Ymax> <Zmax>"));
             return;
 
         }
@@ -156,9 +156,9 @@ public class CreateCommand {
         //Check if the location name is unique.
         if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + args[2] + "';")) {
 
-            sender.sendMessage(Utils.error("The location ")
+            sender.sendMessage(ChatUtils.error("The location ")
                     .append(Component.text(args[2], NamedTextColor.DARK_RED))
-                    .append(Utils.error(" already exists.")));
+                    .append(ChatUtils.error(" already exists.")));
             return;
 
         }
@@ -180,7 +180,7 @@ public class CreateCommand {
         String saveWorld = PlotSystem.getInstance().getConfig().getString("save_world");
 
         if (saveWorld == null) {
-            sender.sendMessage(Utils.error("The save world is not set in config."));
+            sender.sendMessage(ChatUtils.error("The save world is not set in config."));
             return;
         }
 
@@ -200,7 +200,7 @@ public class CreateCommand {
         //Copy paste the regions in the save world.
         //Iterate through the regions one-by-one.
         //Run it asynchronously to not freeze the server.
-        sender.sendMessage(Utils.success("Transferring terrain, this may take a while."));
+        sender.sendMessage(ChatUtils.success("Transferring terrain, this may take a while."));
 
 
         //Create atomic boolean to query whether a region can be copied.
@@ -247,7 +247,7 @@ public class CreateCommand {
         }
 
         LOGGER.info("Add segments to list, there are " + regions.size());
-        sender.sendMessage(Utils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
+        sender.sendMessage(ChatUtils.success("Added " + regions.size() + " segments of 256x256 to the list to be copied."));
 
         //Iterate until all regions are done.
         Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
@@ -264,12 +264,12 @@ public class CreateCommand {
                     Bukkit.getScheduler().runTaskAsynchronously(PlotSystem.getInstance(), () -> {
 
                         if (!WorldEditor.largeCopy(regionFormat.minPoint, regionFormat.maxPoint, regionFormat.pasteMinPoint, copy, paste)) {
-                            sender.sendMessage(Utils.error("An error occured while transferring the terrain."));
+                            sender.sendMessage(ChatUtils.error("An error occured while transferring the terrain."));
                         } else {
                             regions.remove(regionFormat);
-                            sender.sendMessage(Utils.success("Segment copied, there are ")
+                            sender.sendMessage(ChatUtils.success("Segment copied, there are ")
                                     .append(Component.text(regions.size(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" remaining.")));
+                                    .append(ChatUtils.success(" remaining.")));
                             LOGGER.info("Segment copied, there are " + regions.size() + " remaining.");
                             isReady.set(true);
                         }
@@ -278,7 +278,7 @@ public class CreateCommand {
                 }
             }
 
-            sender.sendMessage(Utils.success("Terrain transfer has been completed."));
+            sender.sendMessage(ChatUtils.success("Terrain transfer has been completed."));
 
             int coordMin = globalSQL.addCoordinate(new Location(
                     Bukkit.getWorld(args[2]),
@@ -292,7 +292,7 @@ public class CreateCommand {
             if (plotSQL.update("INSERT INTO location_data(name, alias, server, coordMin, coordMax, xTransform, zTransform) VALUES('"
                     + args[2] + "','" + args[2] + "','" + PlotSystem.SERVER_NAME + "'," + coordMin + "," + coordMax + "," + xTransform + "," + zTransform + ");")) {
 
-                sender.sendMessage(Utils.success("Created new location ")
+                sender.sendMessage(ChatUtils.success("Created new location ")
                         .append(Component.text(args[2], NamedTextColor.DARK_AQUA)));
 
                 //Set the status of all effected regions in the region database.
@@ -315,7 +315,7 @@ public class CreateCommand {
 
             } else {
 
-                sender.sendMessage(Utils.error("An error occurred, please check the console for more info."));
+                sender.sendMessage(ChatUtils.error("An error occurred, please check the console for more info."));
                 Bukkit.getLogger().warning("An error occured while adding new location!");
 
             }
@@ -354,7 +354,7 @@ public class CreateCommand {
         //Check if the sender is a player
         if (!(sender instanceof Player)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by players!"));
+            sender.sendMessage(ChatUtils.error("This command can only be used by players!"));
             return;
 
         }
@@ -365,7 +365,7 @@ public class CreateCommand {
         //Check if the user has permission to use this command
         if (!u.player.hasPermission("uknet.plots.create.zone")) {
 
-            u.player.sendMessage(Utils.error("You do not have permission to use this command!"));
+            u.player.sendMessage(ChatUtils.error("You do not have permission to use this command!"));
             return;
 
         }
@@ -373,7 +373,7 @@ public class CreateCommand {
         //Check if the selection is valid, meaning that at least 3 points are selected with the selection tool.
         if (u.selectionTool.size() < 3) {
 
-            u.player.sendMessage(Utils.error("You must select at least 3 points for a valid zone!"));
+            u.player.sendMessage(ChatUtils.error("You must select at least 3 points for a valid zone!"));
             return;
 
         }
@@ -382,12 +382,12 @@ public class CreateCommand {
         //Lastly there is a limit of 21 total zones at a time.
         if (plotSQL.hasRow("SELECT id FROM zone_members WHERE uuid='" + u.player.getUniqueId() + "' AND is_owner=1;")) {
 
-            u.player.sendMessage(Utils.error("You already have a zone, close this before creating a new one."));
+            u.player.sendMessage(ChatUtils.error("You already have a zone, close this before creating a new one."));
             return;
 
         } else if (plotSQL.getInt("SELECT count(id) FROM zones WHERE status='open';") >= 21) {
 
-            u.player.sendMessage(Utils.error("There are currently 21 zones, this is the maximum."));
+            u.player.sendMessage(ChatUtils.error("There are currently 21 zones, this is the maximum."));
             return;
 
         }
