@@ -3,6 +3,7 @@ package net.bteuk.plotsystem.utils;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.DiscordDirectMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Time;
@@ -23,19 +24,45 @@ public class Inactive {
 
     public static void cancelInactivePlots() {
 
-        //Get config.
+        // Get config.
         FileConfiguration config = PlotSystem.getInstance().getConfig();
 
-        //Get all plots claimed by inactive players.
+        // Get all plots claimed by inactive players.
+        int plotInactivityDays = config.getInt("plot_inactive_cancel");
         long time = Time.currentTime();
-        long timeCap = config.getLong("plot_inactive_cancel") * 24 * 60 * 60 * 1000;
+        long timeCap = plotInactivityDays * 24L * 60L * 60L * 1000L;
         long timeDif = time - timeCap;
 
         //Get plot sql.
         PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
-        //Get inactive plots.
-        //Check if they are claimed (not submitted), the last enter time is greater than the inactivity time and the location is on this server.
+        // Get plots that will be deleted for inactive in 1 day.
+        // If the inactivity is less than 3 days don't bother.
+        if (plotInactivityDays >= 3) {
+            // The bound will be 1 hour, since this timer goes all every hour.
+            long timeCapPlus1 = timeDif + (24 * 60 * 60 * 1000);
+            List<Integer> nearlyInactivePlots = plotSQL.getIntList("SELECT pm.id FROM plot_members AS pm INNER JOIN plot_data AS pd ON pd.id=pm.id " +
+                    "WHERE pm.is_owner=1 AND pm.last_enter>=" + timeDif + " AND pm.last_enter<" + timeCapPlus1 + " AND pd.status='claimed' AND pm.inactivity_notice=0 AND pd.location IN (" +
+                    "SELECT ld.name FROM location_data AS ld WHERE ld.server='" + PlotSystem.SERVER_NAME + "');");
+            // Send DM to users that their plot will be deleted in 24 hours.
+            if (nearlyInactivePlots != null) {
+                nearlyInactivePlots.forEach(plotId -> {
+                    //Get the uuid of the plot owner.
+                    String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotId + " AND is_owner=1;");
+
+                    if (uuid != null) {
+                        // Set the inactivity notice to 1 and send a dm.
+                        plotSQL.update("UPDATE plot_members SET inactivity_notice=1 WHERE id=" + plotId + " AND uuid='" + uuid + "';");
+
+                        DiscordDirectMessage discordDirectMessage = new DiscordDirectMessage(uuid, String.format("Plot %d has been inactive for %d days. The plot will be deleted in 24 hours, to prevent this please enter the plot.", plotId, plotInactivityDays - 1));
+                        Network.getInstance().getChat().sendSocketMesage(discordDirectMessage);
+                    }
+                });
+            }
+        }
+
+        // Get inactive plots.
+        // Check if they are claimed (not submitted), the last enter time is greater than the inactivity time and the location is on this server.
         List<Integer> inactivePlots = plotSQL.getIntList("SELECT pm.id FROM plot_members AS pm INNER JOIN plot_data AS pd ON pd.id=pm.id " +
                 "WHERE pm.is_owner=1 AND pm.last_enter<" + timeDif + " AND pd.status='claimed' AND pd.location IN (" +
                 "SELECT ld.name FROM location_data AS ld WHERE ld.server='" + PlotSystem.SERVER_NAME + "');");
@@ -95,7 +122,7 @@ public class Inactive {
                     e.printStackTrace();
                 }
 
-                //Get the uuid of the plot owner.
+                // Get the uuid of the plot owner.
                 String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
 
                 //Remove all members of plot in database.
@@ -106,7 +133,9 @@ public class Inactive {
 
                 DirectMessage directMessage = new DirectMessage("global", uuid, "server",
                         ChatUtils.error("Plot %s has been removed due to inactivity!", String.valueOf(plot)), true);
+                DiscordDirectMessage discordDirectMessage = new DiscordDirectMessage(uuid, String.format("Plot %d has been removed due to inactivity!", plot));
                 Network.getInstance().getChat().sendSocketMesage(directMessage);
+                Network.getInstance().getChat().sendSocketMesage(discordDirectMessage);
 
                 //Log plot removal to console.
                 PlotSystem.LOGGER.info("Plot " + plot + " removed due to inactivity!");

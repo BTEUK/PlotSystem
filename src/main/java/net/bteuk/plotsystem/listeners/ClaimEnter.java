@@ -182,7 +182,7 @@ public class ClaimEnter implements Listener {
                 //If you are the owner of the plot send the relevant message.
                 if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + u.uuid + "' AND is_owner=1;")) {
 
-                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + " WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
+                    plotSQL.update("UPDATE plot_members SET last_enter=" + Time.currentTime() + ",inactivity_notice=0 WHERE id=" + plot + " AND uuid='" + u.uuid + "';");
                     u.player.sendActionBar(
                             ChatUtils.success("You have entered plot ")
                                     .append(Component.text(u.inPlot, NamedTextColor.DARK_AQUA))
