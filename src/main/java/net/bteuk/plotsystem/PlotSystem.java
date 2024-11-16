@@ -1,5 +1,8 @@
 package net.bteuk.plotsystem;
 
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -28,6 +31,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -169,9 +173,15 @@ public class PlotSystem extends JavaPlugin {
         claimEnter = new ClaimEnter(this, plotSQL, globalSQL);
 
         //Commands
-        new PlotSystemCommand(this, globalSQL, plotSQL);
-        new ClaimCommand(this, plotSQL);
-        new ToggleOutlines(this);
+        LifecycleEventManager<Plugin> manager = instance.getLifecycleManager();
+        manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            final Commands commands = event.registrar();
+
+            commands.register("plotsystem", "Deals will all plotsystem related commands.", List.of("ps"), new PlotSystemCommand(globalSQL, plotSQL));
+            commands.register("claim", "Used to claim the plot you're standing in.", List.of("claim"), new ClaimCommand(plotSQL));
+            commands.register("toggleoutlines", "Toggles the visibility of outlines.", new ToggleOutlines(this));
+
+        });
 
         // Get all active plots (unclaimed, claimed, submitted, reviewing) and add holograms.
         List<Integer> active_plots = plotSQL.getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN location_data AS ld ON ld.name=pd.location WHERE pd.status IN ('unclaimed','claimed','submitted','reviewing') AND ld.server='" + SERVER_NAME + "';");

@@ -1,5 +1,6 @@
 package net.bteuk.plotsystem.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
@@ -14,10 +15,8 @@ import net.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -27,24 +26,22 @@ public class PlotSystemCommand extends AbstractCommand {
     private final GlobalSQL globalSQL;
 
 
-    public PlotSystemCommand(PlotSystem instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
-        super(instance, "plotsystem");
-
+    public PlotSystemCommand(GlobalSQL globalSQL, PlotSQL plotSQL) {
         this.plotSQL = plotSQL;
         this.globalSQL = globalSQL;
 
-        command.setTabCompleter(new FixedArgSelector(Arrays.asList("create", "selectiontool", "delete", "help", "setalias", "movemarker"), 0));
+        setTabCompleter(new FixedArgSelector(Arrays.asList("create", "selectiontool", "delete", "help", "setalias", "movemarker"), 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public void execute(CommandSourceStack stack, String[] args) {
 
-        //If there are no arguments return.
+        CommandSender sender = stack.getSender();
+
+        // If there are no arguments return.
         if (args.length == 0) {
-
             sender.sendMessage(ChatUtils.error("/plotsystem help"));
-            return true;
-
+            return;
         }
 
         switch (args[0]) {
@@ -69,11 +66,7 @@ public class PlotSystemCommand extends AbstractCommand {
             }
             case "movemarker" -> moveHologram(sender, args);
             default -> sender.sendMessage(ChatUtils.error("/plotsystem help"));
-
         }
-
-        return true;
-
     }
 
     private void help(CommandSender sender) {

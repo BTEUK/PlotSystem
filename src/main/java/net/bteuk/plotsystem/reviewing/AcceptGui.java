@@ -290,6 +290,7 @@ public class AcceptGui extends Gui {
                         //Get the plot difficulty and player role.
                         int difficulty = plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + user.review.plot + ";");
                         String builderRole = Roles.builderRole(plotOwner).join();
+                        LOGGER.info(String.format("Plot owner %s has builder role %s", plotOwner, builderRole));
 
                         //Calculate the role the player will be promoted to, if any.
                         String newRole = getNewRole(difficulty, builderRole);
@@ -300,18 +301,21 @@ public class AcceptGui extends Gui {
                             Role role = Roles.getRoles().stream().filter(r -> r.getId().equals(newRole)).findFirst().orElse(null);
                             if (role != null) {
                                 discordMessage += "\nYou have been promoted to **" + role.getName() + "**";
+                            } else {
+                                LOGGER.warning(String.format("Role %s could not be found, check the Network roles.yml", newRole));
                             }
+                            // Add the new role and remove the old one.
+                            String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';");
+                            Roles.alterRole(plotOwner, name, newRole, false, true).join();
+                            Roles.alterRole(plotOwner, name, builderRole, true, false).join();
+                        } else {
+                            LOGGER.info("Plot was accepted but no new role was given.");
                         }
                         if (!pages.isEmpty()) {
                             discordMessage += "\nFeedback: " + String.join(" ", pages);
                         }
                         DiscordDirectMessage discordDirectMessage = new DiscordDirectMessage(plotOwner, discordMessage);
                         Network.getInstance().getChat().sendSocketMesage(discordDirectMessage);
-
-                        // Add the new role and remove the old one.
-                        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + plotOwner + "';");
-                        Roles.alterRole(plotOwner, name, newRole, false, true);
-                        Roles.alterRole(plotOwner, name, builderRole, true, false);
 
                         //Close gui and clear review.
                         //Run it sync.
