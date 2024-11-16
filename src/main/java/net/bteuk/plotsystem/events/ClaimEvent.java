@@ -12,8 +12,8 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-import static net.bteuk.network.sql.Tutorials.TUTORIAL_REQUIRED_MESSAGE;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
+import static net.bteuk.plotsystem.commands.ClaimCommand.TUTORIAL_REQUIRED_MESSAGE;
 
 public class ClaimEvent {
 

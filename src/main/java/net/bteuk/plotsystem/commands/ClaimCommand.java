@@ -1,5 +1,6 @@
 package net.bteuk.plotsystem.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -10,37 +11,35 @@ import net.bteuk.plotsystem.gui.ClaimGui;
 import net.bteuk.plotsystem.utils.ParseUtils;
 import net.bteuk.plotsystem.utils.User;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-import static net.bteuk.network.sql.Tutorials.TUTORIAL_REQUIRED_MESSAGE;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
 
 public class ClaimCommand extends AbstractCommand {
+
+    public static final Component TUTORIAL_REQUIRED_MESSAGE =
+            ChatUtils.error("To claim a plot you first complete the starter tutorial.")
+                    .append(ChatUtils.error(" Click here to open the tutorial menu!").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/nav tutorials")));
     private final PlotSQL plotSQL;
 
-    public ClaimCommand(PlotSystem instance, PlotSQL plotSQL) {
-        super(instance, "claim");
+    public ClaimCommand(PlotSQL plotSQL) {
         this.plotSQL = plotSQL;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public void execute(CommandSourceStack stack, String[] args) {
 
-        //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
+        // Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Get the user.
-        User u = PlotSystem.getInstance().getUser(p);
+        User u = PlotSystem.getInstance().getUser(player);
 
         int plot = 0;
         boolean inPlot = false;
@@ -58,7 +57,7 @@ public class ClaimCommand extends AbstractCommand {
             NetworkUser user = Network.getInstance().getUser(u.player);
 
             if (!hasClaimPermission(u, user, plot)) {
-                return true;
+                return;
             }
 
             //Open claim gui.
@@ -66,9 +65,6 @@ public class ClaimCommand extends AbstractCommand {
             u.claimGui.open(user);
 
         }
-
-        return true;
-
     }
 
     public boolean validPlot(User u, int plot, boolean inPlot) {

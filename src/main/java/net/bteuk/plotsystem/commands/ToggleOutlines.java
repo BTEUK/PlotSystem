@@ -1,62 +1,52 @@
 package net.bteuk.plotsystem.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.plotsystem.PlotSystem;
 import net.bteuk.plotsystem.utils.User;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Command to toggle the plot outlines for the current session of the player.
  */
-public class ToggleOutlines implements CommandExecutor {
+public class ToggleOutlines extends AbstractCommand {
 
     private final PlotSystem instance;
 
     public ToggleOutlines(PlotSystem instance) {
-        PluginCommand command = instance.getCommand("toggleoutlines");
-        if (command == null) {
-            instance.getLogger().warning(StringUtils.capitalize("toggleoutlines") + " command not added to plugin.yml, it will therefore not be enabled.");
-        } else {
-            command.setExecutor(this);
-        }
         this.instance = instance;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        // Get the user.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
-            return true;
+        // Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
-        User u = instance.getUser(p);
+        User u = instance.getUser(player);
 
         if (u == null) {
-            p.sendMessage(ChatUtils.error("An error has occurred, please rejoin and contact your server admin."));
-            return true;
+            player.sendMessage(ChatUtils.error("An error has occurred, please rejoin and contact your server admin."));
+            return;
         }
 
         if (u.isDisableOutlines()) {
             // Enable outlines.
             u.setDisableOutlines(false);
             instance.getOutlines().addNearbyOutlines(u);
-            p.sendMessage(ChatUtils.success("Enabled outlines"));
+            player.sendMessage(ChatUtils.success("Enabled outlines"));
         } else {
             // Disable outlines.
             u.setDisableOutlines(true);
-            p.sendMessage(ChatUtils.success("Disabled outlines for this session"));
+            player.sendMessage(ChatUtils.success("Disabled outlines for this session"));
 
             // Remove existing outlines.
-            instance.getOutlines().removeOutlinesForPlayer(p);
+            instance.getOutlines().removeOutlinesForPlayer(player);
         }
-        return true;
     }
 }
